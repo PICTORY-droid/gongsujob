@@ -4,24 +4,15 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
-const JOB_CATEGORIES = [
-  "전체", "철근", "형틀", "방수", "도장", "미장", "전기", "배관", "용접", "타일", "조적", "기타"
-];
-
-const SAMPLE_JOBS = [
-  { id: "1", title: "철근 기능공 3명 급구", company: "김○○ 소장", region: "경기 화성", job_type: "철근", pay: 280000, pay_type: "일당", is_urgent: true, start_date: "2026.04.25" },
-  { id: "2", title: "형틀목공 팀 구합니다", company: "박○○ 소장", region: "서울 강동", job_type: "형틀", pay: 320000, pay_type: "일당", is_urgent: false, start_date: "2026.04.28" },
-  { id: "3", title: "방수 기능공 모집", company: "이○○ 소장", region: "부산 해운대", job_type: "방수", pay: 260000, pay_type: "일당", is_urgent: false, start_date: "2026.05.01" },
-  { id: "4", title: "도장공 경력자 모집", company: "최○○ 소장", region: "인천 남동", job_type: "도장", pay: 240000, pay_type: "일당", is_urgent: true, start_date: "2026.04.26" },
-  { id: "5", title: "전기 기능공 2명", company: "정○○ 소장", region: "대구 달서", job_type: "전기", pay: 300000, pay_type: "일당", is_urgent: false, start_date: "2026.05.02" },
-  { id: "6", title: "배관 설비 기사 구함", company: "강○○ 소장", region: "경남 창원", job_type: "배관", pay: 290000, pay_type: "일당", is_urgent: false, start_date: "2026.05.03" },
-];
+const JOB_CATEGORIES = ["전체", "철근", "형틀", "방수", "도장", "미장", "전기", "배관", "용접", "타일", "조적", "기타"];
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getUser = async () => {
@@ -46,17 +37,35 @@ export default function HomePage() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    fetchJobs();
+  }, [selectedCategory]);
+
+  const fetchJobs = async () => {
+    setLoading(true);
+    let query = supabase
+      .from("jobs")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(6);
+    if (selectedCategory !== "전체") {
+      query = query.eq("job_type", selectedCategory);
+    }
+    const { data, error } = await query;
+    if (!error && data) setJobs(data);
+    setLoading(false);
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
   };
 
-  const filtered = SAMPLE_JOBS.filter(job => {
-    const matchCat = selectedCategory === "전체" || job.job_type === selectedCategory;
-    const matchSearch = job.title.includes(searchQuery) || job.region.includes(searchQuery);
-    return matchCat && matchSearch;
-  });
+  const filtered = jobs.filter(job =>
+    job.title?.includes(searchQuery) || job.region?.includes(searchQuery)
+  );
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', 'Pretendard', sans-serif" }}>
@@ -64,15 +73,18 @@ export default function HomePage() {
       {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "32px", height: "32px", background: "#FF6B00", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px" }}>⚙</div>
+          <img src="/logo.png" alt="로고" style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }} />
           <span style={{ fontWeight: 700, fontSize: "18px", color: "#1a1a1a" }}>현장공수잡</span>
         </div>
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {user ? (
             <>
               <Link href="/mypage" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
-                <div style={{ width: "32px", height: "32px", background: "#FF6B00", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "14px", fontWeight: 700 }}>
-                  {profile?.name?.charAt(0) || user.email?.charAt(0).toUpperCase() || "U"}
+                <div style={{ width: "32px", height: "32px", background: "#FF6B00", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "14px", fontWeight: 700, overflow: "hidden" }}>
+                  {profile?.avatar_url
+                    ? <img src={profile.avatar_url} alt="프로필" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : profile?.name?.charAt(0) || user.email?.charAt(0).toUpperCase() || "U"
+                  }
                 </div>
                 <span style={{ fontSize: "13px", color: "#333", fontWeight: 600 }}>{profile?.name || "내정보"}</span>
               </Link>
@@ -116,21 +128,17 @@ export default function HomePage() {
 
       {/* 빠른 메뉴 */}
       <section style={{ padding: "20px", display: "flex", gap: "12px", maxWidth: "600px", margin: "0 auto" }}>
-        <Link href="/resume/write" style={{ flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", textDecoration: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <div style={{ fontSize: "28px", marginBottom: "6px" }}>📝</div>
-          <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>이력서 등록</div>
-          <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>일자리 매칭 받기</div>
-        </Link>
-        <Link href="/jobs/write" style={{ flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", textDecoration: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <div style={{ fontSize: "28px", marginBottom: "6px" }}>🏗️</div>
-          <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>공고 등록</div>
-          <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>인력 바로 구하기</div>
-        </Link>
-        <Link href="/resumes" style={{ flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", textDecoration: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <div style={{ fontSize: "28px", marginBottom: "6px" }}>👷</div>
-          <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>인재 찾기</div>
-          <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>등록된 근로자 보기</div>
-        </Link>
+        {[
+          { icon: "📝", label: "이력서 등록", desc: "일자리 매칭 받기", href: "/resume/write" },
+          { icon: "🏗️", label: "공고 등록", desc: "인력 바로 구하기", href: "/jobs/write" },
+          { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
+        ].map((item, i) => (
+          <Link key={i} href={item.href} style={{ flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", textDecoration: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+            <div style={{ fontSize: "28px", marginBottom: "6px" }}>{item.icon}</div>
+            <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>{item.label}</div>
+            <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>{item.desc}</div>
+          </Link>
+        ))}
       </section>
 
       {/* 직종 필터 */}
@@ -138,7 +146,7 @@ export default function HomePage() {
         <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
           {JOB_CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setSelectedCategory(cat)}
-              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555" }}>
+              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555", flexShrink: 0 }}>
               {cat}
             </button>
           ))}
@@ -151,32 +159,42 @@ export default function HomePage() {
           <span style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>오늘의 공고 <span style={{ color: "#FF6B00" }}>{filtered.length}</span></span>
           <Link href="/jobs" style={{ fontSize: "12px", color: "#999", textDecoration: "none" }}>전체보기 →</Link>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {filtered.map(job => (
-            <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: "none" }}>
-              <div style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: job.is_urgent ? "1.5px solid #FF6B00" : "1px solid #eee" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
-                      {job.is_urgent && <span style={{ background: "#FF6B00", color: "#fff", fontSize: "10px", borderRadius: "4px", padding: "2px 6px", fontWeight: 600 }}>긴급</span>}
-                      <span style={{ fontSize: "15px", fontWeight: 600, color: "#1a1a1a" }}>{job.title}</span>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px", color: "#999", fontSize: "14px" }}>불러오는 중...</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "40px 20px" }}>
+            <div style={{ fontSize: "32px", marginBottom: "8px" }}>📋</div>
+            <div style={{ fontSize: "14px", color: "#999", marginBottom: "16px" }}>등록된 공고가 없습니다</div>
+            <Link href="/jobs/write" style={{ display: "inline-block", padding: "10px 24px", background: "#FF6B00", color: "#fff", borderRadius: "10px", textDecoration: "none", fontSize: "14px", fontWeight: 600 }}>첫 공고 등록하기</Link>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {filtered.map(job => (
+              <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: "none" }}>
+                <div style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: job.is_urgent ? "1.5px solid #FF6B00" : "1px solid #eee" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                    <div style={{ flex: 1, marginRight: "12px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
+                        {job.is_urgent && <span style={{ background: "#FF6B00", color: "#fff", fontSize: "10px", borderRadius: "4px", padding: "2px 6px", fontWeight: 600 }}>긴급</span>}
+                        <span style={{ fontSize: "15px", fontWeight: 600, color: "#1a1a1a" }}>{job.title}</span>
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#999" }}>{job.company} · {job.region}</div>
                     </div>
-                    <div style={{ fontSize: "12px", color: "#999" }}>{job.company} · {job.region}</div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <div style={{ fontSize: "16px", fontWeight: 700, color: "#FF6B00" }}>{job.pay?.toLocaleString()}원</div>
+                      <div style={{ fontSize: "11px", color: "#999" }}>{job.pay_type}</div>
+                    </div>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: "16px", fontWeight: 700, color: "#FF6B00" }}>{job.pay.toLocaleString()}원</div>
-                    <div style={{ fontSize: "11px", color: "#999" }}>{job.pay_type}</div>
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    <span style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>{job.job_type}</span>
+                    <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📅 {job.start_date}</span>
+                    <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📍 {job.region}</span>
                   </div>
                 </div>
-                <div style={{ display: "flex", gap: "6px" }}>
-                  <span style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>{job.job_type}</span>
-                  <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📅 {job.start_date}</span>
-                  <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📍 {job.region}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 하단 탭바 */}
