@@ -133,7 +133,7 @@ export default function ResumeWritePage() {
       {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
-        <span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>이력서 작성</span>
+        <Link href="/" style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a", textDecoration: "none" }}>현장공수잡</Link>
         <button onClick={handleSubmit} disabled={loading}
           style={{ background: loading ? "#ddd" : "#FF6B00", color: "#fff", border: "none", borderRadius: "8px", padding: "6px 16px", fontSize: "13px", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer" }}>
           {loading ? "저장 중..." : "저장"}
