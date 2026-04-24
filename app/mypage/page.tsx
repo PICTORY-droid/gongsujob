@@ -1,210 +1,183 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/lib/supabase";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
-const REGIONS = [
-  "서울", "경기", "인천", "부산", "대구", "광주", "대전", "울산", "세종",
-  "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"
+const JOB_CATEGORIES = [
+  "전체", "철근", "형틀", "방수", "도장", "미장", "전기", "배관", "용접", "타일", "조적", "기타"
 ];
-const AGE_RANGES = ["20대", "30대", "40대", "50대", "60대 이상"];
 
-export default function MyPage() {
+const SAMPLE_JOBS = [
+  { id: "1", title: "철근 기능공 3명 급구", company: "김○○ 소장", region: "경기 화성", job_type: "철근", pay: 280000, pay_type: "일당", is_urgent: true, start_date: "2026.04.25" },
+  { id: "2", title: "형틀목공 팀 구합니다", company: "박○○ 소장", region: "서울 강동", job_type: "형틀", pay: 320000, pay_type: "일당", is_urgent: false, start_date: "2026.04.28" },
+  { id: "3", title: "방수 기능공 모집", company: "이○○ 소장", region: "부산 해운대", job_type: "방수", pay: 260000, pay_type: "일당", is_urgent: false, start_date: "2026.05.01" },
+  { id: "4", title: "도장공 경력자 모집", company: "최○○ 소장", region: "인천 남동", job_type: "도장", pay: 240000, pay_type: "일당", is_urgent: true, start_date: "2026.04.26" },
+  { id: "5", title: "전기 기능공 2명", company: "정○○ 소장", region: "대구 달서", job_type: "전기", pay: 300000, pay_type: "일당", is_urgent: false, start_date: "2026.05.02" },
+  { id: "6", title: "배관 설비 기사 구함", company: "강○○ 소장", region: "경남 창원", job_type: "배관", pay: 290000, pay_type: "일당", is_urgent: false, start_date: "2026.05.03" },
+];
+
+export default function HomePage() {
+  const [selectedCategory, setSelectedCategory] = useState("전체");
+  const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [name, setName] = useState("");
-  const [region, setRegion] = useState("");
-  const [ageRange, setAgeRange] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const getProfile = async () => {
+    const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { window.location.href = "/login"; return; }
       setUser(user);
-      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-      if (data) {
+      if (user) {
+        const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
         setProfile(data);
-        setName(data.name || "");
-        setRegion(data.region || "");
-        setAgeRange(data.age_range || "");
-        setAvatarUrl(data.avatar_url || "");
       }
-      setLoading(false);
     };
-    getProfile();
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        supabase.from("profiles").select("*").eq("id", session.user.id).single()
+          .then(({ data }) => setProfile(data));
+      } else {
+        setProfile(null);
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-    setUploading(true);
-    try {
-      const fileExt = file.name.split(".").pop();
-      const filePath = `avatars/${user.id}.${fileExt}`;
-      const { error } = await supabase.storage.from("avatars").upload(filePath, file, { upsert: true });
-      if (error) { setMessage("사진 업로드 실패: " + error.message); return; }
-      const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-      setAvatarUrl(data.publicUrl);
-      setMessage("사진이 업로드됐습니다. 저장 버튼을 눌러주세요.");
-    } catch { setMessage("업로드 오류가 발생했습니다."); }
-    finally { setUploading(false); }
-  };
-
-  const handleSave = async () => {
-    if (!user) return;
-    setSaving(true); setMessage("");
-    try {
-      const { error } = await supabase.from("profiles").update({
-        name, region, age_range: ageRange, avatar_url: avatarUrl, updated_at: new Date().toISOString(),
-      }).eq("id", user.id);
-      if (error) { setMessage("저장 실패: " + error.message); return; }
-      setMessage("✅ 저장됐습니다.");
-    } catch { setMessage("오류가 발생했습니다."); }
-    finally { setSaving(false); }
-  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.href = "/";
+    setUser(null);
+    setProfile(null);
   };
 
-  const handleDeleteAccount = async () => {
-    if (!confirm("정말 탈퇴하시겠습니까? 모든 데이터가 삭제됩니다.")) return;
-    await supabase.from("profiles").delete().eq("id", user.id);
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  };
-
-  if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f9fa" }}>
-      <div style={{ fontSize: "14px", color: "#999" }}>불러오는 중...</div>
-    </div>
-  );
+  const filtered = SAMPLE_JOBS.filter(job => {
+    const matchCat = selectedCategory === "전체" || job.job_type === selectedCategory;
+    const matchSearch = job.title.includes(searchQuery) || job.region.includes(searchQuery);
+    return matchCat && matchSearch;
+  });
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', sans-serif", paddingBottom: "80px" }}>
+    <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', 'Pretendard', sans-serif" }}>
 
       {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
-        <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
-        <span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>내 정보</span>
-        <button onClick={handleSave} disabled={saving}
-          style={{ background: saving ? "#ddd" : "#FF6B00", color: "#fff", border: "none", borderRadius: "8px", padding: "6px 16px", fontSize: "13px", fontWeight: 600, cursor: saving ? "not-allowed" : "pointer" }}>
-          {saving ? "저장 중..." : "저장"}
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <img src="/logo.png" alt="로고" style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }} />
+          <span style={{ fontWeight: 700, fontSize: "18px", color: "#1a1a1a" }}>현장공수잡</span>
+        </div>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          {user ? (
+            <>
+              <Link href="/mypage" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
+                <div style={{ width: "32px", height: "32px", background: "#FF6B00", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "14px", fontWeight: 700 }}>
+                  {profile?.name?.charAt(0) || user.email?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <span style={{ fontSize: "13px", color: "#333", fontWeight: 600 }}>{profile?.name || "내정보"}</span>
+              </Link>
+              <button onClick={handleLogout} style={{ padding: "7px 14px", border: "1px solid #ddd", borderRadius: "8px", fontSize: "13px", color: "#666", background: "#fff", cursor: "pointer" }}>로그아웃</button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" style={{ padding: "7px 14px", border: "1px solid #ddd", borderRadius: "8px", fontSize: "13px", color: "#333", textDecoration: "none" }}>로그인</Link>
+              <Link href="/login" style={{ padding: "7px 14px", background: "#FF6B00", borderRadius: "8px", fontSize: "13px", color: "#fff", textDecoration: "none", fontWeight: 600 }}>회원가입</Link>
+            </>
+          )}
+        </div>
       </header>
 
-      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "20px" }}>
-
-        {/* 프로필 사진 */}
-        <div style={{ background: "#fff", borderRadius: "16px", padding: "24px", marginBottom: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", textAlign: "center" }}>
-          <div style={{ position: "relative", display: "inline-block", marginBottom: "12px" }}>
-            <div onClick={() => fileInputRef.current?.click()}
-              style={{ width: "88px", height: "88px", borderRadius: "50%", background: avatarUrl ? "transparent" : "#FF6B00", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", overflow: "hidden", border: "2px solid #eee" }}>
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="프로필" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              ) : (
-                <span style={{ fontSize: "32px", color: "#fff", fontWeight: 700 }}>{name?.charAt(0) || "U"}</span>
-              )}
-            </div>
-            <div style={{ position: "absolute", bottom: 0, right: 0, background: "#FF6B00", borderRadius: "50%", width: "26px", height: "26px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px solid #fff" }}
-              onClick={() => fileInputRef.current?.click()}>
-              <span style={{ fontSize: "12px" }}>📷</span>
-            </div>
-          </div>
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: "none" }} />
-          {uploading && <div style={{ fontSize: "12px", color: "#FF6B00" }}>업로드 중...</div>}
-          <div style={{ fontSize: "12px", color: "#999" }}>사진을 클릭해서 변경하세요</div>
-          <div style={{ marginTop: "8px", fontSize: "12px", color: "#aaa", background: "#f5f5f5", borderRadius: "6px", padding: "4px 10px", display: "inline-block" }}>
-            {profile?.user_type || ""}
-          </div>
+      {/* 히어로 */}
+      <section style={{ background: "linear-gradient(135deg, #FF6B00 0%, #ff8c00 100%)", padding: "40px 20px", color: "#fff", textAlign: "center" }}>
+        <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "8px", lineHeight: 1.4 }}>건설 현장 일자리,<br />지금 바로 찾으세요</h1>
+        <p style={{ fontSize: "14px", opacity: 0.9, marginBottom: "24px" }}>전국 건설 현장 일용직 · 당일 지급 · 소장님 직접 등록</p>
+        <div style={{ background: "#fff", borderRadius: "12px", padding: "6px 6px 6px 16px", display: "flex", gap: "8px", maxWidth: "480px", margin: "0 auto" }}>
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="직종 또는 지역 검색"
+            style={{ flex: 1, border: "none", outline: "none", fontSize: "15px", color: "#333", background: "transparent" }} />
+          <button style={{ background: "#FF6B00", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>검색</button>
         </div>
+      </section>
 
-        {/* 기본 정보 */}
-        <div style={{ background: "#fff", borderRadius: "16px", padding: "20px", marginBottom: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <div style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a", marginBottom: "16px" }}>기본 정보</div>
-
-          <div style={{ marginBottom: "14px" }}>
-            <label style={{ fontSize: "12px", color: "#999", display: "block", marginBottom: "6px" }}>닉네임</label>
-            <input value={name} onChange={(e) => setName(e.target.value)}
-              placeholder="닉네임 입력"
-              style={{ width: "100%", padding: "11px 14px", border: "1px solid #eee", borderRadius: "10px", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
+      {/* 통계 */}
+      <section style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "16px 20px", display: "flex", justifyContent: "center", gap: "32px" }}>
+        {[
+          { num: "1,247", label: "오늘 공고" },
+          { num: "8,430", label: "등록 근로자" },
+          { num: "312", label: "협력 현장" },
+          { num: "당일", label: "일당 지급" },
+        ].map((s, i) => (
+          <div key={i} style={{ textAlign: "center" }}>
+            <div style={{ fontSize: "18px", fontWeight: 700, color: "#FF6B00" }}>{s.num}</div>
+            <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>{s.label}</div>
           </div>
+        ))}
+      </section>
 
-          <div style={{ marginBottom: "14px" }}>
-            <label style={{ fontSize: "12px", color: "#999", display: "block", marginBottom: "6px" }}>이메일</label>
-            <div style={{ padding: "11px 14px", background: "#f5f5f5", borderRadius: "10px", fontSize: "14px", color: "#999" }}>{user?.email || "-"}</div>
-          </div>
+      {/* 빠른 메뉴 */}
+      <section style={{ padding: "20px", display: "flex", gap: "12px", maxWidth: "600px", margin: "0 auto" }}>
+        <Link href="/resume/write" style={{ flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", textDecoration: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+          <div style={{ fontSize: "28px", marginBottom: "6px" }}>📝</div>
+          <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>이력서 등록</div>
+          <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>일자리 매칭 받기</div>
+        </Link>
+        <Link href="/jobs/write" style={{ flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", textDecoration: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+          <div style={{ fontSize: "28px", marginBottom: "6px" }}>🏗️</div>
+          <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>공고 등록</div>
+          <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>인력 바로 구하기</div>
+        </Link>
+        <Link href="/resumes" style={{ flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", textDecoration: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+          <div style={{ fontSize: "28px", marginBottom: "6px" }}>👷</div>
+          <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>인재 찾기</div>
+          <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>등록된 근로자 보기</div>
+        </Link>
+      </section>
 
-          <div style={{ marginBottom: "14px" }}>
-            <label style={{ fontSize: "12px", color: "#999", display: "block", marginBottom: "8px" }}>지역</label>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
-              {REGIONS.map((r) => (
-                <button key={r} onClick={() => setRegion(r)}
-                  style={{ padding: "8px 4px", border: `1.5px solid ${region === r ? "#FF6B00" : "#eee"}`, borderRadius: "8px", background: region === r ? "#fff8f5" : "#fff", fontSize: "13px", fontWeight: region === r ? 700 : 400, color: region === r ? "#FF6B00" : "#333", cursor: "pointer" }}>
-                  {r}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label style={{ fontSize: "12px", color: "#999", display: "block", marginBottom: "8px" }}>연령대</label>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              {AGE_RANGES.map((a) => (
-                <button key={a} onClick={() => setAgeRange(a)}
-                  style={{ padding: "8px 14px", border: `1.5px solid ${ageRange === a ? "#FF6B00" : "#eee"}`, borderRadius: "8px", background: ageRange === a ? "#fff8f5" : "#fff", fontSize: "13px", fontWeight: ageRange === a ? 700 : 400, color: ageRange === a ? "#FF6B00" : "#333", cursor: "pointer" }}>
-                  {a}
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* 직종 필터 */}
+      <section style={{ padding: "0 20px 12px", maxWidth: "600px", margin: "0 auto" }}>
+        <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
+          {JOB_CATEGORIES.map(cat => (
+            <button key={cat} onClick={() => setSelectedCategory(cat)}
+              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555" }}>
+              {cat}
+            </button>
+          ))}
         </div>
+      </section>
 
-        {/* 메시지 */}
-        {message && (
-          <div style={{ background: message.includes("✅") ? "#f0fff4" : "#fff3f3", border: `1px solid ${message.includes("✅") ? "#9ae6b4" : "#ffd0d0"}`, borderRadius: "10px", padding: "12px 16px", fontSize: "13px", color: message.includes("✅") ? "#276749" : "#e53e3e", marginBottom: "16px" }}>
-            {message}
-          </div>
-        )}
-
-        {/* 내 활동 */}
-        <div style={{ background: "#fff", borderRadius: "16px", padding: "20px", marginBottom: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <div style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a", marginBottom: "14px" }}>내 활동</div>
-          {[
-            { icon: "📝", label: "내 이력서", href: "/resume/write" },
-            { icon: "📋", label: "내가 올린 공고", href: "/jobs/my" },
-            { icon: "✅", label: "지원한 공고", href: "/applications" },
-          ].map((item, i) => (
-            <Link key={i} href={item.href} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: i < 2 ? "1px solid #f5f5f5" : "none", textDecoration: "none" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontSize: "18px" }}>{item.icon}</span>
-                <span style={{ fontSize: "14px", color: "#333" }}>{item.label}</span>
+      {/* 공고 목록 */}
+      <section style={{ padding: "0 20px 80px", maxWidth: "600px", margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+          <span style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>오늘의 공고 <span style={{ color: "#FF6B00" }}>{filtered.length}</span></span>
+          <Link href="/jobs" style={{ fontSize: "12px", color: "#999", textDecoration: "none" }}>전체보기 →</Link>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {filtered.map(job => (
+            <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: "none" }}>
+              <div style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: job.is_urgent ? "1.5px solid #FF6B00" : "1px solid #eee" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
+                      {job.is_urgent && <span style={{ background: "#FF6B00", color: "#fff", fontSize: "10px", borderRadius: "4px", padding: "2px 6px", fontWeight: 600 }}>긴급</span>}
+                      <span style={{ fontSize: "15px", fontWeight: 600, color: "#1a1a1a" }}>{job.title}</span>
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#999" }}>{job.company} · {job.region}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: "16px", fontWeight: 700, color: "#FF6B00" }}>{job.pay.toLocaleString()}원</div>
+                    <div style={{ fontSize: "11px", color: "#999" }}>{job.pay_type}</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "6px" }}>
+                  <span style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>{job.job_type}</span>
+                  <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📅 {job.start_date}</span>
+                  <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📍 {job.region}</span>
+                </div>
               </div>
-              <span style={{ color: "#ccc", fontSize: "16px" }}>→</span>
             </Link>
           ))}
         </div>
-
-        {/* 로그아웃·탈퇴 */}
-        <div style={{ background: "#fff", borderRadius: "16px", padding: "8px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <button onClick={handleLogout}
-            style={{ width: "100%", padding: "14px 0", background: "transparent", border: "none", fontSize: "14px", color: "#666", cursor: "pointer", textAlign: "left", borderBottom: "1px solid #f5f5f5" }}>
-            로그아웃
-          </button>
-          <button onClick={handleDeleteAccount}
-            style={{ width: "100%", padding: "14px 0", background: "transparent", border: "none", fontSize: "14px", color: "#e53e3e", cursor: "pointer", textAlign: "left" }}>
-            회원 탈퇴
-          </button>
-        </div>
-      </div>
+      </section>
 
       {/* 하단 탭바 */}
       <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
@@ -217,7 +190,7 @@ export default function MyPage() {
         ].map((tab, i) => (
           <Link key={i} href={tab.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", textDecoration: "none" }}>
             <span style={{ fontSize: "20px" }}>{tab.icon}</span>
-            <span style={{ fontSize: "10px", color: i === 4 ? "#FF6B00" : "#999", fontWeight: i === 4 ? 600 : 400 }}>{tab.label}</span>
+            <span style={{ fontSize: "10px", color: i === 0 ? "#FF6B00" : "#999", fontWeight: i === 0 ? 600 : 400 }}>{tab.label}</span>
           </Link>
         ))}
       </nav>
