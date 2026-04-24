@@ -61,7 +61,6 @@ export default function MyPage() {
   const seekerMenus = [
     { icon: "📝", label: "이력서 작성·수정", desc: "내 이력서 관리", href: "/resume/write" },
     { icon: "📋", label: "공고 보기", desc: "채용 공고 둘러보기", href: "/jobs" },
-    { icon: "👷", label: "인재 찾기", desc: "다른 근로자 보기", href: "/resumes" },
   ];
 
   const menus = isEmployer ? employerMenus : seekerMenus;
