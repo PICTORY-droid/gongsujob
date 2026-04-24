@@ -23,7 +23,21 @@ export async function GET(request: NextRequest) {
         },
       }
     );
-    await supabase.auth.exchangeCodeForSession(code);
+
+    const { data: { session } } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (session?.user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", session.user.id)
+        .single();
+
+      // 프로필 있으면 홈으로, 없으면 온보딩으로
+      if (profile) {
+        return NextResponse.redirect(`${origin}/`);
+      }
+    }
   }
 
   return NextResponse.redirect(`${origin}/onboarding`);
