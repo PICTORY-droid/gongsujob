@@ -43,7 +43,7 @@ export default function ResumesPage() {
       {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
-        <Link href="/" style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a", textDecoration: "none" }}>현장공수잡</Link>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}><img src="/logo.png" alt="로고" style={{ width: "28px", height: "28px", borderRadius: "6px", objectFit: "cover" }} /><span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>현장공수잡</span></Link>
         <div style={{ width: "40px" }} />
       </header>
 
