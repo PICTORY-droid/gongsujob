@@ -50,6 +50,22 @@ export default function MyPage() {
     </div>
   );
 
+  const isEmployer = profile?.role === "employer";
+
+  const employerMenus = [
+    { icon: "📋", label: "공고 등록", desc: "새 구인 공고 올리기", href: "/jobs/write" },
+    { icon: "🏗️", label: "전체 공고 보기", desc: "등록된 모든 공고", href: "/jobs" },
+    { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
+  ];
+
+  const seekerMenus = [
+    { icon: "📝", label: "이력서 작성·수정", desc: "내 이력서 관리", href: "/resume/write" },
+    { icon: "📋", label: "공고 보기", desc: "채용 공고 둘러보기", href: "/jobs" },
+    { icon: "👷", label: "인재 찾기", desc: "다른 근로자 보기", href: "/resumes" },
+  ];
+
+  const menus = isEmployer ? employerMenus : seekerMenus;
+
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', sans-serif", paddingBottom: "80px" }}>
 
@@ -73,41 +89,47 @@ export default function MyPage() {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: "18px", fontWeight: 700, color: "#1a1a1a" }}>{profile?.name || "이름 없음"}</div>
             <div style={{ fontSize: "13px", color: "#999", marginTop: "2px" }}>{user?.email}</div>
-            <div style={{ marginTop: "4px" }}>
-              <span style={{ background: profile?.role === "employer" ? "#fff3e0" : "#f0f9ff", color: profile?.role === "employer" ? "#FF6B00" : "#0ea5e9", fontSize: "11px", borderRadius: "6px", padding: "3px 8px", fontWeight: 600 }}>
-                {profile?.role === "employer" ? "구인자 (소장님)" : "구직자"}
+            <div style={{ marginTop: "6px", display: "flex", gap: "6px" }}>
+              <span style={{ background: isEmployer ? "#fff3e0" : "#f0f9ff", color: isEmployer ? "#FF6B00" : "#0ea5e9", fontSize: "11px", borderRadius: "6px", padding: "3px 8px", fontWeight: 600 }}>
+                {isEmployer ? "🏗️ 구인자 (소장님)" : "👷 구직자"}
               </span>
+              {profile?.phone && (
+                <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>
+                  📞 {profile.phone}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         {/* 메뉴 */}
         <div style={{ background: "#fff", borderRadius: "16px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", overflow: "hidden" }}>
-          {[
-            { icon: "📝", label: "이력서 작성·수정", href: "/resume/write" },
-            { icon: "📋", label: "공고 등록", href: "/jobs/write" },
-          ].map((item, i, arr) => (
-            <Link key={i} href={item.href} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 20px", textDecoration: "none", borderBottom: i < arr.length - 1 ? "1px solid #f5f5f5" : "none" }}>
-              <span style={{ fontSize: "20px" }}>{item.icon}</span>
-              <span style={{ fontSize: "14px", color: "#1a1a1a", fontWeight: 500 }}>{item.label}</span>
-              <span style={{ marginLeft: "auto", color: "#ccc", fontSize: "16px" }}>›</span>
+          <div style={{ padding: "14px 20px 8px", fontSize: "12px", color: "#999", fontWeight: 600 }}>빠른 메뉴</div>
+          {menus.map((item, i) => (
+            <Link key={i} href={item.href} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 20px", textDecoration: "none", borderTop: "1px solid #f5f5f5" }}>
+              <span style={{ fontSize: "22px" }}>{item.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "14px", color: "#1a1a1a", fontWeight: 600 }}>{item.label}</div>
+                <div style={{ fontSize: "12px", color: "#999", marginTop: "1px" }}>{item.desc}</div>
+              </div>
+              <span style={{ color: "#ccc", fontSize: "18px" }}>›</span>
             </Link>
           ))}
         </div>
 
-        {/* 내가 등록한 공고 */}
-        {myJobs.length > 0 && (
+        {/* 구인자: 내가 등록한 공고 */}
+        {isEmployer && myJobs.length > 0 && (
           <div style={{ background: "#fff", borderRadius: "16px", padding: "20px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
             <div style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a", marginBottom: "12px" }}>내가 등록한 공고 ({myJobs.length})</div>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {myJobs.map(job => (
                 <div key={job.id} style={{ border: "1px solid #eee", borderRadius: "10px", padding: "12px 14px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div>
+                    <Link href={`/jobs/${job.id}`} style={{ flex: 1, textDecoration: "none" }}>
                       <div style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>{job.title}</div>
                       <div style={{ fontSize: "12px", color: "#999", marginTop: "2px" }}>{job.region} · {job.job_type} · {job.pay?.toLocaleString()}원/{job.pay_type}</div>
-                    </div>
-                    <button onClick={() => handleDeleteJob(job.id)} style={{ fontSize: "12px", color: "#e53e3e", border: "1px solid #ffd0d0", borderRadius: "6px", padding: "4px 8px", background: "#fff", cursor: "pointer" }}>삭제</button>
+                    </Link>
+                    <button onClick={() => handleDeleteJob(job.id)} style={{ fontSize: "12px", color: "#e53e3e", border: "1px solid #ffd0d0", borderRadius: "6px", padding: "4px 8px", background: "#fff", cursor: "pointer", marginLeft: "8px", flexShrink: 0 }}>삭제</button>
                   </div>
                 </div>
               ))}
@@ -115,29 +137,41 @@ export default function MyPage() {
           </div>
         )}
 
-        {/* 내 지원 현황 */}
-        {myApplications.length > 0 && (
+        {/* 구직자: 지원 현황 */}
+        {!isEmployer && (
           <div style={{ background: "#fff", borderRadius: "16px", padding: "20px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-            <div style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a", marginBottom: "12px" }}>지원 현황 ({myApplications.length})</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {myApplications.map((app, i) => (
-                <div key={i} style={{ border: "1px solid #eee", borderRadius: "10px", padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>{app.jobs?.title || "공고 없음"}</div>
-                    <div style={{ fontSize: "12px", color: "#999", marginTop: "2px" }}>{app.jobs?.region}</div>
-                  </div>
-                  <span style={{ background: "#f0fff4", color: "#276749", fontSize: "11px", borderRadius: "6px", padding: "3px 8px", fontWeight: 600 }}>{app.status}</span>
-                </div>
-              ))}
+            <div style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a", marginBottom: "12px" }}>
+              지원 현황 {myApplications.length > 0 && <span style={{ color: "#FF6B00" }}>({myApplications.length})</span>}
             </div>
+            {myApplications.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "20px 0", color: "#999", fontSize: "13px" }}>
+                아직 지원한 공고가 없습니다<br />
+                <Link href="/jobs" style={{ color: "#FF6B00", textDecoration: "none", fontWeight: 600, marginTop: "8px", display: "inline-block" }}>공고 보러 가기 →</Link>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {myApplications.map((app, i) => (
+                  <div key={i} style={{ border: "1px solid #eee", borderRadius: "10px", padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>{app.jobs?.title || "공고 없음"}</div>
+                      <div style={{ fontSize: "12px", color: "#999", marginTop: "2px" }}>{app.jobs?.region} · {app.jobs?.pay?.toLocaleString()}원/{app.jobs?.pay_type}</div>
+                    </div>
+                    <span style={{ background: "#f0fff4", color: "#276749", fontSize: "11px", borderRadius: "6px", padding: "3px 8px", fontWeight: 600, flexShrink: 0, marginLeft: "8px" }}>{app.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        {myJobs.length === 0 && myApplications.length === 0 && (
-          <div style={{ textAlign: "center", padding: "40px 20px", color: "#999", fontSize: "14px" }}>
-            아직 등록한 공고나 지원 내역이 없습니다.
-          </div>
-        )}
+        {/* 계정 설정 */}
+        <div style={{ background: "#fff", borderRadius: "16px", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+          <div style={{ padding: "14px 20px 8px", fontSize: "12px", color: "#999", fontWeight: 600 }}>계정</div>
+          <button onClick={handleLogout} style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "14px 20px", background: "none", border: "none", borderTop: "1px solid #f5f5f5", cursor: "pointer", textAlign: "left" }}>
+            <span style={{ fontSize: "22px" }}>🚪</span>
+            <span style={{ fontSize: "14px", color: "#e53e3e", fontWeight: 500 }}>로그아웃</span>
+          </button>
+        </div>
       </div>
 
       {/* 하단 탭바 */}
