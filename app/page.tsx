@@ -142,31 +142,31 @@ export default function HomePage() {
         ))}
       </section>
 
-      {/* 직종 필터 드롭다운 */}
-      <section style={{ padding: "0 20px 12px", maxWidth: "600px", margin: "0 auto" }}>
-        <div style={{ position: "relative" }}>
-          <button onClick={() => setDropdownOpen(prev => !prev)}
-            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 16px", border: "1.5px solid #FF6B00", borderRadius: "10px", background: "#fff", fontSize: "14px", fontWeight: 600, color: "#FF6B00", cursor: "pointer" }}>
-            {selectedCategory === "전체" ? "직종 선택" : selectedCategory}
-            <span style={{ fontSize: "11px" }}>{dropdownOpen ? "▲" : "▼"}</span>
-          </button>
-          {dropdownOpen && (
-            <div style={{ position: "absolute", top: "44px", left: 0, background: "#fff", border: "1px solid #eee", borderRadius: "12px", boxShadow: "0 4px 16px rgba(0,0,0,0.10)", zIndex: 50, minWidth: "160px", overflow: "hidden" }}>
-              {JOB_CATEGORIES.map(cat => (
-                <button key={cat} onClick={() => { setSelectedCategory(cat); setDropdownOpen(false); }}
-                  style={{ display: "block", width: "100%", padding: "11px 18px", border: "none", background: selectedCategory === cat ? "#fff8f5" : "#fff", fontSize: "14px", fontWeight: selectedCategory === cat ? 700 : 400, color: selectedCategory === cat ? "#FF6B00" : "#333", cursor: "pointer", textAlign: "left" }}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      
 
       {/* 공고 목록 */}
       <section style={{ padding: "0 20px 80px", maxWidth: "600px", margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-          <span style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>오늘의 공고 <span style={{ color: "#FF6B00" }}>{filtered.length}</span></span>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>오늘의 공고 <span style={{ color: "#FF6B00" }}>{filtered.length}</span></span>
+            <div style={{ position: "relative" }}>
+              <button onClick={() => setDropdownOpen(prev => !prev)}
+                style={{ display: "flex", alignItems: "center", gap: "6px", padding: "5px 12px", border: "1.5px solid #FF6B00", borderRadius: "8px", background: "#fff", fontSize: "12px", fontWeight: 600, color: "#FF6B00", cursor: "pointer" }}>
+                {selectedCategory === "전체" ? "직종 선택" : selectedCategory}
+                <span style={{ fontSize: "10px" }}>{dropdownOpen ? "▲" : "▼"}</span>
+              </button>
+              {dropdownOpen && (
+                <div style={{ position: "absolute", top: "34px", left: 0, background: "#fff", border: "1px solid #eee", borderRadius: "12px", boxShadow: "0 4px 16px rgba(0,0,0,0.10)", zIndex: 50, minWidth: "160px", overflow: "hidden" }}>
+                  {JOB_CATEGORIES.map(cat => (
+                    <button key={cat} onClick={() => { setSelectedCategory(cat); setDropdownOpen(false); }}
+                      style={{ display: "block", width: "100%", padding: "11px 18px", border: "none", background: selectedCategory === cat ? "#fff8f5" : "#fff", fontSize: "14px", fontWeight: selectedCategory === cat ? 700 : 400, color: selectedCategory === cat ? "#FF6B00" : "#333", cursor: "pointer", textAlign: "left" }}>
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
           <Link href="/jobs" style={{ fontSize: "12px", color: "#999", textDecoration: "none" }}>전체보기 →</Link>
         </div>
         {loading ? (
