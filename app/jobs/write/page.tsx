@@ -23,6 +23,7 @@ export default function JobWritePage() {
     headcount: "1",
     start_date: "",
     end_date: "",
+    completion_date: "",
     description: "",
     is_urgent: false,
   });
@@ -62,6 +63,7 @@ export default function JobWritePage() {
         headcount: parseInt(form.headcount),
         start_date: form.start_date,
         end_date: form.end_date || null,
+        completion_date: form.completion_date || null,
         description: form.description,
         is_urgent: form.is_urgent,
         is_active: true,
@@ -80,7 +82,10 @@ export default function JobWritePage() {
       {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}><img src="/logo.png" alt="로고" style={{ width: "28px", height: "28px", borderRadius: "6px", objectFit: "cover" }} /><span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>현장공수잡</span></Link>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
+          <img src="/logo.png" alt="로고" style={{ width: "28px", height: "28px", borderRadius: "6px", objectFit: "cover" }} />
+          <span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>현장공수잡</span>
+        </Link>
         <button onClick={handleSubmit} disabled={loading}
           style={{ background: loading ? "#ddd" : "#FF6B00", color: "#fff", border: "none", borderRadius: "8px", padding: "6px 16px", fontSize: "13px", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer" }}>
           {loading ? "등록 중..." : "등록"}
@@ -192,11 +197,21 @@ export default function JobWritePage() {
               style={{ width: "100%", padding: "11px 14px", border: "1px solid #eee", borderRadius: "10px", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
           </div>
 
-          <div>
+          <div style={{ marginBottom: "14px" }}>
             <label style={{ fontSize: "12px", color: "#999", display: "block", marginBottom: "6px" }}>종료일 (미정이면 비워두세요)</label>
             <input name="end_date" value={form.end_date} onChange={handleChange}
               type="date"
               style={{ width: "100%", padding: "11px 14px", border: "1px solid #eee", borderRadius: "10px", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
+          </div>
+
+          <div>
+            <label style={{ fontSize: "12px", color: "#999", display: "block", marginBottom: "6px" }}>현장완공일</label>
+            <input name="completion_date" value={form.completion_date} onChange={handleChange}
+              type="date"
+              style={{ width: "100%", padding: "11px 14px", border: "1px solid #eee", borderRadius: "10px", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
+            <div style={{ fontSize: "11px", color: "#FF6B00", marginTop: "6px", padding: "8px 12px", background: "#fff8f5", borderRadius: "8px" }}>
+              ⚠️ 현장완공일 기준 15일이 지나면 해당 공고는 자동 삭제됩니다.
+            </div>
           </div>
         </div>
 
