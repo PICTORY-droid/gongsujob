@@ -26,13 +26,7 @@ export default function JobDetailPage() {
   const [showCalc, setShowCalc] = useState(false);
   const [kakaoReady, setKakaoReady] = useState(false);
 
-  useEffect(() => {
-    window.kakaoCallback = () => setKakaoReady(true);
-    const script = document.createElement("script");
-    script.src = "//dapi.kakao.com/v2/maps/sdk.js?appkey=df58203831b3eac3cf6f8b301680d626&libraries=services&autoload=false";
-    script.onload = () => window.kakao.maps.load(() => setKakaoReady(true));
-    document.head.appendChild(script);
-  }, []);
+
   useEffect(() => {
     const init = async () => {
       const res2 = await supabase.auth.getUser();
@@ -137,7 +131,7 @@ export default function JobDetailPage() {
           </div>
           <div style={{background:"#fff",borderRadius:"16px",padding:"16px 20px",marginBottom:"12px",boxShadow:"0 1px 4px rgba(0,0,0,0.06)"}}>
             <div style={{fontSize:"13px",fontWeight:700,color:"#1a1a1a",marginBottom:"12px"}}>현장 위치 지도</div>
-            <div id="kakao-map" style={{width:"100%",height:"220px",borderRadius:"10px",background:"#e0e0e0"}} />
+            <a href={"https://map.kakao.com/?q="+encodeURIComponent(job.detail_address||job.region)} target="_blank" rel="noreferrer" style={{display:"block",width:"100%",height:"180px",borderRadius:"10px",background:"#fff3e0",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textDecoration:"none",border:"1.5px solid #FF6B00"}}><span style={{fontSize:"36px",marginBottom:"8px"}}>🗺️</span><span style={{fontSize:"14px",fontWeight:700,color:"#FF6B00"}}>카카오맵에서 보기</span><span style={{fontSize:"12px",color:"#999",marginTop:"4px"}}>{job.detail_address||job.region}</span></a>
             <div style={{fontSize:"12px",color:"#999",marginTop:"8px"}}>{job.detail_address||job.region}</div>
           </div>
           <div style={{background:"#fff",borderRadius:"16px",padding:"16px 20px",marginBottom:"12px",boxShadow:"0 1px 4px rgba(0,0,0,0.06)"}}>
