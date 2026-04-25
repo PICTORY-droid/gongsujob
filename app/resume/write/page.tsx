@@ -14,6 +14,7 @@ export default function ResumeWritePage() {
   const [message, setMessage] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [hasSafetyCert, setHasSafetyCert] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     name: "",
@@ -36,7 +37,6 @@ export default function ResumeWritePage() {
       if (!user) { window.location.href = "/login"; return; }
       setUser(user);
 
-      // 기존 이력서 불러오기
       const { data } = await supabase.from("resumes").select("*").eq("user_id", user.id).single();
       if (data) {
         setForm({
@@ -54,8 +54,8 @@ export default function ResumeWritePage() {
           is_public: data.is_public ?? true,
         });
         setPhotoUrl(data.photo_url || "");
+        setHasSafetyCert(data.has_safety_cert ?? false);
       } else {
-        // 프로필에서 이름 가져오기
         const { data: profile } = await supabase.from("profiles").select("name").eq("id", user.id).single();
         if (profile?.name) setForm(prev => ({ ...prev, name: profile.name }));
       }
@@ -107,6 +107,7 @@ export default function ResumeWritePage() {
         education: form.education,
         photo_url: photoUrl,
         is_public: form.is_public,
+        has_safety_cert: hasSafetyCert,
         updated_at: new Date().toISOString(),
       };
 
@@ -116,7 +117,8 @@ export default function ResumeWritePage() {
       } else {
         await supabase.from("resumes").insert(resumeData);
       }
-      setMessage("✅ 이력서가 저장됐습니다."); setTimeout(() => { window.location.href = "/mypage"; }, 1500);
+      setMessage("✅ 이력서가 저장됐습니다.");
+      setTimeout(() => { window.location.href = "/mypage"; }, 1500);
     } catch { setMessage("오류가 발생했습니다."); }
     finally { setLoading(false); }
   };
@@ -133,7 +135,10 @@ export default function ResumeWritePage() {
       {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}><img src="/logo.png" alt="로고" style={{ width: "28px", height: "28px", borderRadius: "6px", objectFit: "cover" }} /><span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>현장공수잡</span></Link>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
+          <img src="/logo.png" alt="로고" style={{ width: "28px", height: "28px", borderRadius: "6px", objectFit: "cover" }} />
+          <span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>현장공수잡</span>
+        </Link>
         <button onClick={handleSubmit} disabled={loading}
           style={{ background: loading ? "#ddd" : "#FF6B00", color: "#fff", border: "none", borderRadius: "8px", padding: "6px 16px", fontSize: "13px", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer" }}>
           {loading ? "저장 중..." : "저장"}
@@ -164,10 +169,34 @@ export default function ResumeWritePage() {
           </div>
         </div>
 
+        {/* 안전보건교육 이수증 */}
+        <div style={{ background: "#fff", borderRadius: "16px", padding: "16px 20px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: "14px", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={hasSafetyCert}
+              onChange={(e) => setHasSafetyCert(e.target.checked)}
+              style={{ width: "22px", height: "22px", accentColor: "#FF6B00", flexShrink: 0, cursor: "pointer" }}
+            />
+            <div>
+              <div style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a" }}>
+                🦺 건설기초 안전보건교육 이수증 보유
+              </div>
+              <div style={{ fontSize: "12px", color: "#999", marginTop: "3px" }}>
+                이수증 미소지 시 현장 출입 불가 — 체크하면 소장님 신뢰도가 높아져요
+              </div>
+            </div>
+          </label>
+          {hasSafetyCert && (
+            <div style={{ marginTop: "10px", padding: "8px 12px", background: "#f0fff4", borderRadius: "8px", border: "1px solid #9ae6b4", fontSize: "12px", color: "#276749", fontWeight: 600 }}>
+              ✅ 이수증 보유 — 인재 목록에서 배지가 표시됩니다
+            </div>
+          )}
+        </div>
+
         {/* 기본 정보 */}
         <div style={{ background: "#fff", borderRadius: "16px", padding: "20px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
           <div style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a", marginBottom: "16px" }}>기본 정보</div>
-
           {[
             { label: "이름 *", name: "name", placeholder: "홍길동" },
             { label: "생년월일", name: "birth", placeholder: "예) 1985-03-15", type: "date" },
