@@ -19,10 +19,8 @@ export default function HomePage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = "/login"; return; }
       setUser(user);
-      if (user) {
-        const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-        setProfile(data);
-      }
+      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+      setProfile(data);
     };
     getUser();
 
@@ -62,6 +60,7 @@ export default function HomePage() {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    window.location.href = "/login";
   };
 
   const filtered = jobs.filter(job =>
@@ -129,9 +128,7 @@ export default function HomePage() {
 
       {/* 빠른 메뉴 */}
       <section style={{ padding: "20px", display: "flex", gap: "12px", maxWidth: "600px", margin: "0 auto" }}>
-        {[const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (user) {
+        {[
           { icon: "📝", label: "이력서 등록", desc: "일자리 매칭 받기", href: "/resume/write" },
           { icon: "🏗️", label: "공고 등록", desc: "인력 바로 구하기", href: "/jobs/write" },
           { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
@@ -149,7 +146,7 @@ export default function HomePage() {
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           {JOB_CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setSelectedCategory(cat)}
-              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555" }}>
+              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555", flexShrink: 0 }}>
               {cat}
             </button>
           ))}
@@ -167,8 +164,7 @@ export default function HomePage() {
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 20px" }}>
             <div style={{ fontSize: "32px", marginBottom: "8px" }}>📋</div>
-            <div style={{ fontSize: "14px", color: "#999", marginBottom: "16px" }}>등록된 공고가 없습니다</div>
-            <Link href="/jobs/write" style={{ display: "inline-block", padding: "10px 24px", background: "#FF6B00", color: "#fff", borderRadius: "10px", textDecoration: "none", fontSize: "14px", fontWeight: 600 }}>첫 공고 등록하기</Link>
+            <div style={{ fontSize: "14px", color: "#999" }}>등록된 공고가 없습니다</div>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -182,14 +178,7 @@ export default function HomePage() {
                         <span style={{ fontSize: "15px", fontWeight: 600, color: "#1a1a1a" }}>{job.title}</span>
                       </div>
                       <div style={{ fontSize: "12px", color: "#999" }}>{job.company} · {job.region}</div>
-                    </div><div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
-          {JOB_CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setSelectedCategory(cat)}
-              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555", flexShrink: 0 }}>
-              {cat}
-            </button>
-          ))}
-        </div>
+                    </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       <div style={{ fontSize: "16px", fontWeight: 700, color: "#FF6B00" }}>{job.pay?.toLocaleString()}원</div>
                       <div style={{ fontSize: "11px", color: "#999" }}>{job.pay_type}</div>
