@@ -11,8 +11,18 @@ export default function ResumesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchQuery, setSearchQuery] = useState("");
+  const [profile, setProfile] = useState<any>(null);
+  const [toast, setToast] = useState(false);
 
   useEffect(() => {
+    const getProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+        setProfile(data);
+      }
+    };
+    getProfile();
     fetchResumes();
   }, [selectedCategory]);
 
@@ -23,11 +33,9 @@ export default function ResumesPage() {
       .select("*")
       .eq("is_public", true)
       .order("created_at", { ascending: false });
-
     if (selectedCategory !== "전체") {
       query = query.eq("job_type", selectedCategory);
     }
-
     const { data, error } = await query;
     if (!error && data) setResumes(data);
     setLoading(false);
@@ -37,13 +45,30 @@ export default function ResumesPage() {
     r.name?.includes(searchQuery) || r.job_type?.includes(searchQuery) || r.address?.includes(searchQuery)
   );
 
+  const handleCardClick = () => {
+    if (profile?.user_type !== "구인자") {
+      setToast(true);
+      setTimeout(() => setToast(false), 2000);
+    }
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', sans-serif", paddingBottom: "80px" }}>
+
+      {/* 토스트 팝업 */}
+      {toast && (
+        <div style={{ position: "fixed", top: "72px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.75)", color: "#fff", fontSize: "13px", padding: "10px 20px", borderRadius: "999px", zIndex: 999, whiteSpace: "nowrap" }}>
+          구인전용 메뉴입니다
+        </div>
+      )}
 
       {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}><img src="/logo.png" alt="로고" style={{ width: "28px", height: "28px", borderRadius: "6px", objectFit: "cover" }} /><span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>현장공수잡</span></Link>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
+          <img src="/logo.png" alt="로고" style={{ width: "28px", height: "28px", borderRadius: "6px", objectFit: "cover" }} />
+          <span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>현장공수잡</span>
+        </Link>
         <div style={{ width: "40px" }} />
       </header>
 
@@ -59,7 +84,7 @@ export default function ResumesPage() {
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           {JOB_CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setSelectedCategory(cat)}
-              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555", flexShrink: 0 }}>
+              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555" }}>
               {cat}
             </button>
           ))}
@@ -79,7 +104,8 @@ export default function ResumesPage() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {filtered.map(resume => (
-              <div key={resume.id} style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee" }}>
+              <div key={resume.id} onClick={handleCardClick}
+                style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee", cursor: profile?.user_type === "구인자" ? "pointer" : "default" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
                   <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: resume.photo_url ? "transparent" : "#FF6B00", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                     {resume.photo_url
