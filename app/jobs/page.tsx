@@ -11,6 +11,7 @@ export default function JobsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchQuery, setSearchQuery] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     const checkAndFetch = async () => {
@@ -62,15 +63,24 @@ export default function JobsPage() {
           style={{ width: "100%", padding: "10px 14px", border: "1px solid #eee", borderRadius: "10px", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
       </div>
 
-      {/* 직종 필터 */}
+      {/* 직종 필터 드롭다운 */}
       <div style={{ background: "#fff", padding: "12px 20px", borderBottom: "1px solid #eee" }}>
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-          {JOB_CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setSelectedCategory(cat)}
-              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555" }}>
-              {cat}
-            </button>
-          ))}
+        <div style={{ position: "relative" }}>
+          <button onClick={() => setDropdownOpen(prev => !prev)}
+            style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 16px", border: "1.5px solid #FF6B00", borderRadius: "10px", background: "#fff", fontSize: "14px", fontWeight: 600, color: "#FF6B00", cursor: "pointer" }}>
+            {selectedCategory === "전체" ? "직종 선택" : selectedCategory}
+            <span style={{ fontSize: "11px" }}>{dropdownOpen ? "▲" : "▼"}</span>
+          </button>
+          {dropdownOpen && (
+            <div style={{ position: "absolute", top: "44px", left: 0, background: "#fff", border: "1px solid #eee", borderRadius: "12px", boxShadow: "0 4px 16px rgba(0,0,0,0.10)", zIndex: 50, minWidth: "160px", overflow: "hidden" }}>
+              {JOB_CATEGORIES.map(cat => (
+                <button key={cat} onClick={() => { setSelectedCategory(cat); setDropdownOpen(false); }}
+                  style={{ display: "block", width: "100%", padding: "11px 18px", border: "none", background: selectedCategory === cat ? "#fff8f5" : "#fff", fontSize: "14px", fontWeight: selectedCategory === cat ? 700 : 400, color: selectedCategory === cat ? "#FF6B00" : "#333", cursor: "pointer", textAlign: "left" }}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
