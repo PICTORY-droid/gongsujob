@@ -69,7 +69,7 @@ export default function JobWritePage() {
       });
       if (error) { setMessage("등록 실패: " + error.message); return; }
       setMessage("✅ 공고가 등록됐습니다.");
-      setTimeout(() => { window.location.href = "/jobs"; }, 1500);
+      setTimeout(() => { window.location.href = "/mypage"; }, 1500);
     } catch { setMessage("오류가 발생했습니다."); }
     finally { setLoading(false); }
   };

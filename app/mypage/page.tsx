@@ -50,7 +50,7 @@ export default function MyPage() {
     </div>
   );
 
-  const isEmployer = profile?.role === "employer";
+  const isEmployer = profile?.user_type === "구인자";
 
   const employerMenus = [
     { icon: "📋", label: "공고 등록", desc: "새 구인 공고 올리기", href: "/jobs/write" },
