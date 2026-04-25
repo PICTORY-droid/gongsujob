@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
@@ -9,6 +9,12 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [mode, setMode] = useState<"login" | "signup">("login");
+  const [autoLogin, setAutoLogin] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(/iPhone|iPad|Android/i.test(navigator.userAgent));
+  }, []);
 
   const handleEmailAuth = async () => {
     if (!email.trim() || !password.trim()) { setError("이메일과 비밀번호를 입력해주세요."); return; }
@@ -17,6 +23,10 @@ export default function LoginPage() {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) { setError("이메일 또는 비밀번호가 올바르지 않습니다."); return; }
+        // 자동로그인 설정 저장 (PC만)
+        if (!isMobile) {
+          localStorage.setItem("autoLogin", autoLogin ? "true" : "false");
+        }
       } else {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) { setError("회원가입 실패: " + error.message); return; }
@@ -28,6 +38,7 @@ export default function LoginPage() {
   };
 
   const handleGoogle = async () => {
+    if (!isMobile) localStorage.setItem("autoLogin", autoLogin ? "true" : "false");
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -35,6 +46,7 @@ export default function LoginPage() {
   };
 
   const handleKakao = async () => {
+    if (!isMobile) localStorage.setItem("autoLogin", autoLogin ? "true" : "false");
     await supabase.auth.signInWithOAuth({
       provider: "kakao",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
@@ -91,6 +103,15 @@ export default function LoginPage() {
             placeholder="비밀번호" onKeyPress={(e) => e.key === "Enter" && handleEmailAuth()}
             style={{ width: "100%", padding: "12px 14px", border: "1px solid #eee", borderRadius: "10px", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
         </div>
+
+        {/* 자동로그인 체크박스 (PC 로그인 탭만) */}
+        {!isMobile && mode === "login" && (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+            <input type="checkbox" id="autoLogin" checked={autoLogin} onChange={(e) => setAutoLogin(e.target.checked)}
+              style={{ width: "16px", height: "16px", accentColor: "#FF6B00", cursor: "pointer" }} />
+            <label htmlFor="autoLogin" style={{ fontSize: "13px", color: "#555", cursor: "pointer" }}>자동로그인</label>
+          </div>
+        )}
 
         {error && <div style={{ background: "#fff3f3", border: "1px solid #ffd0d0", borderRadius: "8px", padding: "10px 14px", fontSize: "13px", color: "#e53e3e", marginBottom: "14px" }}>{error}</div>}
 

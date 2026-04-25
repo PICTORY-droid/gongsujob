@@ -16,14 +16,13 @@ export default function ResumesPage() {
   const [selectedResume, setSelectedResume] = useState<any>(null);
 
   useEffect(() => {
-    const getProfile = async () => {
+    const checkAndInit = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-        setProfile(data);
-      }
+      if (!user) { window.location.href = "/login"; return; }
+      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+      setProfile(data);
     };
-    getProfile();
+    checkAndInit();
   }, []);
 
   useEffect(() => {
@@ -66,10 +65,7 @@ export default function ResumesPage() {
       {selectedResume && (
         <div onClick={() => setSelectedResume(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: "20px 20px 0 0", padding: "28px 24px 40px", width: "100%", maxWidth: "480px", maxHeight: "80vh", overflowY: "auto" }}>
-            {/* 핸들 */}
             <div style={{ width: "40px", height: "4px", background: "#eee", borderRadius: "2px", margin: "0 auto 20px" }} />
-
-            {/* 프로필 */}
             <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
               <div style={{ width: "60px", height: "60px", borderRadius: "50%", background: selectedResume.photo_url ? "transparent" : "#FF6B00", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                 {selectedResume.photo_url
@@ -82,8 +78,6 @@ export default function ResumesPage() {
                 <div style={{ fontSize: "13px", color: "#999", marginTop: "2px" }}>{selectedResume.job_type} · 경력 {selectedResume.career_years || 0}년</div>
               </div>
             </div>
-
-            {/* 연락처 */}
             <div style={{ background: "#fff3e0", borderRadius: "12px", padding: "16px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#FF6B00", fontWeight: 700, marginBottom: "10px" }}>📞 연락처</div>
               {selectedResume.phone && (
@@ -96,8 +90,6 @@ export default function ResumesPage() {
                 <div style={{ fontSize: "13px", color: "#666" }}>{selectedResume.email}</div>
               )}
             </div>
-
-            {/* 상세 정보 */}
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {selectedResume.address && (
                 <div style={{ background: "#f8f9fa", borderRadius: "10px", padding: "12px 14px" }}>
@@ -124,7 +116,6 @@ export default function ResumesPage() {
                 </div>
               )}
             </div>
-
             <button onClick={() => setSelectedResume(null)} style={{ marginTop: "20px", width: "100%", padding: "14px", background: "#f5f5f5", border: "none", borderRadius: "12px", fontSize: "14px", color: "#666", cursor: "pointer", fontWeight: 600 }}>닫기</button>
           </div>
         </div>

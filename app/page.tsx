@@ -17,6 +17,7 @@ export default function HomePage() {
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { window.location.href = "/login"; return; }
       setUser(user);
       if (user) {
         const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
@@ -128,7 +129,9 @@ export default function HomePage() {
 
       {/* 빠른 메뉴 */}
       <section style={{ padding: "20px", display: "flex", gap: "12px", maxWidth: "600px", margin: "0 auto" }}>
-        {[
+        {[const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      if (user) {
           { icon: "📝", label: "이력서 등록", desc: "일자리 매칭 받기", href: "/resume/write" },
           { icon: "🏗️", label: "공고 등록", desc: "인력 바로 구하기", href: "/jobs/write" },
           { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
