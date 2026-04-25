@@ -56,7 +56,7 @@ export default function ResumesPage() {
 
       {/* 직종 필터 */}
       <div style={{ background: "#fff", padding: "12px 20px", borderBottom: "1px solid #eee" }}>
-        <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           {JOB_CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setSelectedCategory(cat)}
               style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555", flexShrink: 0 }}>

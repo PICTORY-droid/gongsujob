@@ -143,10 +143,10 @@ export default function HomePage() {
 
       {/* 직종 필터 */}
       <section style={{ padding: "0 20px 12px", maxWidth: "600px", margin: "0 auto" }}>
-        <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           {JOB_CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setSelectedCategory(cat)}
-              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555", flexShrink: 0 }}>
+              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555" }}>
               {cat}
             </button>
           ))}
@@ -179,7 +179,14 @@ export default function HomePage() {
                         <span style={{ fontSize: "15px", fontWeight: 600, color: "#1a1a1a" }}>{job.title}</span>
                       </div>
                       <div style={{ fontSize: "12px", color: "#999" }}>{job.company} · {job.region}</div>
-                    </div>
+                    </div><div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
+          {JOB_CATEGORIES.map(cat => (
+            <button key={cat} onClick={() => setSelectedCategory(cat)}
+              style={{ padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap", border: selectedCategory === cat ? "none" : "1px solid #ddd", background: selectedCategory === cat ? "#FF6B00" : "#fff", color: selectedCategory === cat ? "#fff" : "#555", flexShrink: 0 }}>
+              {cat}
+            </button>
+          ))}
+        </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
                       <div style={{ fontSize: "16px", fontWeight: 700, color: "#FF6B00" }}>{job.pay?.toLocaleString()}원</div>
                       <div style={{ fontSize: "11px", color: "#999" }}>{job.pay_type}</div>
