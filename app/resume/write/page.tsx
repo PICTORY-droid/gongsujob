@@ -116,7 +116,7 @@ export default function ResumeWritePage() {
       } else {
         await supabase.from("resumes").insert(resumeData);
       }
-      setMessage("✅ 이력서가 저장됐습니다.");
+      setMessage("✅ 이력서가 저장됐습니다."); setTimeout(() => { window.location.href = "/mypage"; }, 1500);
     } catch { setMessage("오류가 발생했습니다."); }
     finally { setLoading(false); }
   };
