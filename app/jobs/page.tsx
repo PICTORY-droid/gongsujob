@@ -19,7 +19,7 @@ export default function JobsPage() {
   const fetchJobs = async () => {
     setLoading(true);
     let query = supabase
-      .from("jobs")
+      .from("active_jobs")
       .select("*")
       .eq("is_active", true)
       .order("created_at", { ascending: false });
