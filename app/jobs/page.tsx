@@ -14,6 +14,12 @@ export default function JobsPage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
+    const handleClickOutside = () => setDropdownOpen(false);
+    if (dropdownOpen) document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [dropdownOpen]);
+
+  useEffect(() => {
     const checkAndFetch = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = "/login"; return; }
@@ -29,11 +35,9 @@ export default function JobsPage() {
       .select("*")
       .eq("is_active", true)
       .order("created_at", { ascending: false });
-
     if (selectedCategory !== "전체") {
       query = query.eq("job_type", selectedCategory);
     }
-
     const { data, error } = await query;
     if (!error && data) setJobs(data);
     setLoading(false);
@@ -46,7 +50,6 @@ export default function JobsPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', sans-serif", paddingBottom: "80px" }}>
 
-      {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
@@ -56,17 +59,15 @@ export default function JobsPage() {
         <Link href="/jobs/write" style={{ background: "#FF6B00", color: "#fff", border: "none", borderRadius: "8px", padding: "6px 14px", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>+ 등록</Link>
       </header>
 
-      {/* 검색 */}
       <div style={{ background: "#fff", padding: "12px 20px", borderBottom: "1px solid #eee" }}>
         <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="직종 또는 지역 검색"
           style={{ width: "100%", padding: "10px 14px", border: "1px solid #eee", borderRadius: "10px", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
       </div>
 
-      {/* 직종 필터 드롭다운 */}
       <div style={{ background: "#fff", padding: "12px 20px", borderBottom: "1px solid #eee" }}>
         <div style={{ position: "relative" }}>
-          <button onClick={() => setDropdownOpen(prev => !prev)}
+          <button onClick={(e) => { e.stopPropagation(); setDropdownOpen(prev => !prev); }}
             style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 16px", border: "1.5px solid #FF6B00", borderRadius: "10px", background: "#fff", fontSize: "14px", fontWeight: 600, color: "#FF6B00", cursor: "pointer" }}>
             {selectedCategory === "전체" ? "직종 선택" : selectedCategory}
             <span style={{ fontSize: "11px" }}>{dropdownOpen ? "▲" : "▼"}</span>
@@ -84,7 +85,6 @@ export default function JobsPage() {
         </div>
       </div>
 
-      {/* 공고 목록 */}
       <div style={{ maxWidth: "600px", margin: "0 auto", padding: "16px 20px" }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: "40px", color: "#999", fontSize: "14px" }}>불러오는 중...</div>
@@ -124,7 +124,6 @@ export default function JobsPage() {
         )}
       </div>
 
-      {/* 하단 탭바 */}
       <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
         {[
           { icon: "🏠", label: "홈", href: "/" },

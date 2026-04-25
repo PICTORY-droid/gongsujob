@@ -16,6 +16,12 @@ export default function HomePage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
+    const handleClickOutside = () => setDropdownOpen(false);
+    if (dropdownOpen) document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [dropdownOpen]);
+
+  useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = "/login"; return; }
@@ -71,7 +77,6 @@ export default function HomePage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', 'Pretendard', sans-serif" }}>
 
-      {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <img src="/logo.png" alt="로고" style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }} />
@@ -100,7 +105,6 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* 히어로 */}
       <section style={{ background: "linear-gradient(135deg, #FF6B00 0%, #ff8c00 100%)", padding: "40px 20px", color: "#fff", textAlign: "center" }}>
         <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "8px", lineHeight: 1.4 }}>건설 현장 일자리,<br />지금 바로 찾으세요</h1>
         <p style={{ fontSize: "14px", opacity: 0.9, marginBottom: "24px" }}>전국 건설 현장 일용직 · 당일 지급 · 소장님 직접 등록</p>
@@ -112,7 +116,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 통계 */}
       <section style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "16px 20px", display: "flex", justifyContent: "center", gap: "32px" }}>
         {[
           { num: "1,247", label: "오늘 공고" },
@@ -127,7 +130,6 @@ export default function HomePage() {
         ))}
       </section>
 
-      {/* 빠른 메뉴 */}
       <section style={{ padding: "20px", display: "flex", gap: "12px", maxWidth: "600px", margin: "0 auto" }}>
         {[
           { icon: "📝", label: "이력서 등록", desc: "일자리 매칭 받기", href: "/resume/write" },
@@ -142,15 +144,12 @@ export default function HomePage() {
         ))}
       </section>
 
-      
-
-      {/* 공고 목록 */}
       <section style={{ padding: "0 20px 80px", maxWidth: "600px", margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <span style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>오늘의 공고 <span style={{ color: "#FF6B00" }}>{filtered.length}</span></span>
             <div style={{ position: "relative" }}>
-              <button onClick={() => setDropdownOpen(prev => !prev)}
+              <button onClick={(e) => { e.stopPropagation(); setDropdownOpen(prev => !prev); }}
                 style={{ display: "flex", alignItems: "center", gap: "6px", padding: "5px 12px", border: "1.5px solid #FF6B00", borderRadius: "8px", background: "#fff", fontSize: "12px", fontWeight: 600, color: "#FF6B00", cursor: "pointer" }}>
                 {selectedCategory === "전체" ? "직종 선택" : selectedCategory}
                 <span style={{ fontSize: "10px" }}>{dropdownOpen ? "▲" : "▼"}</span>
@@ -169,6 +168,7 @@ export default function HomePage() {
           </div>
           <Link href="/jobs" style={{ fontSize: "12px", color: "#999", textDecoration: "none" }}>전체보기 →</Link>
         </div>
+
         {loading ? (
           <div style={{ textAlign: "center", padding: "40px", color: "#999", fontSize: "14px" }}>불러오는 중...</div>
         ) : filtered.length === 0 ? (
@@ -206,7 +206,6 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* 하단 탭바 */}
       <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
         {[
           { icon: "🏠", label: "홈", href: "/" },

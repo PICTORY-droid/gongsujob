@@ -17,6 +17,12 @@ export default function ResumesPage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
+    const handleClickOutside = () => setDropdownOpen(false);
+    if (dropdownOpen) document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [dropdownOpen]);
+
+  useEffect(() => {
     const checkAndInit = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = "/login"; return; }
@@ -55,14 +61,12 @@ export default function ResumesPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', sans-serif", paddingBottom: "80px" }}>
 
-      {/* 토스트 */}
       {toast && (
         <div style={{ position: "fixed", top: "72px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.75)", color: "#fff", fontSize: "13px", padding: "10px 20px", borderRadius: "999px", zIndex: 999, whiteSpace: "nowrap" }}>
           구인전용 메뉴입니다
         </div>
       )}
 
-      {/* 상세 모달 */}
       {selectedResume && (
         <div onClick={() => setSelectedResume(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: "20px 20px 0 0", padding: "28px 24px 40px", width: "100%", maxWidth: "480px", maxHeight: "80vh", overflowY: "auto" }}>
@@ -122,7 +126,6 @@ export default function ResumesPage() {
         </div>
       )}
 
-      {/* 헤더 */}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
@@ -132,17 +135,15 @@ export default function ResumesPage() {
         <div style={{ width: "40px" }} />
       </header>
 
-      {/* 검색 */}
       <div style={{ background: "#fff", padding: "12px 20px", borderBottom: "1px solid #eee" }}>
         <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="이름, 직종, 지역 검색"
           style={{ width: "100%", padding: "10px 14px", border: "1px solid #eee", borderRadius: "10px", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
       </div>
 
-      {/* 직종 필터 드롭다운 */}
       <div style={{ background: "#fff", padding: "12px 20px", borderBottom: "1px solid #eee" }}>
         <div style={{ position: "relative" }}>
-          <button onClick={() => setDropdownOpen(prev => !prev)}
+          <button onClick={(e) => { e.stopPropagation(); setDropdownOpen(prev => !prev); }}
             style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 16px", border: "1.5px solid #FF6B00", borderRadius: "10px", background: "#fff", fontSize: "14px", fontWeight: 600, color: "#FF6B00", cursor: "pointer" }}>
             {selectedCategory === "전체" ? "직종 선택" : selectedCategory}
             <span style={{ fontSize: "11px" }}>{dropdownOpen ? "▲" : "▼"}</span>
@@ -160,7 +161,6 @@ export default function ResumesPage() {
         </div>
       </div>
 
-      {/* 인재 목록 */}
       <div style={{ maxWidth: "600px", margin: "0 auto", padding: "16px 20px" }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: "40px", color: "#999", fontSize: "14px" }}>불러오는 중...</div>
@@ -201,7 +201,6 @@ export default function ResumesPage() {
         )}
       </div>
 
-      {/* 하단 탭바 */}
       <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
         {[
           { icon: "🏠", label: "홈", href: "/" },
