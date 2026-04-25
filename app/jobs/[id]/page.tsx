@@ -91,7 +91,7 @@ export default function JobDetailPage() {
   const isEmployer = profile?.user_type === "구인자";
   return (
     <>
-      <Script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=df58203831b3eac3cf6f8b301680d626&libraries=services" strategy="afterInteractive" onLoad={() => { setKakaoReady(true); }} />
+      <Script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=df58203831b3eac3cf6f8b301680d626&libraries=services" strategy="beforeInteractive" onLoad={() => { setKakaoReady(true); }} />
       <div style={{minHeight:"100vh",background:"#f8f9fa",paddingBottom:"120px"}}>
         <header style={{background:"#fff",borderBottom:"1px solid #eee",padding:"0 20px",height:"56px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:100}}>
           <Link href="/jobs" style={{fontSize:"13px",color:"#666",textDecoration:"none"}}>← 공고목록</Link>
