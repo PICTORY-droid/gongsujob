@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
   try {
     const res = await fetch(
       "https://dapi.kakao.com/v2/local/search/address.json?query=" + encodeURIComponent(address),
-      { headers: { Authorization: "KakaoAK df58203831b3eac3cf6f8b301680d626" } }
+      { headers: { Authorization: "KakaoAK fc92387847139e9982abf7ba92bed979" } }
     );
     const data = await res.json();
     if (data.documents && data.documents.length > 0) {
