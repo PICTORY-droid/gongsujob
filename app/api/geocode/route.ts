@@ -5,12 +5,21 @@ export async function GET(req: NextRequest) {
   if (!address) return NextResponse.json({ error: "no address" }, { status: 400 });
   try {
     const res = await fetch(
-      "https://dapi.kakao.com/v2/local/search/address.json?query=" + encodeURIComponent(address),
+      "https://dapi.kakao.com/v2/local/search/keyword.json?query=" + encodeURIComponent(address),
       { headers: { Authorization: "KakaoAK fc92387847139e9982abf7ba92bed979" } }
     );
     const data = await res.json();
     if (data.documents && data.documents.length > 0) {
       const { x, y } = data.documents[0];
+      return NextResponse.json({ lng: x, lat: y });
+    }
+    const res2 = await fetch(
+      "https://dapi.kakao.com/v2/local/search/address.json?query=" + encodeURIComponent(address),
+      { headers: { Authorization: "KakaoAK fc92387847139e9982abf7ba92bed979" } }
+    );
+    const data2 = await res2.json();
+    if (data2.documents && data2.documents.length > 0) {
+      const { x, y } = data2.documents[0];
       return NextResponse.json({ lng: x, lat: y });
     }
     return NextResponse.json({ error: "not found" }, { status: 404 });
