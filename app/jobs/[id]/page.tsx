@@ -19,8 +19,7 @@ export default function JobDetailPage() {
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [calcDays, setCalcDays] = useState(1);
   const [showCalc, setShowCalc] = useState(false);
-  const [mapCoords, setMapCoords] = useState<{lat: string; lng: string} | null>(null);
-const [staticMapUrl, setStaticMapUrl] = useState<string | null>(null);
+  const [staticMapUrl, setStaticMapUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -50,9 +49,8 @@ const [staticMapUrl, setStaticMapUrl] = useState<string | null>(null);
           const geoRes = await fetch("/api/geocode?address=" + encodeURIComponent(address));
           const geoData = await geoRes.json();
           if (!geoData.error) {
-  setMapCoords(geoData);
-  setStaticMapUrl(`/api/staticmap?lng=${geoData.lng}&lat=${geoData.lat}`);
-}
+            setStaticMapUrl(`/api/staticmap?lng=${geoData.lng}&lat=${geoData.lat}`);
+          }
         } catch {}
       }
     };
@@ -83,7 +81,6 @@ const [staticMapUrl, setStaticMapUrl] = useState<string | null>(null);
   const calc = calcResult();
   const isEmployer = profile?.user_type === "구인자";
   const address = job.detail_address || job.region;
-  
 
   return (
     <div style={{minHeight:"100vh",background:"#f8f9fa",paddingBottom:"120px"}}>
