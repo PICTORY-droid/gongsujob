@@ -10,13 +10,19 @@ export async function GET(req: NextRequest) {
   const y = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
 
   const tileUrl = `https://tile.openstreetmap.org/${zoom}/${x}/${y}.png`;
-  const res = await fetch(tileUrl, { headers: { "User-Agent": "gongsujob/1.0" } });
-  const buffer = await res.arrayBuffer();
-
-  return new NextResponse(buffer, {
-    headers: {
-      "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=86400",
-    },
-  });
+  try {
+    const res = await fetch(tileUrl, { 
+      headers: { "User-Agent": "gongsujob/1.0" },
+      cache: "no-store"
+    });
+    const buffer = await res.arrayBuffer();
+    return new NextResponse(buffer, {
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "no-store",
+      },
+    });
+  } catch {
+    return NextResponse.json({ error: "fail" }, { status: 500 });
+  }
 }
