@@ -80,7 +80,7 @@ export default function JobDetailPage() {
   const isEmployer = profile?.user_type === "구인자";
   const address = job.detail_address || job.region;
   const staticMapUrl = mapCoords
-    ? `https://dapi.kakao.com/v2/maps/staticmap?appkey=df58203831b3eac3cf6f8b301680d626&center=${mapCoords.lng},${mapCoords.lat}&level=4&w=560&h=220&marker=pos:${mapCoords.lng} ${mapCoords.lat}`
+    ? `/api/staticmap?lng=${mapCoords.lng}&lat=${mapCoords.lat}`
     : null;
 
   return (
