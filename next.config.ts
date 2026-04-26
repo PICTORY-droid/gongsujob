@@ -1,3 +1,17 @@
 import type { NextConfig } from "next";
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "img-src * data: blob:;",
+          },
+        ],
+      },
+    ];
+  },
+};
 export default nextConfig;
