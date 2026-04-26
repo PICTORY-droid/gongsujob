@@ -20,6 +20,7 @@ export default function JobDetailPage() {
   const [calcDays, setCalcDays] = useState(1);
   const [showCalc, setShowCalc] = useState(false);
   const [mapCoords, setMapCoords] = useState<{lat: string; lng: string} | null>(null);
+const [staticMapUrl, setStaticMapUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -48,7 +49,10 @@ export default function JobDetailPage() {
         try {
           const geoRes = await fetch("/api/geocode?address=" + encodeURIComponent(address));
           const geoData = await geoRes.json();
-          if (!geoData.error) setMapCoords(geoData);
+          if (!geoData.error) {
+  setMapCoords(geoData);
+  setStaticMapUrl(`/api/staticmap?lng=${geoData.lng}&lat=${geoData.lat}`);
+}
         } catch {}
       }
     };
@@ -79,9 +83,7 @@ export default function JobDetailPage() {
   const calc = calcResult();
   const isEmployer = profile?.user_type === "구인자";
   const address = job.detail_address || job.region;
-  const staticMapUrl = mapCoords
-    ? `/api/staticmap?lng=${mapCoords.lng}&lat=${mapCoords.lat}`
-    : null;
+  
 
   return (
     <div style={{minHeight:"100vh",background:"#f8f9fa",paddingBottom:"120px"}}>
