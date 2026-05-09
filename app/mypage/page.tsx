@@ -276,11 +276,13 @@ export default function MyPage() {
     { icon: "📋", label: "공고 등록", desc: "새 구인 공고 올리기", href: "/jobs/write" },
     { icon: "🏗️", label: "전체 공고 보기", desc: "등록된 모든 공고", href: "/jobs" },
     { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
+    { icon: "💼", label: "포지션 제안 관리", desc: "보낸 제안 이력 확인", href: "/offers" },
   ];
 
   const seekerMenus = [
     { icon: "📝", label: "이력서 작성·수정", desc: "내 이력서 관리", href: "/resume/write" },
     { icon: "📋", label: "공고 보기", desc: "채용 공고 둘러보기", href: "/jobs" },
+    { icon: "💼", label: "포지션 제안 관리", desc: "받은 제안 확인", href: "/offers" },
   ];
 
   const menus = isEmployer ? employerMenus : seekerMenus;
