@@ -30,8 +30,9 @@ https://gongsujob-phgb.vercel.app
 
 - 로그인 화면과 회원가입 화면 분리
 - 이메일 회원가입 및 로그인
-- Google 소셜 로그인
-- Kakao 소셜 로그인
+- Google 소셜 인증
+- Kakao 소셜 인증
+- 소셜 인증은 기존 계정이면 로그인, 신규 계정이면 가입 후 첫 설정으로 이동
 - Supabase Auth 기반 사용자 인증
 - 구인자, 구직자 유형별 화면 분기
 
