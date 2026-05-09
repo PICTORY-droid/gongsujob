@@ -174,9 +174,12 @@ export default function ResumesPage() {
                   <div style={{ fontSize: "13px", color: "#666", marginBottom: "6px" }}>
                     전화번호: {maskPhone(selectedResume.phone)}
                   </div>
-                  <div style={{ fontSize: "13px", color: "#666" }}>
+                  <div style={{ fontSize: "13px", color: "#666", marginBottom: "12px" }}>
                     이메일: {maskEmail(selectedResume.email)}
                   </div>
+                  <Link href="/verify-employer" style={{ display: "block", width: "100%", textAlign: "center", padding: "11px 12px", borderRadius: "10px", background: "#FF6B00", color: "#fff", textDecoration: "none", fontSize: "13px", fontWeight: 800 }}>
+                    이메일 인증하고 연락처 보기
+                  </Link>
                 </>
               )}
             </div>
