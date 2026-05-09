@@ -518,7 +518,7 @@ export default function ResumesPage() {
         )}
       </div>
 
-      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
+      <nav className="mobile-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
         {[
           { icon: "🏠", label: "홈", href: "/" },
           { icon: "📋", label: "공고", href: "/jobs" },
