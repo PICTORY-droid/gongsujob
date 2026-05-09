@@ -153,9 +153,11 @@ export default function AuthForm({ mode }: AuthFormProps) {
             {isLogin ? "로그인" : "회원가입"}
           </div>
           <div style={{ fontSize: "13px", color: "#999", lineHeight: 1.5 }}>
-            {isLogin
-              ? "로그인 후 서비스를 이용할 수 있습니다."
-              : "이메일 회원가입 후 첫 설정을 완료해야 서비스를 이용할 수 있습니다."}
+            {isLogin ? (
+              <>소셜 계정은 기존 계정이면 로그인,<br />첫 이용은 가입 후 첫 설정으로 이어집니다.</>
+            ) : (
+              <>이메일 회원가입 후 첫 설정을 완료해야<br />서비스를 이용할 수 있습니다.</>
+            )}
           </div>
         </div>
 
@@ -174,7 +176,8 @@ export default function AuthForm({ mode }: AuthFormProps) {
         </div>
 
         <div style={{ fontSize: "12px", color: "#999", lineHeight: 1.5, textAlign: "center", marginBottom: "20px" }}>
-          소셜 계정은 기존 계정이면 로그인, 처음 이용하면 가입 후 첫 설정으로 이어집니다.
+          소셜 계정은 기존 계정이면 로그인,<br />
+          첫 이용은 가입 후 설정으로 이어집니다.
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
