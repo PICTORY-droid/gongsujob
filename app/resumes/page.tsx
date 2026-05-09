@@ -284,7 +284,8 @@ export default function ResumesPage() {
             <div style={{ background: "#fff8f5", border: "1px solid #ffd9bf", borderRadius: "12px", padding: "14px", marginBottom: "12px" }}>
               <div style={{ fontSize: "12px", color: "#FF6B00", fontWeight: 800, marginBottom: "6px" }}>🔐 개인정보 보호 안내</div>
               <div style={{ fontSize: "12px", color: "#666", lineHeight: 1.5 }}>
-                구직자의 연락처는 바로 공개되지 않습니다. 구직자가 포지션 제안을 수락하면 연락처 열람이 가능합니다.
+                구직자의 연락처는 바로 공개되지 않습니다.<br />
+                구직자가 포지션 제안을 수락하면 연락처 열람이 가능합니다.
               </div>
             </div>
 
@@ -347,7 +348,8 @@ export default function ResumesPage() {
                   <div style={{ background: "#f8f9fa", borderRadius: "14px", padding: "16px", border: "1px solid #eee" }}>
                     <div style={{ fontSize: "14px", fontWeight: 800, color: "#1a1a1a", marginBottom: "6px" }}>포지션 제안 작성</div>
                     <div style={{ fontSize: "12px", color: "#666", lineHeight: 1.5, marginBottom: "14px" }}>
-                      제안이 발송되면 구직자에게 앱 알림이 전달됩니다. 구직자가 수락하면 연락처 열람이 가능합니다.
+                      제안이 발송되면 구직자에게 앱 알림이 전달됩니다.<br />
+                      구직자가 수락하면 연락처 열람이 가능합니다.
                     </div>
 
                     {myJobs.length > 0 && (
