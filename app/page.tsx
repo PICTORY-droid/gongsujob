@@ -16,6 +16,7 @@ export default function HomePage() {
   const [resumes, setResumes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = () => setDropdownOpen(false);
@@ -26,7 +27,12 @@ export default function HomePage() {
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { window.location.href = "/login"; return; }
+      if (!user) {
+        setUser(null);
+        setProfile(null);
+        return;
+      }
+
       setUser(user);
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
       setProfile(data);
@@ -89,6 +95,15 @@ export default function HomePage() {
     window.location.href = "/login";
   };
 
+  const handleProtectedMove = (href: string) => {
+    if (!user) {
+      setLoginModalOpen(true);
+      return;
+    }
+
+    window.location.href = href;
+  };
+
   const isEmployer = profile?.user_type === "구인자";
 
   const filteredJobs = jobs.filter(job =>
@@ -104,7 +119,14 @@ export default function HomePage() {
 
   const filtered = isEmployer ? filteredResumes : filteredJobs;
 
-  const actionCards = isEmployer
+  const actionCards = !user
+    ? [
+        { icon: "📝", label: "이력서 등록", desc: "일자리 매칭 받기", href: "/resume/write" },
+        { icon: "📋", label: "공고 보기", desc: "현장 일자리 찾기", href: "/jobs" },
+        { icon: "🏗️", label: "공고 등록", desc: "인력 바로 구하기", href: "/jobs/write" },
+        { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
+      ]
+    : isEmployer
     ? [
         { icon: "🏗️", label: "공고 등록", desc: "인력 바로 구하기", href: "/jobs/write" },
         { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
@@ -157,6 +179,27 @@ export default function HomePage() {
           }
         }
       `}</style>
+
+      {loginModalOpen && (
+        <div onClick={() => setLoginModalOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: "360px", background: "#fff", borderRadius: "18px", padding: "24px 20px", boxShadow: "0 12px 36px rgba(0,0,0,0.22)", textAlign: "center" }}>
+            <div style={{ fontSize: "32px", marginBottom: "10px" }}>🔐</div>
+            <div style={{ fontSize: "18px", fontWeight: 800, color: "#1a1a1a", marginBottom: "8px" }}>로그인이 필요합니다</div>
+            <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.6, marginBottom: "18px" }}>
+              이 기능은 로그인 후 이용할 수 있습니다.<br />
+              로그인 또는 회원가입 후 다시 이용해주세요.
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button onClick={() => setLoginModalOpen(false)} style={{ flex: 1, padding: "12px", background: "#fff", border: "1px solid #ddd", borderRadius: "10px", fontSize: "13px", color: "#666", cursor: "pointer", fontWeight: 700 }}>
+                닫기
+              </button>
+              <button onClick={() => { window.location.href = "/login"; }} style={{ flex: 2, padding: "12px", background: "#FF6B00", border: "none", borderRadius: "10px", fontSize: "13px", color: "#fff", cursor: "pointer", fontWeight: 800 }}>
+                로그인하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -226,13 +269,13 @@ export default function HomePage() {
         ))}
       </section>
 
-      <section style={{ padding: "20px", display: "flex", gap: "12px", maxWidth: "600px", margin: "0 auto" }}>
+      <section style={{ padding: "20px", display: "flex", gap: "12px", maxWidth: "600px", margin: "0 auto", flexWrap: "wrap" }}>
         {actionCards.map((item, i) => (
-          <Link key={i} href={item.href} style={{ flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", textDecoration: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+          <button key={i} onClick={() => handleProtectedMove(item.href)} style={{ flex: "1 1 130px", background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", cursor: "pointer" }}>
             <div style={{ fontSize: "28px", marginBottom: "6px" }}>{item.icon}</div>
             <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>{item.label}</div>
             <div style={{ fontSize: "11px", color: "#999", marginTop: "2px" }}>{item.desc}</div>
-          </Link>
+          </button>
         ))}
       </section>
 
@@ -260,9 +303,9 @@ export default function HomePage() {
               )}
             </div>
           </div>
-          <Link href={isEmployer ? "/resumes" : "/jobs"} style={{ fontSize: "12px", color: "#999", textDecoration: "none" }}>
+          <button onClick={() => handleProtectedMove(isEmployer ? "/resumes" : "/jobs")} style={{ background: "transparent", border: "none", fontSize: "12px", color: "#999", cursor: "pointer" }}>
             {isEmployer ? "전체 인재 →" : "전체보기 →"}
-          </Link>
+          </button>
         </div>
 
         {loading ? (
@@ -331,7 +374,7 @@ export default function HomePage() {
           </div>
         )}
       </section>
-      <MobileBottomNav />
+      <MobileBottomNav userLoggedIn={!!user} onRequireLogin={() => setLoginModalOpen(true)} />
     </div>
   );
 }

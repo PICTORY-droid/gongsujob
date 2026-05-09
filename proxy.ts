@@ -50,7 +50,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/",
     "/jobs/:path*",
     "/mypage",
     "/onboarding",

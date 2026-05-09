@@ -11,7 +11,15 @@ const bottomTabs = [
   { icon: "👤", label: "내정보", href: "/mypage" },
 ];
 
-export default function MobileBottomNav() {
+type MobileBottomNavProps = {
+  userLoggedIn?: boolean;
+  onRequireLogin?: () => void;
+};
+
+export default function MobileBottomNav({
+  userLoggedIn = true,
+  onRequireLogin,
+}: MobileBottomNavProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
@@ -25,7 +33,19 @@ export default function MobileBottomNav() {
         const active = isActive(tab.href);
 
         return (
-          <Link key={tab.href} href={tab.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", textDecoration: "none" }}>
+          <Link
+            key={tab.href}
+            href={tab.href}
+            onClick={(e) => {
+              const isProtected = tab.href !== "/" && tab.href !== "/contact";
+
+              if (!userLoggedIn && isProtected) {
+                e.preventDefault();
+                onRequireLogin?.();
+              }
+            }}
+            style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", textDecoration: "none" }}
+          >
             <span style={{ fontSize: "20px" }}>{tab.icon}</span>
             <span style={{ fontSize: "10px", color: active ? "#FF6B00" : "#999", fontWeight: active ? 600 : 400 }}>{tab.label}</span>
           </Link>
