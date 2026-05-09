@@ -281,98 +281,194 @@ export default function HomePage() {
       </section>
 
       <section style={{ padding: "0 20px 80px", maxWidth: "600px", margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>
-              {isEmployer ? "등록된 인재" : "오늘의 공고"} <span style={{ color: "#FF6B00" }}>{filtered.length}</span>
-            </span>
-            <div style={{ position: "relative" }}>
-              <button onClick={(e) => { e.stopPropagation(); setDropdownOpen(prev => !prev); }}
-                style={{ display: "flex", alignItems: "center", gap: "6px", padding: "5px 12px", border: "1.5px solid #FF6B00", borderRadius: "8px", background: "#fff", fontSize: "12px", fontWeight: 600, color: "#FF6B00", cursor: "pointer" }}>
-                {selectedCategory === "전체" ? "직종 선택" : selectedCategory}
-                <span style={{ fontSize: "10px" }}>{dropdownOpen ? "▲" : "▼"}</span>
-              </button>
-              {dropdownOpen && (
-                <div style={{ position: "absolute", top: "34px", left: 0, background: "#fff", border: "1px solid #eee", borderRadius: "12px", boxShadow: "0 4px 16px rgba(0,0,0,0.10)", zIndex: 50, minWidth: "160px", overflow: "hidden" }}>
-                  {JOB_CATEGORIES.map(cat => (
-                    <button key={cat} onClick={() => { setSelectedCategory(cat); setDropdownOpen(false); }}
-                      style={{ display: "block", width: "100%", padding: "11px 18px", border: "none", background: selectedCategory === cat ? "#fff8f5" : "#fff", fontSize: "14px", fontWeight: selectedCategory === cat ? 700 : 400, color: selectedCategory === cat ? "#FF6B00" : "#333", cursor: "pointer", textAlign: "left" }}>
-                      {cat}
+        {!user ? (
+          <>
+            <div style={{ marginBottom: "28px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <span style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a" }}>
+                  공고 미리보기 <span style={{ color: "#FF6B00" }}>{filteredJobs.length}</span>
+                </span>
+                <button onClick={() => handleProtectedMove("/jobs")} style={{ background: "transparent", border: "none", fontSize: "12px", color: "#999", cursor: "pointer" }}>
+                  전체보기 →
+                </button>
+              </div>
+
+              {loading ? (
+                <div style={{ textAlign: "center", padding: "32px", color: "#999", fontSize: "14px" }}>불러오는 중...</div>
+              ) : filteredJobs.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "32px 20px", background: "#fff", borderRadius: "12px", border: "1px solid #eee" }}>
+                  <div style={{ fontSize: "28px", marginBottom: "8px" }}>📋</div>
+                  <div style={{ fontSize: "14px", color: "#999" }}>등록된 공고가 없습니다</div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {filteredJobs.slice(0, 3).map(job => (
+                    <button key={job.id} onClick={() => handleProtectedMove(`/jobs/${job.id}`)} style={{ width: "100%", textAlign: "left", background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee", cursor: "pointer" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
+                        <div style={{ flex: 1 }}>
+                          {job.is_urgent && <span style={{ background: "#ffebee", color: "#e53935", fontSize: "10px", borderRadius: "4px", padding: "2px 6px", marginRight: "6px" }}>긴급</span>}
+                          <div style={{ fontSize: "15px", fontWeight: 700, color: "#1a1a1a", marginBottom: "4px" }}>{job.title}</div>
+                          <div style={{ fontSize: "12px", color: "#999" }}>{job.company} · {job.region}</div>
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div style={{ fontSize: "16px", fontWeight: 700, color: "#FF6B00" }}>{job.pay?.toLocaleString()}원</div>
+                          <div style={{ fontSize: "11px", color: "#999" }}>{job.pay_type}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                        <span style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>{job.job_type}</span>
+                        <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📅 {job.start_date}</span>
+                        <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📍 {job.region}</span>
+                      </div>
                     </button>
                   ))}
                 </div>
               )}
             </div>
-          </div>
-          <button onClick={() => handleProtectedMove(isEmployer ? "/resumes" : "/jobs")} style={{ background: "transparent", border: "none", fontSize: "12px", color: "#999", cursor: "pointer" }}>
-            {isEmployer ? "전체 인재 →" : "전체보기 →"}
-          </button>
-        </div>
 
-        {loading ? (
-          <div style={{ textAlign: "center", padding: "40px", color: "#999", fontSize: "14px" }}>불러오는 중...</div>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px 20px" }}>
-            <div style={{ fontSize: "32px", marginBottom: "8px" }}>{isEmployer ? "👷" : "📋"}</div>
-            <div style={{ fontSize: "14px", color: "#999" }}>
-              {isEmployer ? "등록된 인재가 없습니다" : "등록된 공고가 없습니다"}
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <span style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a" }}>
+                  인재 미리보기 <span style={{ color: "#FF6B00" }}>{filteredResumes.length}</span>
+                </span>
+                <button onClick={() => handleProtectedMove("/resumes")} style={{ background: "transparent", border: "none", fontSize: "12px", color: "#999", cursor: "pointer" }}>
+                  전체 인재 →
+                </button>
+              </div>
+
+              {filteredResumes.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "32px 20px", background: "#fff", borderRadius: "12px", border: "1px solid #eee" }}>
+                  <div style={{ fontSize: "28px", marginBottom: "8px" }}>👷</div>
+                  <div style={{ fontSize: "14px", color: "#999" }}>등록된 인재가 없습니다</div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {filteredResumes.slice(0, 3).map(resume => (
+                    <button key={resume.id} onClick={() => handleProtectedMove("/resumes")} style={{ width: "100%", textAlign: "left", background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee", cursor: "pointer" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: resume.skills ? "10px" : "0" }}>
+                        <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: resume.photo_url ? "transparent" : "#FF6B00", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                          {resume.photo_url
+                            ? <img src={resume.photo_url} alt="프로필" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            : <span style={{ fontSize: "20px", color: "#fff", fontWeight: 700 }}>{resume.name?.charAt(0) || "👷"}</span>
+                          }
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: "15px", fontWeight: 700, color: "#1a1a1a" }}>{resume.name || "이름 미입력"}</div>
+                          <div style={{ fontSize: "12px", color: "#999", marginTop: "2px" }}>
+                            경력 {resume.career_years || 0}년 · {resume.address || "지역 미입력"}
+                          </div>
+                        </div>
+                        <div style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "12px", borderRadius: "6px", padding: "4px 10px", fontWeight: 600 }}>
+                          {resume.job_type || "직종 미입력"}
+                        </div>
+                      </div>
+                      {resume.skills && (
+                        <div style={{ fontSize: "12px", color: "#666", background: "#f8f9fa", borderRadius: "8px", padding: "8px 12px" }}>
+                          🛠 {resume.skills}
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ) : isEmployer ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {filteredResumes.map(resume => (
-              <Link key={resume.id} href="/resumes"
-                style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee", textDecoration: "none" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: resume.skills ? "10px" : "0" }}>
-                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: resume.photo_url ? "transparent" : "#FF6B00", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
-                    {resume.photo_url
-                      ? <img src={resume.photo_url} alt="프로필" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      : <span style={{ fontSize: "20px", color: "#fff", fontWeight: 700 }}>{resume.name?.charAt(0) || "👷"}</span>
-                    }
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "15px", fontWeight: 700, color: "#1a1a1a" }}>{resume.name || "이름 미입력"}</div>
-                    <div style={{ fontSize: "12px", color: "#999", marginTop: "2px" }}>
-                      경력 {resume.career_years || 0}년 · {resume.address || "지역 미입력"}
-                    </div>
-                  </div>
-                  <div style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "12px", borderRadius: "6px", padding: "4px 10px", fontWeight: 600 }}>
-                    {resume.job_type || "직종 미입력"}
-                  </div>
-                </div>
-                {resume.skills && (
-                  <div style={{ fontSize: "12px", color: "#666", background: "#f8f9fa", borderRadius: "8px", padding: "8px 12px" }}>
-                    🛠 {resume.skills}
-                  </div>
-                )}
-              </Link>
-            ))}
-          </div>
+          </>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {filteredJobs.map(job => (
-              <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: "none" }}>
-                <div style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
-                    <div style={{ flex: 1 }}>
-                      {job.is_urgent && <span style={{ background: "#ffebee", color: "#e53935", fontSize: "10px", borderRadius: "4px", padding: "2px 6px", marginRight: "6px" }}>긴급</span>}
-                      <div style={{ fontSize: "15px", fontWeight: 700, color: "#1a1a1a", marginBottom: "4px" }}>{job.title}</div>
-                      <div style={{ fontSize: "12px", color: "#999" }}>{job.company} · {job.region}</div>
+          <>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>
+                  {isEmployer ? "등록된 인재" : "오늘의 공고"} <span style={{ color: "#FF6B00" }}>{filtered.length}</span>
+                </span>
+                <div style={{ position: "relative" }}>
+                  <button onClick={(e) => { e.stopPropagation(); setDropdownOpen(prev => !prev); }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "5px 12px", border: "1.5px solid #FF6B00", borderRadius: "8px", background: "#fff", fontSize: "12px", fontWeight: 600, color: "#FF6B00", cursor: "pointer" }}>
+                    {selectedCategory === "전체" ? "직종 선택" : selectedCategory}
+                    <span style={{ fontSize: "10px" }}>{dropdownOpen ? "▲" : "▼"}</span>
+                  </button>
+                  {dropdownOpen && (
+                    <div style={{ position: "absolute", top: "34px", left: 0, background: "#fff", border: "1px solid #eee", borderRadius: "12px", boxShadow: "0 4px 16px rgba(0,0,0,0.10)", zIndex: 50, minWidth: "160px", overflow: "hidden" }}>
+                      {JOB_CATEGORIES.map(cat => (
+                        <button key={cat} onClick={() => { setSelectedCategory(cat); setDropdownOpen(false); }}
+                          style={{ display: "block", width: "100%", padding: "11px 18px", border: "none", background: selectedCategory === cat ? "#fff8f5" : "#fff", fontSize: "14px", fontWeight: selectedCategory === cat ? 700 : 400, color: selectedCategory === cat ? "#FF6B00" : "#333", cursor: "pointer", textAlign: "left" }}>
+                          {cat}
+                        </button>
+                      ))}
                     </div>
-                    <div style={{ textAlign: "right", flexShrink: 0 }}>
-                      <div style={{ fontSize: "16px", fontWeight: 700, color: "#FF6B00" }}>{job.pay?.toLocaleString()}원</div>
-                      <div style={{ fontSize: "11px", color: "#999" }}>{job.pay_type}</div>
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                    <span style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>{job.job_type}</span>
-                    <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📅 {job.start_date}</span>
-                    <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📍 {job.region}</span>
-                  </div>
+                  )}
                 </div>
-              </Link>
-            ))}
-          </div>
+              </div>
+              <button onClick={() => handleProtectedMove(isEmployer ? "/resumes" : "/jobs")} style={{ background: "transparent", border: "none", fontSize: "12px", color: "#999", cursor: "pointer" }}>
+                {isEmployer ? "전체 인재 →" : "전체보기 →"}
+              </button>
+            </div>
+
+            {loading ? (
+              <div style={{ textAlign: "center", padding: "40px", color: "#999", fontSize: "14px" }}>불러오는 중...</div>
+            ) : filtered.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "40px 20px" }}>
+                <div style={{ fontSize: "32px", marginBottom: "8px" }}>{isEmployer ? "👷" : "📋"}</div>
+                <div style={{ fontSize: "14px", color: "#999" }}>
+                  {isEmployer ? "등록된 인재가 없습니다" : "등록된 공고가 없습니다"}
+                </div>
+              </div>
+            ) : isEmployer ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {filteredResumes.map(resume => (
+                  <Link key={resume.id} href="/resumes"
+                    style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee", textDecoration: "none" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: resume.skills ? "10px" : "0" }}>
+                      <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: resume.photo_url ? "transparent" : "#FF6B00", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                        {resume.photo_url
+                          ? <img src={resume.photo_url} alt="프로필" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          : <span style={{ fontSize: "20px", color: "#fff", fontWeight: 700 }}>{resume.name?.charAt(0) || "👷"}</span>
+                        }
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: "15px", fontWeight: 700, color: "#1a1a1a" }}>{resume.name || "이름 미입력"}</div>
+                        <div style={{ fontSize: "12px", color: "#999", marginTop: "2px" }}>
+                          경력 {resume.career_years || 0}년 · {resume.address || "지역 미입력"}
+                        </div>
+                      </div>
+                      <div style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "12px", borderRadius: "6px", padding: "4px 10px", fontWeight: 600 }}>
+                        {resume.job_type || "직종 미입력"}
+                      </div>
+                    </div>
+                    {resume.skills && (
+                      <div style={{ fontSize: "12px", color: "#666", background: "#f8f9fa", borderRadius: "8px", padding: "8px 12px" }}>
+                        🛠 {resume.skills}
+                      </div>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {filteredJobs.map(job => (
+                  <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: "none" }}>
+                    <div style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
+                        <div style={{ flex: 1 }}>
+                          {job.is_urgent && <span style={{ background: "#ffebee", color: "#e53935", fontSize: "10px", borderRadius: "4px", padding: "2px 6px", marginRight: "6px" }}>긴급</span>}
+                          <div style={{ fontSize: "15px", fontWeight: 700, color: "#1a1a1a", marginBottom: "4px" }}>{job.title}</div>
+                          <div style={{ fontSize: "12px", color: "#999" }}>{job.company} · {job.region}</div>
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div style={{ fontSize: "16px", fontWeight: 700, color: "#FF6B00" }}>{job.pay?.toLocaleString()}원</div>
+                          <div style={{ fontSize: "11px", color: "#999" }}>{job.pay_type}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                        <span style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>{job.job_type}</span>
+                        <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📅 {job.start_date}</span>
+                        <span style={{ background: "#f5f5f5", color: "#666", fontSize: "11px", borderRadius: "6px", padding: "3px 8px" }}>📍 {job.region}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </section>
 
