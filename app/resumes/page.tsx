@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import AppHeader from "@/components/AppHeader";
 
 const JOB_CATEGORIES = ["전체", "철근", "형틀", "방수", "도장", "미장", "전기", "배관", "용접", "타일", "조적", "기타"];
 
@@ -441,15 +442,7 @@ export default function ResumesPage() {
           </div>
         </div>
       )}
-
-      <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
-        <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
-          <img src="/logo.png" alt="로고" style={{ width: "28px", height: "28px", borderRadius: "6px", objectFit: "cover" }} />
-          <span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>현장공수잡</span>
-        </Link>
-        <div style={{ width: "40px" }} />
-      </header>
+      <AppHeader backHref="/" backLabel="← 홈" rightSpace={40} />
 
       <div style={{ background: "#fff", padding: "12px 20px", borderBottom: "1px solid #eee" }}>
         <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}

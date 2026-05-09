@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import NetPayCalculator from "@/components/NetPayCalculator";
+import AppHeader from "@/components/AppHeader";
 
 export default function JobDetailPage() {
   const params = useParams();
@@ -78,14 +79,7 @@ export default function JobDetailPage() {
 
   return (
     <div style={{minHeight:"100vh",background:"#f8f9fa",paddingBottom:"120px"}}>
-      <header style={{background:"#fff",borderBottom:"1px solid #eee",padding:"0 20px",height:"56px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:100}}>
-        <Link href="/jobs" style={{fontSize:"13px",color:"#666",textDecoration:"none"}}>← 공고목록</Link>
-        <Link href="/" style={{display:"flex",alignItems:"center",gap:"6px",textDecoration:"none"}}>
-          <img src="/logo.png" alt="로고" style={{width:"28px",height:"28px",borderRadius:"6px",objectFit:"cover"}} />
-          <span style={{fontSize:"16px",fontWeight:700,color:"#1a1a1a"}}>현장공수잡</span>
-        </Link>
-        <div style={{width:"60px"}} />
-      </header>
+      <AppHeader backHref="/jobs" backLabel="← 공고목록" rightSpace={60} />
 
       <div style={{maxWidth:"600px",margin:"0 auto",padding:"16px 20px"}}>
         <div style={{background:"#fff",borderRadius:"16px",padding:"20px",marginBottom:"12px",boxShadow:"0 1px 4px rgba(0,0,0,0.06)"}}>
