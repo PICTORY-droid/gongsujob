@@ -290,10 +290,10 @@ export default function HomeHeader({
               <Link href="/contact" className="home-header-link-muted">
                 문의
               </Link>
-              <Link href="/login" className="home-header-link">
+              <Link href="/login?mode=login" className="home-header-link">
                 로그인
               </Link>
-              <Link href="/login" className="home-header-link-primary">
+              <Link href="/login?mode=signup" className="home-header-link-primary">
                 회원가입
               </Link>
             </>

@@ -28,6 +28,7 @@ https://gongsujob-phgb.vercel.app
 
 ### 회원 기능
 
+- 로그인 화면과 회원가입 화면 분리
 - 이메일 회원가입 및 로그인
 - Google 소셜 로그인
 - Kakao 소셜 로그인
@@ -148,6 +149,7 @@ app
 └─ page.tsx
 
 components
+├─ AuthForm.tsx
 ├─ AppFooter.tsx
 ├─ AppHeader.tsx
 ├─ HomeHeader.tsx
