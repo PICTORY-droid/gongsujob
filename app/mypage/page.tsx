@@ -101,6 +101,18 @@ export default function MyPage() {
           </div>
         </div>
 
+        {isEmployer && (
+          <div style={{ background: "#fff8f5", border: "1px solid #ffd9bf", borderRadius: "16px", padding: "16px 18px", marginBottom: "12px" }}>
+            <div style={{ fontSize: "14px", fontWeight: 800, color: "#1a1a1a", marginBottom: "6px" }}>
+              🔐 인재 연락처 열람 안내
+            </div>
+            <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.6 }}>
+              구인자는 개인정보 보호를 위해 한 달에 한 번 본인인증 후 구직자의 연락처를 열람할 수 있습니다.
+              본인인증이 완료되지 않은 경우 인재 연락처 열람이 제한될 수 있습니다.
+            </div>
+          </div>
+        )}
+
         {/* 메뉴 */}
         <div style={{ background: "#fff", borderRadius: "16px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", overflow: "hidden" }}>
           <div style={{ padding: "14px 20px 8px", fontSize: "12px", color: "#999", fontWeight: 600 }}>빠른 메뉴</div>

@@ -68,8 +68,8 @@ export default function ResumesPage() {
       )}
 
       {selectedResume && (
-        <div onClick={() => setSelectedResume(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: "20px 20px 0 0", padding: "28px 24px 40px", width: "100%", maxWidth: "480px", maxHeight: "80vh", overflowY: "auto" }}>
+        <div onClick={() => setSelectedResume(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: "20px", padding: "28px 24px 32px", width: "100%", maxWidth: "480px", maxHeight: "72vh", overflowY: "auto", boxShadow: "0 12px 40px rgba(0,0,0,0.25)" }}>
             <div style={{ width: "40px", height: "4px", background: "#eee", borderRadius: "2px", margin: "0 auto 20px" }} />
             <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
               <div style={{ width: "60px", height: "60px", borderRadius: "50%", background: selectedResume.photo_url ? "transparent" : "#FF6B00", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
@@ -83,6 +83,13 @@ export default function ResumesPage() {
                 <div style={{ fontSize: "13px", color: "#999", marginTop: "2px" }}>{selectedResume.job_type} · 경력 {selectedResume.career_years || 0}년</div>
               </div>
             </div>
+            <div style={{ background: "#fff8f5", border: "1px solid #ffd9bf", borderRadius: "12px", padding: "14px", marginBottom: "12px" }}>
+              <div style={{ fontSize: "12px", color: "#FF6B00", fontWeight: 800, marginBottom: "6px" }}>🔐 개인정보 보호 안내</div>
+              <div style={{ fontSize: "12px", color: "#666", lineHeight: 1.5 }}>
+                구인자는 한 달에 한 번 본인인증 후 구직자의 연락처를 열람할 수 있습니다.
+              </div>
+            </div>
+
             <div style={{ background: "#fff3e0", borderRadius: "12px", padding: "16px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#FF6B00", fontWeight: 700, marginBottom: "10px" }}>📞 연락처</div>
               {selectedResume.phone && (
