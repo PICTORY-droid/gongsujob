@@ -208,7 +208,7 @@ export default function JobDetailPage() {
       </div>
 
       {!isEmployer && (
-        <div style={{position:"fixed",bottom:"64px",left:0,right:0,background:"#fff",borderTop:"1px solid #eee",padding:"12px 20px",zIndex:90}}>
+        <div className="mobile-apply-bar" style={{position:"fixed",bottom:"64px",left:0,right:0,background:"#fff",borderTop:"1px solid #eee",padding:"12px 20px",zIndex:90}}>
           {message && <div style={{textAlign:"center",fontSize:"13px",color:"#276749",marginBottom:"8px",fontWeight:600}}>{message}</div>}
           <button onClick={handleApply} disabled={applied || applying} style={{width:"100%",maxWidth:"560px",display:"block",margin:"0 auto",padding:"14px",borderRadius:"12px",border:"none",fontSize:"16px",fontWeight:700,background:applied?"#e2e8f0":"#FF6B00",color:applied?"#999":"#fff",cursor:applied?"default":"pointer"}}>
             {applying ? "지원 중.." : applied ? "이미 지원한 공고" : "지원하기"}
@@ -216,7 +216,7 @@ export default function JobDetailPage() {
         </div>
       )}
 
-      <nav style={{position:"fixed",bottom:0,left:0,right:0,background:"#fff",borderTop:"1px solid #eee",display:"flex",padding:"8px 0",zIndex:80}}>
+      <nav className="mobile-bottom-nav" style={{position:"fixed",bottom:0,left:0,right:0,background:"#fff",borderTop:"1px solid #eee",display:"flex",padding:"8px 0",zIndex:80}}>
         {[{icon:"🏠",label:"홈",href:"/"},{icon:"📋",label:"공고",href:"/jobs"},{icon:"👷",label:"인재",href:"/resumes"},{icon:"📝",label:"이력서",href:"/resume/write"},{icon:"👤",label:"내정보",href:"/mypage"}].map((tab, i) => (
           <Link key={i} href={tab.href} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:"2px",textDecoration:"none"}}>
             <span style={{fontSize:"20px"}}>{tab.icon}</span>
