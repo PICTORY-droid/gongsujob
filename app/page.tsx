@@ -12,6 +12,7 @@ export default function HomePage() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [resumes, setResumes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -45,6 +46,7 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchJobs();
+    fetchResumes();
   }, [selectedCategory]);
 
   const fetchJobs = async () => {
@@ -63,6 +65,22 @@ export default function HomePage() {
     setLoading(false);
   };
 
+  const fetchResumes = async () => {
+    let query = supabase
+      .from("resumes")
+      .select("*")
+      .eq("is_public", true)
+      .order("created_at", { ascending: false });
+
+    if (selectedCategory !== "전체") {
+      query = query.eq("job_type", selectedCategory);
+    }
+
+    const { data, error } = await query;
+    if (!error && data) setResumes(data);
+  };
+
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -70,11 +88,20 @@ export default function HomePage() {
     window.location.href = "/login";
   };
 
-  const filtered = jobs.filter(job =>
+  const isEmployer = profile?.user_type === "구인자";
+
+  const filteredJobs = jobs.filter(job =>
     job.title?.includes(searchQuery) || job.region?.includes(searchQuery)
   );
 
-  const isEmployer = profile?.user_type === "구인자";
+  const filteredResumes = resumes.filter(resume =>
+    resume.name?.includes(searchQuery) ||
+    resume.job_type?.includes(searchQuery) ||
+    resume.address?.includes(searchQuery) ||
+    resume.skills?.includes(searchQuery)
+  );
+
+  const filtered = isEmployer ? filteredResumes : filteredJobs;
 
   const actionCards = isEmployer
     ? [
@@ -219,7 +246,9 @@ export default function HomePage() {
       <section style={{ padding: "0 20px 80px", maxWidth: "600px", margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>오늘의 공고 <span style={{ color: "#FF6B00" }}>{filtered.length}</span></span>
+            <span style={{ fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>
+              {isEmployer ? "등록된 인재" : "오늘의 공고"} <span style={{ color: "#FF6B00" }}>{filtered.length}</span>
+            </span>
             <div style={{ position: "relative" }}>
               <button onClick={(e) => { e.stopPropagation(); setDropdownOpen(prev => !prev); }}
                 style={{ display: "flex", alignItems: "center", gap: "6px", padding: "5px 12px", border: "1.5px solid #FF6B00", borderRadius: "8px", background: "#fff", fontSize: "12px", fontWeight: 600, color: "#FF6B00", cursor: "pointer" }}>
@@ -238,27 +267,59 @@ export default function HomePage() {
               )}
             </div>
           </div>
-          <Link href="/jobs" style={{ fontSize: "12px", color: "#999", textDecoration: "none" }}>전체보기 →</Link>
+          <Link href={isEmployer ? "/resumes" : "/jobs"} style={{ fontSize: "12px", color: "#999", textDecoration: "none" }}>
+            {isEmployer ? "전체 인재 →" : "전체보기 →"}
+          </Link>
         </div>
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "40px", color: "#999", fontSize: "14px" }}>불러오는 중...</div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 20px" }}>
-            <div style={{ fontSize: "32px", marginBottom: "8px" }}>📋</div>
-            <div style={{ fontSize: "14px", color: "#999" }}>등록된 공고가 없습니다</div>
+            <div style={{ fontSize: "32px", marginBottom: "8px" }}>{isEmployer ? "👷" : "📋"}</div>
+            <div style={{ fontSize: "14px", color: "#999" }}>
+              {isEmployer ? "등록된 인재가 없습니다" : "등록된 공고가 없습니다"}
+            </div>
+          </div>
+        ) : isEmployer ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {filteredResumes.map(resume => (
+              <Link key={resume.id} href="/resumes"
+                style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee", textDecoration: "none" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: resume.skills ? "10px" : "0" }}>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: resume.photo_url ? "transparent" : "#FF6B00", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                    {resume.photo_url
+                      ? <img src={resume.photo_url} alt="프로필" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      : <span style={{ fontSize: "20px", color: "#fff", fontWeight: 700 }}>{resume.name?.charAt(0) || "👷"}</span>
+                    }
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "15px", fontWeight: 700, color: "#1a1a1a" }}>{resume.name || "이름 미입력"}</div>
+                    <div style={{ fontSize: "12px", color: "#999", marginTop: "2px" }}>
+                      경력 {resume.career_years || 0}년 · {resume.address || "지역 미입력"}
+                    </div>
+                  </div>
+                  <div style={{ background: "#fff3e0", color: "#FF6B00", fontSize: "12px", borderRadius: "6px", padding: "4px 10px", fontWeight: 600 }}>
+                    {resume.job_type || "직종 미입력"}
+                  </div>
+                </div>
+                {resume.skills && (
+                  <div style={{ fontSize: "12px", color: "#666", background: "#f8f9fa", borderRadius: "8px", padding: "8px 12px" }}>
+                    🛠 {resume.skills}
+                  </div>
+                )}
+              </Link>
+            ))}
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {filtered.map(job => (
+            {filteredJobs.map(job => (
               <Link key={job.id} href={`/jobs/${job.id}`} style={{ textDecoration: "none" }}>
-                <div style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: job.is_urgent ? "1.5px solid #FF6B00" : "1px solid #eee" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-                    <div style={{ flex: 1, marginRight: "12px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
-                        {job.is_urgent && <span style={{ background: "#FF6B00", color: "#fff", fontSize: "10px", borderRadius: "4px", padding: "2px 6px", fontWeight: 600 }}>긴급</span>}
-                        <span style={{ fontSize: "15px", fontWeight: 600, color: "#1a1a1a" }}>{job.title}</span>
-                      </div>
+                <div style={{ background: "#fff", borderRadius: "12px", padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: "1px solid #eee" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
+                    <div style={{ flex: 1 }}>
+                      {job.is_urgent && <span style={{ background: "#ffebee", color: "#e53935", fontSize: "10px", borderRadius: "4px", padding: "2px 6px", marginRight: "6px" }}>긴급</span>}
+                      <div style={{ fontSize: "15px", fontWeight: 700, color: "#1a1a1a", marginBottom: "4px" }}>{job.title}</div>
                       <div style={{ fontSize: "12px", color: "#999" }}>{job.company} · {job.region}</div>
                     </div>
                     <div style={{ textAlign: "right", flexShrink: 0 }}>
