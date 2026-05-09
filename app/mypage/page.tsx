@@ -267,10 +267,10 @@ export default function MyPage() {
     await fetchPositionOffers(user.id, profile?.user_type);
   };
 
-  const statusLabel = (status: string) => {
+  const statusLabel = (status: string, isEmployerView = false) => {
     if (status === "pending") return "제안 대기";
-    if (status === "question") return "질문 도착";
-    if (status === "answered") return "답변 완료";
+    if (status === "question") return isEmployerView ? "질문 도착" : "답변 대기";
+    if (status === "answered") return isEmployerView ? "답변 완료" : "답변 도착";
     if (status === "accepted") return "수락됨";
     if (status === "rejected") return "거절됨";
     if (status === "cancelled") return "취소됨";
@@ -470,7 +470,7 @@ export default function MyPage() {
                             </div>
                           </div>
                           <span style={{ alignSelf: "flex-start", background: statusStyle.bg, color: statusStyle.color, fontSize: "11px", borderRadius: "6px", padding: "4px 8px", fontWeight: 700, whiteSpace: "nowrap" }}>
-                            {statusLabel(offer.status)}
+                            {statusLabel(offer.status, isEmployer)}
                           </span>
                         </div>
 
@@ -532,7 +532,7 @@ export default function MyPage() {
                     </div>
                   </div>
                   <span style={{ alignSelf: "flex-start", background: statusStyle.bg, color: statusStyle.color, fontSize: "11px", borderRadius: "6px", padding: "4px 8px", fontWeight: 700, whiteSpace: "nowrap" }}>
-                    {statusLabel(offer.status)}
+                    {statusLabel(offer.status, isEmployer)}
                   </span>
                 </div>
 
