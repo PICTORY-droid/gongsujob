@@ -155,22 +155,26 @@ export default function AuthForm({ mode }: AuthFormProps) {
           <div style={{ fontSize: "13px", color: "#999", lineHeight: 1.5 }}>
             {isLogin
               ? "로그인 후 서비스를 이용할 수 있습니다."
-              : "가입 후 이름, 연락처, 주소를 입력해야 서비스를 이용할 수 있습니다."}
+              : "이메일 회원가입 후 첫 설정을 완료해야 서비스를 이용할 수 있습니다."}
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "12px" }}>
           <button onClick={handleGoogle}
             style={{ width: "100%", padding: "12px", border: "1px solid #ddd", borderRadius: "10px", background: "#fff", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
             <img src="https://www.google.com/favicon.ico" width={18} height={18} alt="google" />
-            구글로 {isLogin ? "로그인" : "회원가입"}
+            구글로 계속하기
           </button>
 
           <button onClick={handleKakao}
             style={{ width: "100%", padding: "12px", border: "none", borderRadius: "10px", background: "#FEE500", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
             <span style={{ fontSize: "18px" }}>💬</span>
-            카카오로 {isLogin ? "로그인" : "회원가입"}
+            카카오로 계속하기
           </button>
+        </div>
+
+        <div style={{ fontSize: "12px", color: "#999", lineHeight: 1.5, textAlign: "center", marginBottom: "20px" }}>
+          소셜 계정은 기존 계정이면 로그인, 처음 이용하면 가입 후 첫 설정으로 이어집니다.
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
