@@ -153,6 +153,8 @@ npm install
 ~~~env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+KAKAO_REST_API_KEY=your_kakao_rest_api_key
+WEATHER_API_KEY=your_weather_api_key
 ~~~
 
 개발 서버를 실행합니다.
