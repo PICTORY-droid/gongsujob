@@ -131,6 +131,7 @@ app
 └─ page.tsx
 
 components
+├─ AppFooter.tsx
 ├─ AppHeader.tsx
 ├─ JobCard.tsx
 ├─ MobileBottomNav.tsx

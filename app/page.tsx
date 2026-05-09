@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import AppFooter from "@/components/AppFooter";
 
 const JOB_CATEGORIES = ["전체", "철근", "형틀", "방수", "도장", "미장", "전기", "배관", "용접", "타일", "조적", "기타"];
 
@@ -374,6 +375,9 @@ export default function HomePage() {
           </div>
         )}
       </section>
+
+      <AppFooter />
+
       <MobileBottomNav userLoggedIn={!!user} onRequireLogin={() => setLoginModalOpen(true)} />
     </div>
   );
