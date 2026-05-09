@@ -85,7 +85,13 @@ export default function ResumeWritePage() {
       if (error) { setMessage("사진 업로드 실패: " + error.message); return; }
       const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
       setPhotoUrl(data.publicUrl);
-      setMessage("사진 업로드 완료. 저장 버튼을 눌러주세요.");
+
+      await supabase
+        .from("profiles")
+        .update({ avatar_url: data.publicUrl })
+        .eq("id", user.id);
+
+      setMessage("사진 업로드 완료. 내정보 프로필에도 반영됩니다. 저장 버튼을 눌러주세요.");
     } catch { setMessage("업로드 오류가 발생했습니다."); }
     finally { setUploading(false); }
   };
