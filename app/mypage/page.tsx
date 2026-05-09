@@ -17,6 +17,7 @@ export default function MyPage() {
   const [questionText, setQuestionText] = useState<Record<string, string>>({});
   const [answerText, setAnswerText] = useState<Record<string, string>>({});
   const [actionMessage, setActionMessage] = useState("");
+  const [showOffersModal, setShowOffersModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -276,13 +277,13 @@ export default function MyPage() {
     { icon: "📋", label: "공고 등록", desc: "새 구인 공고 올리기", href: "/jobs/write" },
     { icon: "🏗️", label: "전체 공고 보기", desc: "등록된 모든 공고", href: "/jobs" },
     { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
-    { icon: "💼", label: "포지션 제안 관리", desc: "보낸 제안 이력 확인", href: "/offers" },
+    { icon: "💼", label: "포지션 제안 관리", desc: "보낸 제안 이력 확인", href: "__offers_modal__" },
   ];
 
   const seekerMenus = [
     { icon: "📝", label: "이력서 작성·수정", desc: "내 이력서 관리", href: "/resume/write" },
     { icon: "📋", label: "공고 보기", desc: "채용 공고 둘러보기", href: "/jobs" },
-    { icon: "💼", label: "포지션 제안 관리", desc: "받은 제안 확인", href: "/offers" },
+    { icon: "💼", label: "포지션 제안 관리", desc: "받은 제안 확인", href: "__offers_modal__" },
   ];
 
   const menus = isEmployer ? employerMenus : seekerMenus;
@@ -348,16 +349,63 @@ export default function MyPage() {
         <div style={{ background: "#fff", borderRadius: "16px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", overflow: "hidden" }}>
           <div style={{ padding: "14px 20px 8px", fontSize: "12px", color: "#999", fontWeight: 600 }}>빠른 메뉴</div>
           {menus.map((item, i) => (
-            <Link key={i} href={item.href} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 20px", textDecoration: "none", borderTop: "1px solid #f5f5f5" }}>
-              <span style={{ fontSize: "22px" }}>{item.icon}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "14px", color: "#1a1a1a", fontWeight: 600 }}>{item.label}</div>
-                <div style={{ fontSize: "12px", color: "#999", marginTop: "1px" }}>{item.desc}</div>
-              </div>
-              <span style={{ color: "#ccc", fontSize: "18px" }}>›</span>
-            </Link>
+            item.href === "__offers_modal__" ? (
+              <button
+                key={i}
+                onClick={() => setShowOffersModal(true)}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "14px 20px", background: "none", border: "none", borderTop: "1px solid #f5f5f5", cursor: "pointer", textAlign: "left" }}
+              >
+                <span style={{ fontSize: "22px" }}>{item.icon}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "14px", color: "#1a1a1a", fontWeight: 600 }}>{item.label}</div>
+                  <div style={{ fontSize: "12px", color: "#999", marginTop: "1px" }}>{item.desc}</div>
+                </div>
+                <span style={{ color: "#ccc", fontSize: "18px" }}>›</span>
+              </button>
+            ) : (
+              <Link key={i} href={item.href} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 20px", textDecoration: "none", borderTop: "1px solid #f5f5f5" }}>
+                <span style={{ fontSize: "22px" }}>{item.icon}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "14px", color: "#1a1a1a", fontWeight: 600 }}>{item.label}</div>
+                  <div style={{ fontSize: "12px", color: "#999", marginTop: "1px" }}>{item.desc}</div>
+                </div>
+                <span style={{ color: "#ccc", fontSize: "18px" }}>›</span>
+              </Link>
+            )
           ))}
         </div>
+
+        {showOffersModal && (
+          <div
+            onClick={() => setShowOffersModal(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: "100%", maxWidth: "520px", maxHeight: "82vh", overflowY: "auto", background: "#f8f9fa", borderRadius: "20px", padding: "18px", boxShadow: "0 12px 40px rgba(0,0,0,0.25)" }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+                <div style={{ fontSize: "17px", fontWeight: 800, color: "#1a1a1a" }}>
+                  {isEmployer ? "보낸 포지션 제안" : "받은 포지션 제안"}
+                </div>
+                <button
+                  onClick={() => setShowOffersModal(false)}
+                  style={{ width: "32px", height: "32px", borderRadius: "50%", border: "none", background: "#fff", color: "#666", fontSize: "18px", cursor: "pointer" }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div style={{ background: isEmployer ? "#fff8f5" : "#f0f9ff", border: "1px solid " + (isEmployer ? "#ffd9bf" : "#bae6fd"), borderRadius: "16px", padding: "16px 18px", marginBottom: "12px" }}>
+                <div style={{ fontSize: "14px", fontWeight: 800, color: "#1a1a1a", marginBottom: "6px" }}>
+                  {isEmployer ? "제안 이력 관리" : "제안 확인 안내"}
+                </div>
+                <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.6 }}>
+                  {isEmployer
+                    ? "보낸 포지션 제안의 진행 상태를 확인할 수 있습니다. 구직자가 제안을 수락하면 연락처가 표시됩니다."
+                    : "받은 제안의 상태를 확인할 수 있습니다. 제안을 수락한 경우에만 구인자에게 연락처가 공개됩니다."}
+                </div>
+              </div>
 
         <div style={{ background: "#fff", borderRadius: "16px", padding: "20px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
           <div style={{ fontSize: "14px", fontWeight: 800, color: "#1a1a1a", marginBottom: "12px" }}>
@@ -468,6 +516,11 @@ export default function MyPage() {
             </div>
           )}
         </div>
+
+
+            </div>
+          </div>
+        )}
 
         {isEmployer && myJobs.length > 0 && (
           <div style={{ background: "#fff", borderRadius: "16px", padding: "20px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
