@@ -400,9 +400,6 @@ export default function MyPage() {
                         <div style={{ background: "#fafafa", padding: "8px 10px", fontSize: "11px", color: "#999", fontWeight: 700 }}>질문 및 답변</div>
                         {messages.map((message) => (
                           <div key={message.id} style={{ padding: "9px 10px", borderTop: "1px solid #f5f5f5" }}>
-                            <div style={{ fontSize: "11px", color: "#999", marginBottom: "3px" }}>
-                              {message.sender_user_id === user?.id ? "나" : "상대방"}
-                            </div>
                             <div style={{ fontSize: "12px", color: "#333", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{message.message}</div>
                           </div>
                         ))}
