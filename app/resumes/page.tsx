@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 const JOB_CATEGORIES = ["전체", "철근", "형틀", "방수", "도장", "미장", "전기", "배관", "용접", "타일", "조적", "기타"];
 
@@ -517,21 +518,7 @@ export default function ResumesPage() {
           </div>
         )}
       </div>
-
-      <nav className="mobile-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
-        {[
-          { icon: "🏠", label: "홈", href: "/" },
-          { icon: "📋", label: "공고", href: "/jobs" },
-          { icon: "👷", label: "인재", href: "/resumes" },
-          { icon: "📝", label: "이력서", href: "/resume/write" },
-          { icon: "👤", label: "내정보", href: "/mypage" },
-        ].map((tab, i) => (
-          <Link key={i} href={tab.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", textDecoration: "none" }}>
-            <span style={{ fontSize: "20px" }}>{tab.icon}</span>
-            <span style={{ fontSize: "10px", color: i === 2 ? "#FF6B00" : "#999", fontWeight: i === 2 ? 600 : 400 }}>{tab.label}</span>
-          </Link>
-        ))}
-      </nav>
+      <MobileBottomNav />
     </div>
   );
 }

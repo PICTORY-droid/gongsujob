@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 export default function JobDetailPage() {
   const params = useParams();
@@ -271,15 +272,7 @@ export default function JobDetailPage() {
           </button>
         </div>
       )}
-
-      <nav className="mobile-bottom-nav" style={{position:"fixed",bottom:0,left:0,right:0,background:"#fff",borderTop:"1px solid #eee",display:"flex",padding:"8px 0",zIndex:80}}>
-        {[{icon:"🏠",label:"홈",href:"/"},{icon:"📋",label:"공고",href:"/jobs"},{icon:"👷",label:"인재",href:"/resumes"},{icon:"📝",label:"이력서",href:"/resume/write"},{icon:"👤",label:"내정보",href:"/mypage"}].map((tab, i) => (
-          <Link key={i} href={tab.href} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:"2px",textDecoration:"none"}}>
-            <span style={{fontSize:"20px"}}>{tab.icon}</span>
-            <span style={{fontSize:"10px",color:i===1?"#FF6B00":"#999",fontWeight:i===1?600:400}}>{tab.label}</span>
-          </Link>
-        ))}
-      </nav>
+      <MobileBottomNav />
     </div>
   );
 }
