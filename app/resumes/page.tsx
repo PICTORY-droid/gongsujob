@@ -17,6 +17,7 @@ export default function ResumesPage() {
   const [toast, setToast] = useState("");
   const [selectedResume, setSelectedResume] = useState<any>(null);
   const [contactAllowed, setContactAllowed] = useState(false);
+  const [existingOffer, setExistingOffer] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [offerOpen, setOfferOpen] = useState(false);
   const [offerSent, setOfferSent] = useState(false);
@@ -125,28 +126,36 @@ export default function ResumesPage() {
     return `${id.slice(0, 4)}****@${domain}`;
   };
 
-  const checkAcceptedOffer = async (resume: any) => {
-    if (!user) return false;
+  const offerStatusLabel = (status?: string) => {
+    if (status === "pending") return "제안 대기";
+    if (status === "question") return "새 메세지";
+    if (status === "answered") return "새 메세지";
+    if (status === "accepted") return "수락됨";
+    if (status === "rejected") return "거절됨";
+    if (status === "cancelled") return "취소됨";
+    return "제안 진행 중";
+  };
+
+  const checkExistingOffer = async (resume: any) => {
+    if (!user) return null;
 
     const { data } = await supabase
       .from("position_offers")
-      .select("id")
+      .select("*")
       .eq("employer_user_id", user.id)
       .eq("resume_id", resume.id)
-      .eq("status", "accepted")
+      .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    if (data) {
+    if (data?.status === "accepted") {
       await supabase.from("resume_contact_views").insert({
         employer_user_id: user.id,
         resume_id: resume.id,
       });
-
-      return true;
     }
 
-    return false;
+    return data;
   };
 
   const handleCardClick = async (resume: any) => {
@@ -161,9 +170,11 @@ export default function ResumesPage() {
     setOfferSent(false);
     setOfferMessage("");
     setContactAllowed(false);
+    setExistingOffer(null);
 
-    const allowed = await checkAcceptedOffer(resume);
-    setContactAllowed(allowed);
+    const offer = await checkExistingOffer(resume);
+    setExistingOffer(offer);
+    setContactAllowed(offer?.status === "accepted");
 
     setOfferForm({
       title: "",
@@ -224,7 +235,7 @@ export default function ResumesPage() {
         message: offerForm.message,
         status: "pending",
       })
-      .select("id")
+      .select("*")
       .single();
 
     if (error) {
@@ -241,13 +252,7 @@ export default function ResumesPage() {
       link_url: "/mypage",
     });
 
-    if (offer?.id) {
-      await supabase.from("position_offer_messages").insert({
-        offer_id: offer.id,
-        sender_user_id: user.id,
-        message: offerForm.message,
-      });
-    }
+    setExistingOffer(offer);
 
     setOfferMessage("포지션 제안을 보냈습니다. 구직자가 수락하면 연락처를 확인할 수 있습니다.");
     setOfferSent(true);
@@ -343,6 +348,18 @@ export default function ResumesPage() {
                 {offerSent ? (
                   <div style={{ background: "#f0fff4", border: "1px solid #9ae6b4", borderRadius: "12px", padding: "12px", fontSize: "13px", color: "#276749", lineHeight: 1.5, fontWeight: 600 }}>
                     포지션 제안을 보냈습니다. 구직자가 수락하면 연락처를 확인할 수 있습니다.
+                  </div>
+                ) : existingOffer && existingOffer.status !== "rejected" && existingOffer.status !== "cancelled" ? (
+                  <div style={{ background: existingOffer.status === "accepted" ? "#f0fff4" : "#fff8f5", border: "1px solid " + (existingOffer.status === "accepted" ? "#9ae6b4" : "#ffd9bf"), borderRadius: "12px", padding: "12px", fontSize: "13px", color: "#666", lineHeight: 1.6 }}>
+                    <div style={{ color: existingOffer.status === "accepted" ? "#276749" : "#FF6B00", fontWeight: 800, marginBottom: "4px" }}>
+                      이미 포지션 제안을 보냈습니다
+                    </div>
+                    <div>
+                      현재 상태: {offerStatusLabel(existingOffer.status)}
+                    </div>
+                    <div>
+                      {existingOffer.status === "accepted" ? "구직자가 제안을 수락했습니다. 연락처를 확인할 수 있습니다." : "구직자의 응답을 기다리는 중입니다."}
+                    </div>
                   </div>
                 ) : !offerOpen ? (
                   <button onClick={() => setOfferOpen(true)} style={{ width: "100%", padding: "14px", background: "#FF6B00", border: "none", borderRadius: "12px", fontSize: "14px", color: "#fff", cursor: "pointer", fontWeight: 800 }}>
