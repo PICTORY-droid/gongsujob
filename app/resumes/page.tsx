@@ -52,9 +52,22 @@ export default function ResumesPage() {
 
   const maskPhone = (phone?: string) => {
     if (!phone) return "연락처 미입력";
+
     const onlyNumber = phone.replace(/[^0-9]/g, "");
-    if (onlyNumber.length < 8) return "연락처 비공개";
-    return onlyNumber.replace(/(\\d{3})(\\d+)(\\d{4})/, "$1-****-$3");
+
+    if (onlyNumber.length === 11) {
+      return `${onlyNumber.slice(0, 3)}-****-${onlyNumber.slice(7)}`;
+    }
+
+    if (onlyNumber.length === 10) {
+      return `${onlyNumber.slice(0, 3)}-***-${onlyNumber.slice(6)}`;
+    }
+
+    if (onlyNumber.length >= 8) {
+      return `${onlyNumber.slice(0, 3)}-****-${onlyNumber.slice(-4)}`;
+    }
+
+    return "연락처 비공개";
   };
 
   const maskEmail = (email?: string) => {
