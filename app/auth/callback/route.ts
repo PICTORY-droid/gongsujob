@@ -2,6 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+const isProfileComplete = (profile: any) => {
+  return Boolean(
+    profile?.user_type &&
+    profile?.name &&
+    profile?.phone &&
+    profile?.address
+  );
+};
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
@@ -29,15 +38,17 @@ export async function GET(request: NextRequest) {
     if (session?.user) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id")
+        .select("user_type,name,phone,address")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
 
-      if (profile) {
+      if (isProfileComplete(profile)) {
         return NextResponse.redirect(`${origin}/`);
       }
+
+      return NextResponse.redirect(`${origin}/onboarding`);
     }
   }
 
-  return NextResponse.redirect(`${origin}/onboarding`);
+  return NextResponse.redirect(`${origin}/login`);
 }

@@ -16,6 +16,41 @@ export default function LoginPage() {
     setIsMobile(/iPhone|iPad|Android/i.test(navigator.userAgent));
   }, []);
 
+  const isProfileComplete = (profile: any) => {
+    return Boolean(
+      profile?.user_type &&
+      profile?.name &&
+      profile?.phone &&
+      profile?.address
+    );
+  };
+
+  const moveAfterLogin = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("user_type,name,phone,address")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!isProfileComplete(profile)) {
+      window.location.href = "/onboarding";
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const redirectedFrom = params.get("redirectedFrom");
+
+    window.location.href = redirectedFrom || "/";
+  };
+
+
   const handleEmailAuth = async () => {
     if (!email.trim() || !password.trim()) { setError("이메일과 비밀번호를 입력해주세요."); return; }
     setLoading(true); setError("");
@@ -23,16 +58,19 @@ export default function LoginPage() {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) { setError("이메일 또는 비밀번호가 올바르지 않습니다."); return; }
-        // 자동로그인 설정 저장 (PC만)
+
         if (!isMobile) {
           localStorage.setItem("autoLogin", autoLogin ? "true" : "false");
         }
+
+        await moveAfterLogin();
       } else {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) { setError("회원가입 실패: " + error.message); return; }
-        setError(""); alert("이메일을 확인해주세요. 인증 후 로그인 가능합니다.");
+
+        alert("회원가입이 완료되었습니다. 첫 설정을 입력하면 서비스를 이용할 수 있습니다.");
+        window.location.href = "/onboarding";
       }
-      window.location.href = "/";
     } catch { setError("오류가 발생했습니다."); }
     finally { setLoading(false); }
   };
