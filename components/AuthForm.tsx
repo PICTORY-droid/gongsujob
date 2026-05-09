@@ -91,6 +91,16 @@ export default function AuthForm({ mode }: AuthFormProps) {
         return;
       }
 
+      const isAlreadyRegistered =
+        data.user &&
+        Array.isArray(data.user.identities) &&
+        data.user.identities.length === 0;
+
+      if (isAlreadyRegistered) {
+        setError("이미 가입된 이메일입니다. 로그인으로 이용해주세요.");
+        return;
+      }
+
       if (data.session) {
         window.location.href = "/onboarding";
         return;
