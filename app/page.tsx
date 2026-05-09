@@ -257,10 +257,10 @@ export default function HomePage() {
 
       <section style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "16px 20px", display: "flex", justifyContent: "center", gap: "32px" }}>
         {[
-          { num: "1,247", label: "오늘 공고" },
-          { num: "8,430", label: "등록 근로자" },
-          { num: "312", label: "협력 현장" },
-          { num: "당일", label: "일당 지급" },
+          { num: "공고", label: "등록·조회" },
+          { num: "이력서", label: "공개 설정" },
+          { num: "제안", label: "수락·거절" },
+          { num: "연락처", label: "수락 후 공개" },
         ].map((s, i) => (
           <div key={i} style={{ textAlign: "center" }}>
             <div style={{ fontSize: "18px", fontWeight: 700, color: "#FF6B00" }}>{s.num}</div>
