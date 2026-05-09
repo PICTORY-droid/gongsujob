@@ -19,6 +19,7 @@ export default function ResumesPage() {
   const [contactAllowed, setContactAllowed] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [offerOpen, setOfferOpen] = useState(false);
+  const [offerSent, setOfferSent] = useState(false);
   const [offerSending, setOfferSending] = useState(false);
   const [offerMessage, setOfferMessage] = useState("");
   const [offerForm, setOfferForm] = useState({
@@ -157,6 +158,7 @@ export default function ResumesPage() {
 
     setSelectedResume(resume);
     setOfferOpen(false);
+    setOfferSent(false);
     setOfferMessage("");
     setContactAllowed(false);
 
@@ -248,6 +250,8 @@ export default function ResumesPage() {
     }
 
     setOfferMessage("포지션 제안을 보냈습니다. 구직자가 수락하면 연락처를 확인할 수 있습니다.");
+    setOfferSent(true);
+    setOfferOpen(false);
     setOfferSending(false);
   };
 
@@ -336,7 +340,11 @@ export default function ResumesPage() {
 
             {!contactAllowed && (
               <div style={{ marginTop: "16px" }}>
-                {!offerOpen ? (
+                {offerSent ? (
+                  <div style={{ background: "#f0fff4", border: "1px solid #9ae6b4", borderRadius: "12px", padding: "12px", fontSize: "13px", color: "#276749", lineHeight: 1.5, fontWeight: 600 }}>
+                    포지션 제안을 보냈습니다. 구직자가 수락하면 연락처를 확인할 수 있습니다.
+                  </div>
+                ) : !offerOpen ? (
                   <button onClick={() => setOfferOpen(true)} style={{ width: "100%", padding: "14px", background: "#FF6B00", border: "none", borderRadius: "12px", fontSize: "14px", color: "#fff", cursor: "pointer", fontWeight: 800 }}>
                     포지션 제안하기
                   </button>
