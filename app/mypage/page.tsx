@@ -221,13 +221,15 @@ export default function MyPage() {
       return;
     }
 
-    const { error: messageError } = await supabase
+    const { data: newAnswer, error: messageError } = await supabase
       .from("position_offer_messages")
       .insert({
         offer_id: offer.id,
         sender_user_id: user.id,
         message: text,
-      });
+      })
+      .select("*")
+      .single();
 
     if (messageError) {
       setActionMessage("답변 전송 실패: " + messageError.message);
@@ -250,9 +252,18 @@ export default function MyPage() {
       link_url: "/mypage",
     });
 
+    if (newAnswer) {
+      setOfferMessages(prev => ({
+        ...prev,
+        [offer.id]: [...(prev[offer.id] || []), newAnswer],
+      }));
+    }
+
     setSelectedOffer((prev: any) => prev?.id === offer.id ? { ...prev, status: "answered" } : prev);
     setAnswerText(prev => ({ ...prev, [offer.id]: "" }));
-    setActionMessage("답변을 보냈습니다.");
+    setActionMessage("");
+    setOfferToast("답변을 보냈습니다.");
+    setTimeout(() => setOfferToast(""), 1800);
     await fetchPositionOffers(user.id, profile?.user_type);
   };
 
@@ -482,6 +493,7 @@ export default function MyPage() {
           const statusStyle = statusColor(offer.status);
           const messages = offerMessages[offer.id] || [];
           const hasAskedQuestion = messages.some((message: any) => message.sender_user_id === offer.seeker_user_id);
+          const hasAnswered = messages.some((message: any) => message.sender_user_id === offer.employer_user_id);
 
           return (
             <div
@@ -594,13 +606,11 @@ export default function MyPage() {
                     <textarea
                       value={answerText[offer.id] || ""}
                       onChange={(e) => setAnswerText(prev => ({ ...prev, [offer.id]: e.target.value }))}
-                      placeholder="구직자 질문에 답변하거나 추가 안내를 보낼 수 있습니다"
+                      placeholder={hasAnswered ? "추가 답변을 입력할 수 있습니다" : "구직자 질문에 답변하거나 추가 안내를 보낼 수 있습니다"}
                       rows={3}
                       style={{ width: "100%", padding: "10px", border: "1px solid #eee", borderRadius: "10px", fontSize: "13px", boxSizing: "border-box", resize: "vertical", marginBottom: "8px" }}
                     />
-                    <button onClick={() => handleSendAnswer(offer)} style={{ width: "100%", padding: "10px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}>
-                      답변 보내기
-                    </button>
+                    <button onClick={() => handleSendAnswer(offer)} style={{ width: "100%", padding: "10px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}>{hasAnswered ? "추가 답변" : "답변 보내기"}</button>
                   </div>
                 )}
               </div>
