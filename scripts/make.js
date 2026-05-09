@@ -1,1 +1,0 @@
-const fs=require('fs');const path=require('path');const dir=path.join(process.cwd(),'app','jobs','[id]');fs.mkdirSync(dir,{recursive:true});fs.writeFileSync(path.join(dir,'page.tsx'),'placeholder');console.log('done');
