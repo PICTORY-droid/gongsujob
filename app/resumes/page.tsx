@@ -27,7 +27,6 @@ export default function ResumesPage() {
     location: "",
     start_date: "",
     pay: "",
-    headcount: "",
     work_conditions: "",
     message: "",
     job_id: "",
@@ -170,8 +169,7 @@ export default function ResumesPage() {
       location: "",
       start_date: "",
       pay: "",
-      headcount: "",
-      work_conditions: "",
+        work_conditions: "",
       message: "이력서를 확인하고 현장 조건과 잘 맞아 보여 제안드립니다.",
       job_id: "",
     });
@@ -193,7 +191,6 @@ export default function ResumesPage() {
       location: job.detail_address || job.region || prev.location,
       start_date: job.start_date || prev.start_date,
       pay: job.pay ? String(job.pay) : prev.pay,
-      headcount: job.headcount ? String(job.headcount) : prev.headcount,
       work_conditions: job.description || prev.work_conditions,
     }));
   };
@@ -221,7 +218,6 @@ export default function ResumesPage() {
         location: offerForm.location,
         start_date: offerForm.start_date,
         pay: Number(offerForm.pay),
-        headcount: offerForm.headcount ? Number(offerForm.headcount) : null,
         work_conditions: offerForm.work_conditions,
         message: offerForm.message,
         status: "pending",
@@ -371,7 +367,6 @@ export default function ResumesPage() {
                       { key: "location", label: "현장 위치 *", placeholder: "예, 세종시 어진동" },
                       { key: "start_date", label: "근무 시작일 *", placeholder: "예, 2026-05-15" },
                       { key: "pay", label: "예상 일당 *", placeholder: "예, 170000" },
-                      { key: "headcount", label: "모집 인원", placeholder: "예, 2" },
                     ].map(field => (
                       <div key={field.key} style={{ marginBottom: "10px" }}>
                         <label style={{ fontSize: "11px", color: "#999", display: "block", marginBottom: "5px" }}>{field.label}</label>
