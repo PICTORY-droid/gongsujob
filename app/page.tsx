@@ -97,6 +97,11 @@ export default function HomePage() {
   };
 
   const handleProtectedMove = (href: string) => {
+    if (href === "/contact") {
+      window.location.href = href;
+      return;
+    }
+
     if (!user) {
       setLoginModalOpen(true);
       return;
@@ -126,6 +131,7 @@ export default function HomePage() {
         { icon: "📋", label: "공고 보기", desc: "현장 일자리 찾기", href: "/jobs" },
         { icon: "🏗️", label: "공고 등록", desc: "인력 바로 구하기", href: "/jobs/write" },
         { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
+        { icon: "💬", label: "문의하기", desc: "프로젝트 문의", href: "/contact" },
       ]
     : isEmployer
     ? [
