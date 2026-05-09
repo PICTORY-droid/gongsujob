@@ -125,7 +125,6 @@ export default function OnboardingPage() {
         phone: phone.trim(),
         address: address.trim(),
         region,
-        updated_at: new Date().toISOString(),
       });
 
       if (error) {
