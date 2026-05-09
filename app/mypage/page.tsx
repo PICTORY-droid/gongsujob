@@ -17,6 +17,7 @@ export default function MyPage() {
   const [questionText, setQuestionText] = useState<Record<string, string>>({});
   const [answerText, setAnswerText] = useState<Record<string, string>>({});
   const [actionMessage, setActionMessage] = useState("");
+  const [offerToast, setOfferToast] = useState("");
   const [showOffersModal, setShowOffersModal] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -164,13 +165,15 @@ export default function MyPage() {
       return;
     }
 
-    const { error: messageError } = await supabase
+    const { data: newMessage, error: messageError } = await supabase
       .from("position_offer_messages")
       .insert({
         offer_id: offer.id,
         sender_user_id: user.id,
         message: text,
-      });
+      })
+      .select("*")
+      .single();
 
     if (messageError) {
       setActionMessage("질문 전송 실패: " + messageError.message);
@@ -193,9 +196,18 @@ export default function MyPage() {
       link_url: "/mypage",
     });
 
+    if (newMessage) {
+      setOfferMessages(prev => ({
+        ...prev,
+        [offer.id]: [...(prev[offer.id] || []), newMessage],
+      }));
+    }
+
     setSelectedOffer((prev: any) => prev?.id === offer.id ? { ...prev, status: "question" } : prev);
     setQuestionText(prev => ({ ...prev, [offer.id]: "" }));
-    setActionMessage("질문을 보냈습니다.");
+    setActionMessage("");
+    setOfferToast("질문을 보냈습니다.");
+    setTimeout(() => setOfferToast(""), 1800);
     await fetchPositionOffers(user.id, profile?.user_type);
   };
 
@@ -294,6 +306,11 @@ export default function MyPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', sans-serif", paddingBottom: "80px" }}>
+      {offerToast && (
+        <div style={{ position: "fixed", top: "72px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.78)", color: "#fff", fontSize: "13px", padding: "10px 18px", borderRadius: "999px", zIndex: 500, whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(0,0,0,0.18)" }}>
+          {offerToast}
+        </div>
+      )}
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <Link href="/" style={{ fontSize: "13px", color: "#666", textDecoration: "none" }}>← 홈</Link>
         <span style={{ fontSize: "16px", fontWeight: 700, color: "#1a1a1a" }}>내 정보</span>
@@ -464,6 +481,7 @@ export default function MyPage() {
           const offer = selectedOffer;
           const statusStyle = statusColor(offer.status);
           const messages = offerMessages[offer.id] || [];
+          const hasAskedQuestion = messages.some((message: any) => message.sender_user_id === offer.seeker_user_id);
 
           return (
             <div
@@ -538,7 +556,7 @@ export default function MyPage() {
                     <textarea
                       value={questionText[offer.id] || ""}
                       onChange={(e) => setQuestionText(prev => ({ ...prev, [offer.id]: e.target.value }))}
-                      placeholder="궁금한 점을 구인자에게 질문할 수 있습니다"
+                      placeholder={hasAskedQuestion ? "추가로 궁금한 점을 입력할 수 있습니다" : "궁금한 점을 구인자에게 질문할 수 있습니다"}
                       rows={3}
                       style={{ width: "100%", padding: "10px", border: "1px solid #eee", borderRadius: "10px", fontSize: "13px", boxSizing: "border-box", resize: "vertical", marginBottom: "8px" }}
                     />
@@ -551,7 +569,7 @@ export default function MyPage() {
                         거절
                       </button>
                       <button onClick={() => handleSendQuestion(offer)} style={{ flex: 1, padding: "10px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}>
-                        질문
+                        {hasAskedQuestion ? "추가 질문" : "질문"}
                       </button>
                     </div>
                   </div>
