@@ -150,6 +150,7 @@ app
 components
 ├─ AppFooter.tsx
 ├─ AppHeader.tsx
+├─ HomeHeader.tsx
 ├─ JobCard.tsx
 ├─ MobileBottomNav.tsx
 ├─ NetPayCalculator.tsx

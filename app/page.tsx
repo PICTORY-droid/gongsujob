@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import HomeHeader from "@/components/HomeHeader";
 import AppFooter from "@/components/AppFooter";
 
 const JOB_CATEGORIES = ["전체", "철근", "형틀", "방수", "도장", "미장", "전기", "배관", "용접", "타일", "조적", "기타"];
@@ -174,18 +175,6 @@ export default function HomePage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', 'Pretendard', sans-serif" }}>
-      <style>{`
-        .desktop-header-nav {
-          display: none;
-        }
-
-        @media (min-width: 769px) {
-          .desktop-header-nav {
-            display: flex;
-          }
-        }
-      `}</style>
-
       {loginModalOpen && (
         <div onClick={() => setLoginModalOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: "360px", background: "#fff", borderRadius: "18px", padding: "24px 20px", boxShadow: "0 12px 36px rgba(0,0,0,0.22)", textAlign: "center" }}>
@@ -207,45 +196,12 @@ export default function HomePage() {
         </div>
       )}
 
-      <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <img src="/logo.png" alt="로고" style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }} />
-          <span style={{ fontWeight: 700, fontSize: "18px", color: "#1a1a1a" }}>현장공수잡</span>
-        </div>
-
-        {user && (
-          <nav className="desktop-header-nav" style={{ alignItems: "center", gap: "18px", marginLeft: "auto", marginRight: "18px" }}>
-            {desktopTabs.map((tab, i) => (
-              <Link key={i} href={tab.href} style={{ fontSize: "14px", color: "#333", textDecoration: "none", fontWeight: 600 }}>
-                {tab.label}
-              </Link>
-            ))}
-          </nav>
-        )}
-
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          {user ? (
-            <>
-              <Link href="/mypage" style={{ display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
-                <div style={{ width: "32px", height: "32px", background: "#FF6B00", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "14px", fontWeight: 700, overflow: "hidden" }}>
-                  {profile?.avatar_url
-                    ? <img src={profile.avatar_url} alt="프로필" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    : profile?.name?.charAt(0) || user.email?.charAt(0).toUpperCase() || "U"
-                  }
-                </div>
-                <span style={{ fontSize: "13px", color: "#333", fontWeight: 600 }}>{profile?.name || "내정보"}</span>
-              </Link>
-              <button onClick={handleLogout} style={{ padding: "7px 14px", border: "1px solid #ddd", borderRadius: "8px", fontSize: "13px", color: "#666", background: "#fff", cursor: "pointer" }}>로그아웃</button>
-            </>
-          ) : (
-            <>
-              <Link href="/contact" style={{ padding: "7px 12px", border: "1px solid #eee", borderRadius: "8px", fontSize: "13px", color: "#666", textDecoration: "none" }}>문의</Link>
-              <Link href="/login" style={{ padding: "7px 14px", border: "1px solid #ddd", borderRadius: "8px", fontSize: "13px", color: "#333", textDecoration: "none" }}>로그인</Link>
-              <Link href="/login" style={{ padding: "7px 14px", background: "#FF6B00", borderRadius: "8px", fontSize: "13px", color: "#fff", textDecoration: "none", fontWeight: 600 }}>회원가입</Link>
-            </>
-          )}
-        </div>
-      </header>
+      <HomeHeader
+        user={user}
+        profile={profile}
+        desktopTabs={desktopTabs}
+        onLogout={handleLogout}
+      />
 
       <section style={{ background: "linear-gradient(135deg, #FF6B00 0%, #ff8c00 100%)", padding: "40px 20px", color: "#fff", textAlign: "center" }}>
         <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "8px", lineHeight: 1.4 }}>
