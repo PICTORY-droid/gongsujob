@@ -367,7 +367,8 @@ export default function MyPage() {
               🔐 내 연락처 공개 안내
             </div>
             <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.6 }}>
-              제안을 수락한 경우에만 구인자에게 연락처가 공개됩니다. 수락 전에는 연락처가 공개되지 않습니다.
+              제안을 수락한 경우에만 구인자에게 연락처가 공개됩니다.<br />
+              수락 전에는 연락처가 공개되지 않습니다.
             </div>
           </div>
         )}
