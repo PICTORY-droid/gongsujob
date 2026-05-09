@@ -74,6 +74,32 @@ export default function HomePage() {
     job.title?.includes(searchQuery) || job.region?.includes(searchQuery)
   );
 
+  const isEmployer = profile?.user_type === "구인자";
+
+  const actionCards = isEmployer
+    ? [
+        { icon: "🏗️", label: "공고 등록", desc: "인력 바로 구하기", href: "/jobs/write" },
+        { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
+      ]
+    : [
+        { icon: "📝", label: "이력서 등록", desc: "일자리 매칭 받기", href: "/resume/write" },
+        { icon: "📋", label: "공고 보기", desc: "현장 일자리 찾기", href: "/jobs" },
+      ];
+
+  const bottomTabs = isEmployer
+    ? [
+        { icon: "🏠", label: "홈", href: "/" },
+        { icon: "🏗️", label: "공고등록", href: "/jobs/write" },
+        { icon: "👷", label: "인재", href: "/resumes" },
+        { icon: "👤", label: "내정보", href: "/mypage" },
+      ]
+    : [
+        { icon: "🏠", label: "홈", href: "/" },
+        { icon: "📋", label: "공고", href: "/jobs" },
+        { icon: "📝", label: "이력서", href: "/resume/write" },
+        { icon: "👤", label: "내정보", href: "/mypage" },
+      ];
+
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', 'Pretendard', sans-serif" }}>
 
@@ -106,8 +132,12 @@ export default function HomePage() {
       </header>
 
       <section style={{ background: "linear-gradient(135deg, #FF6B00 0%, #ff8c00 100%)", padding: "40px 20px", color: "#fff", textAlign: "center" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "8px", lineHeight: 1.4 }}>건설 현장 일자리,<br />지금 바로 찾으세요</h1>
-        <p style={{ fontSize: "14px", opacity: 0.9, marginBottom: "24px" }}>전국 건설 현장 일용직 · 당일 지급 · 소장님 직접 등록</p>
+        <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "8px", lineHeight: 1.4 }}>
+          {isEmployer ? <>건설 현장 인력,<br />지금 바로 구하세요</> : <>건설 현장 일자리,<br />지금 바로 찾으세요</>}
+        </h1>
+        <p style={{ fontSize: "14px", opacity: 0.9, marginBottom: "24px" }}>
+          {isEmployer ? "직종별 인재 확인 · 현장 공고 등록 · 근로자 매칭" : "전국 건설 현장 일용직 · 당일 지급 · 소장님 직접 등록"}
+        </p>
         <div style={{ background: "#fff", borderRadius: "12px", padding: "6px 6px 6px 16px", display: "flex", gap: "8px", maxWidth: "480px", margin: "0 auto" }}>
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="직종 또는 지역 검색"
@@ -131,11 +161,7 @@ export default function HomePage() {
       </section>
 
       <section style={{ padding: "20px", display: "flex", gap: "12px", maxWidth: "600px", margin: "0 auto" }}>
-        {[
-          { icon: "📝", label: "이력서 등록", desc: "일자리 매칭 받기", href: "/resume/write" },
-          { icon: "🏗️", label: "공고 등록", desc: "인력 바로 구하기", href: "/jobs/write" },
-          { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
-        ].map((item, i) => (
+        {actionCards.map((item, i) => (
           <Link key={i} href={item.href} style={{ flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: "12px", padding: "16px", textAlign: "center", textDecoration: "none", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
             <div style={{ fontSize: "28px", marginBottom: "6px" }}>{item.icon}</div>
             <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>{item.label}</div>
@@ -207,13 +233,7 @@ export default function HomePage() {
       </section>
 
       <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
-        {[
-          { icon: "🏠", label: "홈", href: "/" },
-          { icon: "📋", label: "공고", href: "/jobs" },
-          { icon: "👷", label: "인재", href: "/resumes" },
-          { icon: "📝", label: "이력서", href: "/resume/write" },
-          { icon: "👤", label: "내정보", href: "/mypage" },
-        ].map((tab, i) => (
+        {bottomTabs.map((tab, i) => (
           <Link key={i} href={tab.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", textDecoration: "none" }}>
             <span style={{ fontSize: "20px" }}>{tab.icon}</span>
             <span style={{ fontSize: "10px", color: i === 0 ? "#FF6B00" : "#999", fontWeight: i === 0 ? 600 : 400 }}>{tab.label}</span>

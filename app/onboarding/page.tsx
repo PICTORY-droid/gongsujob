@@ -23,12 +23,13 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const totalSteps = userType === "구인자" ? 2 : 3;
+
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = "/login"; return; }
 
-      // 이미 프로필 있으면 홈으로
       const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
       if (data) { window.location.href = "/"; }
     };
@@ -36,8 +37,14 @@ export default function OnboardingPage() {
   }, []);
 
   const handleComplete = async () => {
-    if (!userType || !region || !ageRange) { setError("모든 항목을 선택해주세요."); return; }
-    setLoading(true); setError("");
+    if (!userType || !region || (userType === "구직자" && !ageRange)) {
+      setError("모든 항목을 선택해주세요.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { window.location.href = "/login"; return; }
@@ -51,25 +58,30 @@ export default function OnboardingPage() {
 
       if (error) { setError("저장 실패: " + error.message); return; }
       window.location.href = "/";
-    } catch { setError("오류가 발생했습니다."); }
-    finally { setLoading(false); }
+    } catch {
+      setError("오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", fontFamily: "'Apple SD Gothic Neo', sans-serif" }}>
       <div style={{ background: "#fff", borderRadius: "16px", padding: "32px 28px", width: "100%", maxWidth: "400px", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
 
-        {/* 진행 표시 */}
         <div style={{ display: "flex", gap: "6px", marginBottom: "28px" }}>
-          {[1, 2, 3].map((s) => (
-            <div key={s} style={{ flex: 1, height: "4px", borderRadius: "2px", background: s <= step ? "#FF6B00" : "#eee", transition: "background 0.3s" }} />
-          ))}
+          {Array.from({ length: totalSteps }).map((_, index) => {
+            const s = index + 1;
+            return (
+              <div key={s} style={{ flex: 1, height: "4px", borderRadius: "2px", background: s <= step ? "#FF6B00" : "#eee", transition: "background 0.3s" }} />
+            );
+          })}
         </div>
 
         {step === 1 && (
           <div>
             <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "6px" }}>어떤 분이세요?</h2>
-            <p style={{ fontSize: "13px", color: "#999", marginBottom: "24px" }}>맞춤 공고 알림을 위해 필요합니다</p>
+            <p style={{ fontSize: "13px", color: "#999", marginBottom: "24px" }}>서비스 이용 유형을 선택해주세요</p>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {USER_TYPES.map((t) => (
                 <button key={t.value} onClick={() => setUserType(t.value)}
@@ -92,7 +104,9 @@ export default function OnboardingPage() {
         {step === 2 && (
           <div>
             <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "6px" }}>활동 지역이 어디예요?</h2>
-            <p style={{ fontSize: "13px", color: "#999", marginBottom: "24px" }}>근처 공고를 먼저 알려드릴게요</p>
+            <p style={{ fontSize: "13px", color: "#999", marginBottom: "24px" }}>
+              {userType === "구인자" ? "공고를 등록할 주요 지역을 선택해주세요" : "근처 공고를 먼저 알려드릴게요"}
+            </p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "24px" }}>
               {REGIONS.map((r) => (
                 <button key={r} onClick={() => setRegion(r)}
@@ -101,20 +115,28 @@ export default function OnboardingPage() {
                 </button>
               ))}
             </div>
+            {error && <div style={{ background: "#fff3f3", border: "1px solid #ffd0d0", borderRadius: "8px", padding: "10px 14px", fontSize: "13px", color: "#e53e3e", marginBottom: "14px" }}>{error}</div>}
             <div style={{ display: "flex", gap: "10px" }}>
               <button onClick={() => setStep(1)}
                 style={{ flex: 1, padding: "13px", background: "#f5f5f5", color: "#666", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 600, cursor: "pointer" }}>
                 이전
               </button>
-              <button onClick={() => region && setStep(3)} disabled={!region}
-                style={{ flex: 2, padding: "13px", background: region ? "#FF6B00" : "#ddd", color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: region ? "pointer" : "not-allowed" }}>
-                다음
-              </button>
+              {userType === "구인자" ? (
+                <button onClick={handleComplete} disabled={loading || !region}
+                  style={{ flex: 2, padding: "13px", background: region && !loading ? "#FF6B00" : "#ddd", color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: region && !loading ? "pointer" : "not-allowed" }}>
+                  {loading ? "저장 중..." : "시작하기 🎉"}
+                </button>
+              ) : (
+                <button onClick={() => region && setStep(3)} disabled={!region}
+                  style={{ flex: 2, padding: "13px", background: region ? "#FF6B00" : "#ddd", color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: region ? "pointer" : "not-allowed" }}>
+                  다음
+                </button>
+              )}
             </div>
           </div>
         )}
 
-        {step === 3 && (
+        {step === 3 && userType === "구직자" && (
           <div>
             <h2 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "6px" }}>연령대가 어떻게 되세요?</h2>
             <p style={{ fontSize: "13px", color: "#999", marginBottom: "24px" }}>맞춤 공고 알림을 위해 필요합니다</p>
