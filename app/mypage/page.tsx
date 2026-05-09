@@ -18,6 +18,7 @@ export default function MyPage() {
   const [answerText, setAnswerText] = useState<Record<string, string>>({});
   const [actionMessage, setActionMessage] = useState("");
   const [showOffersModal, setShowOffersModal] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -148,6 +149,7 @@ export default function MyPage() {
       link_url: "/mypage",
     });
 
+    setSelectedOffer((prev: any) => prev?.id === offer.id ? { ...prev, status } : prev);
     setActionMessage(isAccepted ? "제안을 수락했습니다." : "제안을 거절했습니다.");
     await fetchPositionOffers(user.id, profile?.user_type);
   };
@@ -191,6 +193,7 @@ export default function MyPage() {
       link_url: "/mypage",
     });
 
+    setSelectedOffer((prev: any) => prev?.id === offer.id ? { ...prev, status: "question" } : prev);
     setQuestionText(prev => ({ ...prev, [offer.id]: "" }));
     setActionMessage("질문을 보냈습니다.");
     await fetchPositionOffers(user.id, profile?.user_type);
@@ -235,6 +238,7 @@ export default function MyPage() {
       link_url: "/mypage",
     });
 
+    setSelectedOffer((prev: any) => prev?.id === offer.id ? { ...prev, status: "answered" } : prev);
     setAnswerText(prev => ({ ...prev, [offer.id]: "" }));
     setActionMessage("답변을 보냈습니다.");
     await fetchPositionOffers(user.id, profile?.user_type);
@@ -377,7 +381,10 @@ export default function MyPage() {
 
         {showOffersModal && (
           <div
-            onClick={() => setShowOffersModal(false)}
+            onClick={() => {
+              setShowOffersModal(false);
+              setSelectedOffer(null);
+            }}
             style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
           >
             <div
@@ -389,7 +396,10 @@ export default function MyPage() {
                   {isEmployer ? "보낸 포지션 제안" : "받은 포지션 제안"}
                 </div>
                 <button
-                  onClick={() => setShowOffersModal(false)}
+                  onClick={() => {
+                    setShowOffersModal(false);
+                    setSelectedOffer(null);
+                  }}
                   style={{ width: "32px", height: "32px", borderRadius: "50%", border: "none", background: "#fff", color: "#666", fontSize: "18px", cursor: "pointer" }}
                 >
                   ×
@@ -407,120 +417,178 @@ export default function MyPage() {
                 </div>
               </div>
 
-        <div style={{ background: "#fff", borderRadius: "16px", padding: "20px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <div style={{ fontSize: "14px", fontWeight: 800, color: "#1a1a1a", marginBottom: "12px" }}>
-            {isEmployer ? "보낸 포지션 제안" : "받은 포지션 제안"} {positionOffers.length > 0 && <span style={{ color: "#FF6B00" }}>({positionOffers.length})</span>}
-          </div>
+              {positionOffers.length === 0 ? (
+                <div style={{ background: "#fff", borderRadius: "16px", padding: "36px 20px", textAlign: "center", color: "#999", fontSize: "13px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+                  {isEmployer ? "아직 보낸 제안이 없습니다" : "아직 받은 제안이 없습니다"}
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {positionOffers.map((offer) => {
+                    const statusStyle = statusColor(offer.status);
 
-          {positionOffers.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "24px 0", color: "#999", fontSize: "13px" }}>
-              {isEmployer ? "아직 보낸 제안이 없습니다" : "아직 받은 제안이 없습니다"}
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {positionOffers.map((offer) => {
-                const statusStyle = statusColor(offer.status);
-                const messages = offerMessages[offer.id] || [];
-
-                return (
-                  <div key={offer.id} style={{ border: "1px solid #eee", borderRadius: "12px", padding: "14px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginBottom: "8px" }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: "14px", fontWeight: 800, color: "#1a1a1a", lineHeight: 1.4 }}>{offer.title}</div>
-                        <div style={{ fontSize: "12px", color: "#999", marginTop: "3px" }}>
-                          {offer.job_type} · {offer.location} · {formatPay(offer.pay)}
-                        </div>
-                      </div>
-                      <span style={{ alignSelf: "flex-start", background: statusStyle.bg, color: statusStyle.color, fontSize: "11px", borderRadius: "6px", padding: "4px 8px", fontWeight: 700, whiteSpace: "nowrap" }}>
-                        {statusLabel(offer.status)}
-                      </span>
-                    </div>
-
-                    <div style={{ background: "#f8f9fa", borderRadius: "10px", padding: "10px 12px", fontSize: "12px", color: "#666", lineHeight: 1.6, marginBottom: "10px" }}>
-                      <div>시작일: {offer.start_date}</div>
-                      {offer.headcount && <div>모집 인원: {offer.headcount}명</div>}
-                      {offer.work_conditions && <div style={{ whiteSpace: "pre-wrap" }}>근무 조건: {offer.work_conditions}</div>}
-                      <div style={{ whiteSpace: "pre-wrap" }}>제안 메시지: {offer.message}</div>
-                    </div>
-
-                    {messages.length > 0 && (
-                      <div style={{ border: "1px solid #eee", borderRadius: "10px", overflow: "hidden", marginBottom: "10px" }}>
-                        <div style={{ background: "#fafafa", padding: "8px 10px", fontSize: "11px", color: "#999", fontWeight: 700 }}>질문 및 답변</div>
-                        {messages.map((message) => (
-                          <div key={message.id} style={{ padding: "9px 10px", borderTop: "1px solid #f5f5f5" }}>
-                            <div style={{ fontSize: "12px", color: "#333", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{message.message}</div>
+                    return (
+                      <button
+                        key={offer.id}
+                        onClick={() => setSelectedOffer(offer)}
+                        style={{ width: "100%", background: "#fff", border: "1px solid #eee", borderRadius: "14px", padding: "14px", cursor: "pointer", textAlign: "left", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginBottom: "6px" }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: "14px", fontWeight: 800, color: "#1a1a1a", lineHeight: 1.4 }}>
+                              {offer.title}
+                            </div>
+                            <div style={{ fontSize: "12px", color: "#999", marginTop: "3px" }}>
+                              {offer.job_type} · {offer.location} · {formatPay(offer.pay)}
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {!isEmployer && (offer.status === "pending" || offer.status === "answered" || offer.status === "question") && (
-                      <div>
-                        <div style={{ fontSize: "12px", color: "#666", lineHeight: 1.5, marginBottom: "10px" }}>
-                          제안을 수락하면 구인자에게 연락처가 공개됩니다. 수락 전에는 연락처가 공개되지 않습니다.
+                          <span style={{ alignSelf: "flex-start", background: statusStyle.bg, color: statusStyle.color, fontSize: "11px", borderRadius: "6px", padding: "4px 8px", fontWeight: 700, whiteSpace: "nowrap" }}>
+                            {statusLabel(offer.status)}
+                          </span>
                         </div>
 
-                        <textarea
-                          value={questionText[offer.id] || ""}
-                          onChange={(e) => setQuestionText(prev => ({ ...prev, [offer.id]: e.target.value }))}
-                          placeholder="궁금한 점을 구인자에게 질문할 수 있습니다"
-                          rows={3}
-                          style={{ width: "100%", padding: "10px", border: "1px solid #eee", borderRadius: "10px", fontSize: "13px", boxSizing: "border-box", resize: "vertical", marginBottom: "8px" }}
-                        />
-
-                        <div style={{ display: "flex", gap: "8px" }}>
-                          <button onClick={() => handleOfferStatus(offer, "accepted")} style={{ flex: 1, padding: "10px", background: "#FF6B00", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}>
-                            수락
-                          </button>
-                          <button onClick={() => handleOfferStatus(offer, "rejected")} style={{ flex: 1, padding: "10px", background: "#fff", color: "#e53e3e", border: "1px solid #ffd0d0", borderRadius: "10px", fontSize: "13px", fontWeight: 700, cursor: "pointer" }}>
-                            거절
-                          </button>
-                          <button onClick={() => handleSendQuestion(offer)} style={{ flex: 1, padding: "10px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}>
-                            질문
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {!isEmployer && offer.status === "accepted" && (
-                      <div style={{ background: "#f0fff4", border: "1px solid #9ae6b4", borderRadius: "10px", padding: "10px", fontSize: "12px", color: "#276749", lineHeight: 1.5 }}>
-                        제안을 수락했습니다. 이제 해당 구인자가 연락처를 확인할 수 있습니다.
-                      </div>
-                    )}
-
-                    {isEmployer && offer.status === "accepted" && (
-                      <div style={{ background: "#f0fff4", border: "1px solid #9ae6b4", borderRadius: "10px", padding: "10px", fontSize: "12px", color: "#276749", lineHeight: 1.6 }}>
-                        <div style={{ fontWeight: 800, marginBottom: "4px" }}>구직자가 제안을 수락했습니다</div>
-                        <div>전화번호: {offer.resumes?.phone || "연락처 미입력"}</div>
-                        <div>이메일: {offer.resumes?.email || "이메일 미입력"}</div>
-                      </div>
-                    )}
-
-                    {isEmployer && offer.status !== "accepted" && offer.status !== "rejected" && (
-                      <div>
-                        <textarea
-                          value={answerText[offer.id] || ""}
-                          onChange={(e) => setAnswerText(prev => ({ ...prev, [offer.id]: e.target.value }))}
-                          placeholder="구직자 질문에 답변하거나 추가 안내를 보낼 수 있습니다"
-                          rows={3}
-                          style={{ width: "100%", padding: "10px", border: "1px solid #eee", borderRadius: "10px", fontSize: "13px", boxSizing: "border-box", resize: "vertical", marginBottom: "8px" }}
-                        />
-                        <button onClick={() => handleSendAnswer(offer)} style={{ width: "100%", padding: "10px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}>
-                          답변 보내기
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-
+                        {isEmployer && offer.resumes?.name && (
+                          <div style={{ fontSize: "12px", color: "#666" }}>
+                            제안 대상: {offer.resumes.name} · {offer.resumes.job_type || "직종 미입력"} · {offer.resumes.address || "지역 미입력"}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         )}
+
+        {selectedOffer && (() => {
+          const offer = selectedOffer;
+          const statusStyle = statusColor(offer.status);
+          const messages = offerMessages[offer.id] || [];
+
+          return (
+            <div
+              onClick={() => setSelectedOffer(null)}
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 320, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+            >
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{ width: "100%", maxWidth: "520px", maxHeight: "82vh", overflowY: "auto", background: "#fff", borderRadius: "20px", padding: "20px", boxShadow: "0 12px 40px rgba(0,0,0,0.28)" }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+                  <div style={{ fontSize: "17px", fontWeight: 800, color: "#1a1a1a" }}>
+                    {isEmployer ? "보낸 제안 상세" : "받은 제안 상세"}
+                  </div>
+                  <button
+                    onClick={() => setSelectedOffer(null)}
+                    style={{ width: "32px", height: "32px", borderRadius: "50%", border: "none", background: "#f5f5f5", color: "#666", fontSize: "18px", cursor: "pointer" }}
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {actionMessage && (
+                  <div style={{ background: actionMessage.includes("실패") || actionMessage.includes("입력") ? "#fff3f3" : "#f0fff4", border: "1px solid " + (actionMessage.includes("실패") || actionMessage.includes("입력") ? "#ffd0d0" : "#9ae6b4"), borderRadius: "12px", padding: "12px 14px", fontSize: "13px", color: actionMessage.includes("실패") || actionMessage.includes("입력") ? "#e53e3e" : "#276749", marginBottom: "12px", lineHeight: 1.5 }}>
+                    {actionMessage}
+                  </div>
+                )}
+
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "16px", fontWeight: 800, color: "#1a1a1a", lineHeight: 1.4 }}>
+                      {offer.title}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>
+                      {offer.job_type} · {offer.location} · {formatPay(offer.pay)}
+                    </div>
+                  </div>
+                  <span style={{ alignSelf: "flex-start", background: statusStyle.bg, color: statusStyle.color, fontSize: "11px", borderRadius: "6px", padding: "4px 8px", fontWeight: 700, whiteSpace: "nowrap" }}>
+                    {statusLabel(offer.status)}
+                  </span>
+                </div>
+
+                {isEmployer && offer.resumes?.name && (
+                  <div style={{ fontSize: "12px", color: "#666", marginBottom: "10px" }}>
+                    제안 대상: {offer.resumes.name} · {offer.resumes.job_type || "직종 미입력"} · {offer.resumes.address || "지역 미입력"}
+                  </div>
+                )}
+
+                <div style={{ background: "#f8f9fa", borderRadius: "12px", padding: "12px 14px", fontSize: "12px", color: "#666", lineHeight: 1.7, marginBottom: "12px" }}>
+                  <div>시작일: {offer.start_date}</div>
+                  {offer.work_conditions && <div style={{ whiteSpace: "pre-wrap" }}>근무 조건: {offer.work_conditions}</div>}
+                  <div style={{ whiteSpace: "pre-wrap" }}>제안 메시지: {offer.message}</div>
+                </div>
+
+                {messages.length > 0 && (
+                  <div style={{ border: "1px solid #eee", borderRadius: "12px", overflow: "hidden", marginBottom: "12px" }}>
+                    <div style={{ background: "#fafafa", padding: "9px 12px", fontSize: "11px", color: "#999", fontWeight: 700 }}>질문 및 답변</div>
+                    {messages.map((message) => (
+                      <div key={message.id} style={{ padding: "10px 12px", borderTop: "1px solid #f5f5f5" }}>
+                        <div style={{ fontSize: "12px", color: "#333", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{message.message}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {!isEmployer && (offer.status === "pending" || offer.status === "answered" || offer.status === "question") && (
+                  <div>
+                    <div style={{ fontSize: "12px", color: "#666", lineHeight: 1.5, marginBottom: "10px" }}>
+                      제안을 수락하면 구인자에게 연락처가 공개됩니다. 수락 전에는 연락처가 공개되지 않습니다.
+                    </div>
+
+                    <textarea
+                      value={questionText[offer.id] || ""}
+                      onChange={(e) => setQuestionText(prev => ({ ...prev, [offer.id]: e.target.value }))}
+                      placeholder="궁금한 점을 구인자에게 질문할 수 있습니다"
+                      rows={3}
+                      style={{ width: "100%", padding: "10px", border: "1px solid #eee", borderRadius: "10px", fontSize: "13px", boxSizing: "border-box", resize: "vertical", marginBottom: "8px" }}
+                    />
+
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button onClick={() => handleOfferStatus(offer, "accepted")} style={{ flex: 1, padding: "10px", background: "#FF6B00", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}>
+                        수락
+                      </button>
+                      <button onClick={() => handleOfferStatus(offer, "rejected")} style={{ flex: 1, padding: "10px", background: "#fff", color: "#e53e3e", border: "1px solid #ffd0d0", borderRadius: "10px", fontSize: "13px", fontWeight: 700, cursor: "pointer" }}>
+                        거절
+                      </button>
+                      <button onClick={() => handleSendQuestion(offer)} style={{ flex: 1, padding: "10px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}>
+                        질문
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {!isEmployer && offer.status === "accepted" && (
+                  <div style={{ background: "#f0fff4", border: "1px solid #9ae6b4", borderRadius: "10px", padding: "10px", fontSize: "12px", color: "#276749", lineHeight: 1.5 }}>
+                    제안을 수락했습니다. 이제 해당 구인자가 연락처를 확인할 수 있습니다.
+                  </div>
+                )}
+
+                {isEmployer && offer.status === "accepted" && (
+                  <div style={{ background: "#f0fff4", border: "1px solid #9ae6b4", borderRadius: "10px", padding: "10px", fontSize: "12px", color: "#276749", lineHeight: 1.6 }}>
+                    <div style={{ fontWeight: 800, marginBottom: "4px" }}>구직자가 제안을 수락했습니다</div>
+                    <div>전화번호: {offer.resumes?.phone || "연락처 미입력"}</div>
+                    <div>이메일: {offer.resumes?.email || "이메일 미입력"}</div>
+                  </div>
+                )}
+
+                {isEmployer && offer.status !== "accepted" && offer.status !== "rejected" && (
+                  <div>
+                    <textarea
+                      value={answerText[offer.id] || ""}
+                      onChange={(e) => setAnswerText(prev => ({ ...prev, [offer.id]: e.target.value }))}
+                      placeholder="구직자 질문에 답변하거나 추가 안내를 보낼 수 있습니다"
+                      rows={3}
+                      style={{ width: "100%", padding: "10px", border: "1px solid #eee", borderRadius: "10px", fontSize: "13px", boxSizing: "border-box", resize: "vertical", marginBottom: "8px" }}
+                    />
+                    <button onClick={() => handleSendAnswer(offer)} style={{ width: "100%", padding: "10px", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "10px", fontSize: "13px", fontWeight: 800, cursor: "pointer" }}>
+                      답변 보내기
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {isEmployer && myJobs.length > 0 && (
           <div style={{ background: "#fff", borderRadius: "16px", padding: "20px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
