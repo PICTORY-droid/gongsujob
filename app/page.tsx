@@ -150,17 +150,9 @@ export default function HomePage() {
           display: none;
         }
 
-        .mobile-bottom-nav {
-          display: flex;
-        }
-
         @media (min-width: 769px) {
           .desktop-header-nav {
             display: flex;
-          }
-
-          .mobile-bottom-nav {
-            display: none !important;
           }
         }
       `}</style>
