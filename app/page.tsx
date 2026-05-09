@@ -242,10 +242,10 @@ export default function HomePage() {
 
       <section style={{ background: "linear-gradient(135deg, #FF6B00 0%, #ff8c00 100%)", padding: "40px 20px", color: "#fff", textAlign: "center" }}>
         <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "8px", lineHeight: 1.4 }}>
-          {isEmployer ? <>건설 현장 인력,<br />지금 바로 구하세요</> : <>건설 현장 일자리,<br />지금 바로 찾으세요</>}
+          {isEmployer ? <>건설 현장 인재를<br />한곳에서 확인하세요</> : <>건설 현장 일자리를<br />한곳에서 확인하세요</>}
         </h1>
         <p style={{ fontSize: "14px", opacity: 0.9, marginBottom: "24px" }}>
-          {isEmployer ? "직종별 인재 확인 · 현장 공고 등록 · 근로자 매칭" : "전국 건설 현장 일용직 · 당일 지급 · 소장님 직접 등록"}
+          {isEmployer ? "공고 등록 · 인재 조회 · 포지션 제안 관리" : "직종별 공고 확인 · 이력서 등록 · 포지션 제안 관리"}
         </p>
         <div style={{ background: "#fff", borderRadius: "12px", padding: "6px 6px 6px 16px", display: "flex", gap: "8px", maxWidth: "480px", margin: "0 auto" }}>
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
