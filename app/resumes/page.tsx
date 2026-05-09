@@ -165,9 +165,9 @@ export default function ResumesPage() {
     setContactAllowed(allowed);
 
     setOfferForm({
-      title: `${resume.job_type || "현장"} 포지션 제안드립니다`,
-      job_type: resume.job_type || "",
-      location: resume.address || "",
+      title: "",
+      job_type: "",
+      location: "",
       start_date: "",
       pay: "",
       headcount: "",
