@@ -131,7 +131,6 @@ export default function HomePage() {
         { icon: "📋", label: "공고 보기", desc: "현장 일자리 찾기", href: "/jobs" },
         { icon: "🏗️", label: "공고 등록", desc: "인력 바로 구하기", href: "/jobs/write" },
         { icon: "👷", label: "인재 찾기", desc: "등록된 근로자 보기", href: "/resumes" },
-        { icon: "💬", label: "문의하기", desc: "프로젝트 문의", href: "/contact" },
       ]
     : isEmployer
     ? [
@@ -240,6 +239,7 @@ export default function HomePage() {
             </>
           ) : (
             <>
+              <Link href="/contact" style={{ padding: "7px 12px", border: "1px solid #eee", borderRadius: "8px", fontSize: "13px", color: "#666", textDecoration: "none" }}>문의</Link>
               <Link href="/login" style={{ padding: "7px 14px", border: "1px solid #ddd", borderRadius: "8px", fontSize: "13px", color: "#333", textDecoration: "none" }}>로그인</Link>
               <Link href="/login" style={{ padding: "7px 14px", background: "#FF6B00", borderRadius: "8px", fontSize: "13px", color: "#fff", textDecoration: "none", fontWeight: 600 }}>회원가입</Link>
             </>
