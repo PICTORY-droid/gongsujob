@@ -128,6 +128,13 @@ app
 ├─ layout.tsx
 └─ page.tsx
 
+components
+├─ AppHeader.tsx
+├─ JobCard.tsx
+├─ MobileBottomNav.tsx
+├─ NetPayCalculator.tsx
+└─ ResumeCard.tsx
+
 lib
 └─ supabase.ts
 ~~~
