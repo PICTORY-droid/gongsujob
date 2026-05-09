@@ -94,7 +94,7 @@ export default function HomePage() {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   const handleProtectedMove = (href: string) => {
