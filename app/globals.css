@@ -36,3 +36,14 @@ body {
   }
 }
 
+/* 모바일 전용 지원 버튼 */
+.mobile-apply-bar {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .mobile-apply-bar {
+    display: none !important;
+  }
+}
+
