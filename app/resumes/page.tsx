@@ -168,7 +168,9 @@ export default function ResumesPage() {
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
             <div style={{ fontSize: "40px", marginBottom: "12px" }}>👷</div>
             <div style={{ fontSize: "15px", color: "#999" }}>등록된 인재가 없습니다</div>
-            <Link href="/resume/write" style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: "#FF6B00", color: "#fff", borderRadius: "10px", textDecoration: "none", fontSize: "14px", fontWeight: 600 }}>이력서 등록하기</Link>
+            {profile?.user_type !== "구인자" && (
+              <Link href="/resume/write" style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: "#FF6B00", color: "#fff", borderRadius: "10px", textDecoration: "none", fontSize: "14px", fontWeight: 600 }}>이력서 등록하기</Link>
+            )}
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
