@@ -20,6 +20,7 @@ export default function JobDetailPage() {
   const [calcDays, setCalcDays] = useState(1);
   const [showCalc, setShowCalc] = useState(false);
   const [staticMapUrl, setStaticMapUrl] = useState<string | null>(null);
+  const [mapCoords, setMapCoords] = useState<{ lat: string; lng: string } | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -34,22 +35,23 @@ export default function JobDetailPage() {
       setLoading(false);
       const { data: app } = await supabase.from("applications").select("id").eq("job_id", jobId).eq("user_id", user.id).maybeSingle();
       if (app) setApplied(true);
-      if (job?.region) {
+      const address = job?.detail_address || job?.region;
+      if (address) {
         setWeatherLoading(true);
         try {
-          const res = await fetch("/api/weather?region=" + encodeURIComponent(job.region));
+          const res = await fetch("/api/weather?address=" + encodeURIComponent(address));
           const data = await res.json();
           if (!data.error) setWeather(data);
         } catch {}
         setWeatherLoading(false);
       }
-      const address = job?.detail_address || job?.region;
       if (address) {
         try {
           const geoRes = await fetch("/api/geocode?address=" + encodeURIComponent(address));
           const geoData = await geoRes.json();
           if (!geoData.error) {
             setStaticMapUrl(`/api/staticmap?lng=${geoData.lng}&lat=${geoData.lat}`);
+            setMapCoords({ lat: geoData.lat, lng: geoData.lng });
           }
         } catch {}
       }
@@ -132,7 +134,7 @@ export default function JobDetailPage() {
 
         <div style={{background:"#fff",borderRadius:"16px",padding:"16px 20px",marginBottom:"12px",boxShadow:"0 1px 4px rgba(0,0,0,0.06)"}}>
           <div style={{fontSize:"13px",fontWeight:700,color:"#1a1a1a",marginBottom:"12px"}}>현장 위치 지도</div>
-          <a href={"https://map.kakao.com/?q=" + encodeURIComponent(address)} target="_blank" rel="noreferrer" style={{display:"block",borderRadius:"10px",overflow:"hidden"}}>
+          <a href={mapCoords ? `https://map.kakao.com/link/map/현장위치,${mapCoords.lat},${mapCoords.lng}` : "https://map.kakao.com/?q=" + encodeURIComponent(address)} target="_blank" rel="noreferrer" style={{display:"block",borderRadius:"10px",overflow:"hidden"}}>
             {staticMapUrl ? (
               <img src={staticMapUrl} style={{width:"100%",height:"220px",objectFit:"cover",display:"block"}} alt="지도" />
             ) : (
@@ -147,7 +149,7 @@ export default function JobDetailPage() {
         </div>
 
         <div style={{background:"#fff",borderRadius:"16px",padding:"16px 20px",marginBottom:"12px",boxShadow:"0 1px 4px rgba(0,0,0,0.06)"}}>
-          <div style={{fontSize:"13px",fontWeight:700,color:"#1a1a1a",marginBottom:"12px"}}>현장 날씨 ({job.region})</div>
+          <div style={{fontSize:"13px",fontWeight:700,color:"#1a1a1a",marginBottom:"12px"}}>현장 날씨 ({address})</div>
           {weatherLoading ? (
             <div style={{fontSize:"13px",color:"#999"}}>날씨 불러오는 중...</div>
           ) : weather ? (

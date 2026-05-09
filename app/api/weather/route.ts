@@ -35,11 +35,69 @@ const REGION_GRID: Record<string, { nx: number; ny: number }> = {
   "서귀포": { nx: 52, ny: 33 },
 };
 
-function getGrid(region: string): { nx: number; ny: number } {
+function getGridByRegion(region: string): { nx: number; ny: number } {
   for (const key of Object.keys(REGION_GRID)) {
     if (region.includes(key)) return REGION_GRID[key];
   }
   return { nx: 60, ny: 127 };
+}
+
+function convertLatLngToGrid(lat: number, lng: number): { nx: number; ny: number } {
+  const RE = 6371.00877;
+  const GRID = 5.0;
+  const SLAT1 = 30.0;
+  const SLAT2 = 60.0;
+  const OLON = 126.0;
+  const OLAT = 38.0;
+  const XO = 43;
+  const YO = 136;
+
+  const DEGRAD = Math.PI / 180.0;
+
+  const re = RE / GRID;
+  const slat1 = SLAT1 * DEGRAD;
+  const slat2 = SLAT2 * DEGRAD;
+  const olon = OLON * DEGRAD;
+  const olat = OLAT * DEGRAD;
+
+  let sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+  sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+
+  let sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+  sf = Math.pow(sf, sn) * Math.cos(slat1) / sn;
+
+  let ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
+  ro = re * sf / Math.pow(ro, sn);
+
+  let ra = Math.tan(Math.PI * 0.25 + lat * DEGRAD * 0.5);
+  ra = re * sf / Math.pow(ra, sn);
+
+  let theta = lng * DEGRAD - olon;
+  if (theta > Math.PI) theta -= 2.0 * Math.PI;
+  if (theta < -Math.PI) theta += 2.0 * Math.PI;
+  theta *= sn;
+
+  const nx = Math.floor(ra * Math.sin(theta) + XO + 0.5);
+  const ny = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
+
+  return { nx, ny };
+}
+
+async function getGridFromAddress(req: NextRequest, address: string): Promise<{ nx: number; ny: number }> {
+  try {
+    const geocodeUrl = req.nextUrl.origin + "/api/geocode?address=" + encodeURIComponent(address);
+    const res = await fetch(geocodeUrl, { cache: "no-store" });
+    const data = await res.json();
+
+    const lat = Number(data.lat);
+    const lng = Number(data.lng);
+
+    if (!Number.isNaN(lat) && !Number.isNaN(lng)) {
+      return convertLatLngToGrid(lat, lng);
+    }
+  } catch {}
+
+  return getGridByRegion(address);
 }
 
 function getBaseTime(): { base_date: string; base_time: string } {
@@ -48,40 +106,67 @@ function getBaseTime(): { base_date: string; base_time: string } {
   const hour = kst.getUTCHours();
   const minutes = kst.getUTCMinutes();
   const times = [2, 5, 8, 11, 14, 17, 20, 23];
+
   let base_hour = 23;
   const totalMin = hour * 60 + minutes;
+
   for (const t of times) {
     if (totalMin >= t * 60 + 10) base_hour = t;
   }
+
   let base_date = kst.toISOString().slice(0, 10).replace(/-/g, "");
+
   if (base_hour === 23 && hour < 2) {
     const yesterday = new Date(kst.getTime() - 24 * 60 * 60 * 1000);
     base_date = yesterday.toISOString().slice(0, 10).replace(/-/g, "");
   }
+
   return { base_date, base_time: String(base_hour).padStart(2, "0") + "00" };
 }
 
+function formatTemperature(value: unknown): string | null {
+  if (value === undefined || value === null || value === "") return null;
+  const text = String(value).replace(/°C/g, "").replace(/C/g, "").trim();
+  return text ? text + "°C" : null;
+}
+
+function formatPercent(value: unknown): string | null {
+  if (value === undefined || value === null || value === "") return null;
+  const text = String(value).replace(/%/g, "").trim();
+  return text ? text + "%" : null;
+}
+
 export async function GET(req: NextRequest) {
-  const region = req.nextUrl.searchParams.get("region") || "서울";
-  const { nx, ny } = getGrid(region);
+  const address = req.nextUrl.searchParams.get("address");
+  const region = req.nextUrl.searchParams.get("region");
+  const location = address || region || "서울";
+
+  const { nx, ny } = await getGridFromAddress(req, location);
   const { base_date, base_time } = getBaseTime();
 
   const SERVICE_KEY = process.env.WEATHER_API_KEY;
+
   if (!SERVICE_KEY) {
     return NextResponse.json({ error: "API 키 없음" }, { status: 500 });
   }
 
   const url =
-    `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst` +
-    `?serviceKey=${SERVICE_KEY}` +
-    `&numOfRows=100&pageNo=1&dataType=JSON` +
-    `&base_date=${base_date}&base_time=${base_time}` +
-    `&nx=${nx}&ny=${ny}`;
+    "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst" +
+    "?serviceKey=" + SERVICE_KEY +
+    "&numOfRows=100&pageNo=1&dataType=JSON" +
+    "&base_date=" + base_date +
+    "&base_time=" + base_time +
+    "&nx=" + nx +
+    "&ny=" + ny;
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: "no-store" });
     const data = await res.json();
     const items: any[] = data?.response?.body?.items?.item || [];
+
+    if (items.length === 0) {
+      return NextResponse.json({ error: "날씨 데이터 없음", location, nx, ny }, { status: 500 });
+    }
 
     const today = base_date;
     const sky = items.find((i) => i.category === "SKY" && i.fcstDate === today);
@@ -98,21 +183,42 @@ export async function GET(req: NextRequest) {
     let icon = "☀️";
     let workable = true;
 
-    if (ptyCode === "1" || ptyCode === "4") { weather = "비"; icon = "🌧️"; workable = false; }
-    else if (ptyCode === "2") { weather = "비/눈"; icon = "🌨️"; workable = false; }
-    else if (ptyCode === "3") { weather = "눈"; icon = "❄️"; workable = false; }
-    else if (skyCode === "1") { weather = "맑음"; icon = "☀️"; }
-    else if (skyCode === "3") { weather = "구름많음"; icon = "⛅"; }
-    else if (skyCode === "4") { weather = "흐림"; icon = "☁️"; }
+    if (ptyCode === "1" || ptyCode === "4") {
+      weather = "비";
+      icon = "🌧️";
+      workable = false;
+    } else if (ptyCode === "2") {
+      weather = "비/눈";
+      icon = "🌨️";
+      workable = false;
+    } else if (ptyCode === "3") {
+      weather = "눈";
+      icon = "❄️";
+      workable = false;
+    } else if (skyCode === "1") {
+      weather = "맑음";
+      icon = "☀️";
+    } else if (skyCode === "3") {
+      weather = "구름많음";
+      icon = "⛅";
+    } else if (skyCode === "4") {
+      weather = "흐림";
+      icon = "☁️";
+    }
 
     return NextResponse.json({
-      region, weather, icon, workable,
-      temperature: tmp?.fcstValue ? `${tmp.fcstValue}°C` : null,
-      tempMin: tmn?.fcstValue ? `${tmn.fcstValue}°C` : null,
-      tempMax: tmx?.fcstValue ? `${tmx.fcstValue}°C` : null,
-      rainProb: pop?.fcstValue ? `${pop.fcstValue}%` : null,
+      location,
+      nx,
+      ny,
+      weather,
+      icon,
+      workable,
+      temperature: formatTemperature(tmp?.fcstValue),
+      tempMin: formatTemperature(tmn?.fcstValue),
+      tempMax: formatTemperature(tmx?.fcstValue),
+      rainProb: formatPercent(pop?.fcstValue),
     });
   } catch {
-    return NextResponse.json({ error: "날씨 조회 실패" }, { status: 500 });
+    return NextResponse.json({ error: "날씨 조회 실패", location, nx, ny }, { status: 500 });
   }
 }
