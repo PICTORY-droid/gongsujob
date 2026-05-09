@@ -80,16 +80,29 @@ export default function ResumeWritePage() {
     setUploading(true);
     try {
       const fileExt = file.name.split(".").pop();
-      const filePath = `${user.id}/resume_photo.${fileExt}`;
-      const { error } = await supabase.storage.from("avatars").upload(filePath, file, { upsert: true });
+      const filePath = `${user.id}/resume_photo_${Date.now()}.${fileExt}`;
+
+      const { error } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, {
+          cacheControl: "0",
+          upsert: false,
+        });
+
       if (error) { setMessage("사진 업로드 실패: " + error.message); return; }
+
       const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
       setPhotoUrl(data.publicUrl);
 
-      await supabase
+      const { error: profileError } = await supabase
         .from("profiles")
         .update({ avatar_url: data.publicUrl })
         .eq("id", user.id);
+
+      if (profileError) {
+        setMessage("사진은 업로드됐지만 프로필 반영에 실패했습니다: " + profileError.message);
+        return;
+      }
 
       setMessage("사진 업로드 완료. 내정보 프로필에도 반영됩니다. 저장 버튼을 눌러주세요.");
     } catch { setMessage("업로드 오류가 발생했습니다."); }
