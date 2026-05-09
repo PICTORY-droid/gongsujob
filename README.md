@@ -4,7 +4,7 @@
 
 ## 라이브 데모
 
-https://gongsujob.vercel.app
+https://gongsujob-phgb.vercel.app
 
 ## 왜 만들었나
 
