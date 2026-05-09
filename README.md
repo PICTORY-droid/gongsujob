@@ -1,6 +1,10 @@
 # 🏗️ 공수잡 (GongsuJob)
 
-> 건설 일용직 구인구직 플랫폼 — 현장 관리자와 건설 노동자를 빠르게 연결합니다
+건설 일용직 구인구직 플랫폼 — 현장 관리자와 건설 노동자를 빠르게 연결합니다
+
+## 라이브 데모
+
+https://gongsujob.vercel.app
 
 ## 왜 만들었나
 
@@ -24,26 +28,9 @@
 
 ## 시작하는 방법
 
-1. 패키지 설치
-
-\`\`\`bash
-npm install
-\`\`\`
-
+1. npm install
 2. .env.local 파일 생성 후 아래 내용 입력
-
-\`\`\`
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-\`\`\`
-
-3. 실행
-
-\`\`\`bash
-npm run dev
-\`\`\`
-
-브라우저에서 http://localhost:3000 접속
+3. npm run dev
 
 ## 라이선스
 
