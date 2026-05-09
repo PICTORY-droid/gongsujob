@@ -91,23 +91,69 @@ export default function HomePage() {
         { icon: "🏠", label: "홈", href: "/" },
         { icon: "🏗️", label: "공고등록", href: "/jobs/write" },
         { icon: "👷", label: "인재", href: "/resumes" },
+        { icon: "💬", label: "문의", href: "/contact" },
         { icon: "👤", label: "내정보", href: "/mypage" },
       ]
     : [
         { icon: "🏠", label: "홈", href: "/" },
         { icon: "📋", label: "공고", href: "/jobs" },
         { icon: "📝", label: "이력서", href: "/resume/write" },
+        { icon: "💬", label: "문의", href: "/contact" },
         { icon: "👤", label: "내정보", href: "/mypage" },
+      ];
+
+  const desktopTabs = isEmployer
+    ? [
+        { label: "공고 등록", href: "/jobs/write" },
+        { label: "인재 찾기", href: "/resumes" },
+        { label: "문의하기", href: "/contact" },
+        { label: "내정보", href: "/mypage" },
+      ]
+    : [
+        { label: "공고 보기", href: "/jobs" },
+        { label: "이력서 등록", href: "/resume/write" },
+        { label: "문의하기", href: "/contact" },
+        { label: "내정보", href: "/mypage" },
       ];
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Apple SD Gothic Neo', 'Pretendard', sans-serif" }}>
+      <style>{`
+        .desktop-header-nav {
+          display: none;
+        }
+
+        .mobile-bottom-nav {
+          display: flex;
+        }
+
+        @media (min-width: 769px) {
+          .desktop-header-nav {
+            display: flex;
+          }
+
+          .mobile-bottom-nav {
+            display: none !important;
+          }
+        }
+      `}</style>
 
       <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <img src="/logo.png" alt="로고" style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }} />
           <span style={{ fontWeight: 700, fontSize: "18px", color: "#1a1a1a" }}>현장공수잡</span>
         </div>
+
+        {user && (
+          <nav className="desktop-header-nav" style={{ alignItems: "center", gap: "18px", marginLeft: "auto", marginRight: "18px" }}>
+            {desktopTabs.map((tab, i) => (
+              <Link key={i} href={tab.href} style={{ fontSize: "14px", color: "#333", textDecoration: "none", fontWeight: 600 }}>
+                {tab.label}
+              </Link>
+            ))}
+          </nav>
+        )}
+
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {user ? (
             <>
@@ -232,7 +278,7 @@ export default function HomePage() {
         )}
       </section>
 
-      <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
+      <nav className="mobile-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #eee", display: "flex", padding: "8px 0" }}>
         {bottomTabs.map((tab, i) => (
           <Link key={i} href={tab.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", textDecoration: "none" }}>
             <span style={{ fontSize: "20px" }}>{tab.icon}</span>
