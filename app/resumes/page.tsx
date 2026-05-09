@@ -14,6 +14,7 @@ export default function ResumesPage() {
   const [profile, setProfile] = useState<any>(null);
   const [toast, setToast] = useState(false);
   const [selectedResume, setSelectedResume] = useState<any>(null);
+  const [contactVerified, setContactVerified] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -49,9 +50,51 @@ export default function ResumesPage() {
     r.name?.includes(searchQuery) || r.job_type?.includes(searchQuery) || r.address?.includes(searchQuery)
   );
 
-  const handleCardClick = (resume: any) => {
+  const maskPhone = (phone?: string) => {
+    if (!phone) return "연락처 미입력";
+    const onlyNumber = phone.replace(/[^0-9]/g, "");
+    if (onlyNumber.length < 8) return "연락처 비공개";
+    return onlyNumber.replace(/(\\d{3})(\\d+)(\\d{4})/, "$1-****-$3");
+  };
+
+  const maskEmail = (email?: string) => {
+    if (!email || !email.includes("@")) return "이메일 미입력";
+    const [id, domain] = email.split("@");
+    const visible = id.slice(0, 4);
+    return `${visible}****@${domain}`;
+  };
+
+  const checkContactVerification = async (resume: any) => {
+    setContactVerified(false);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const now = new Date().toISOString();
+
+    const { data } = await supabase
+      .from("employer_verifications")
+      .select("id, expires_at")
+      .eq("employer_user_id", user.id)
+      .gte("expires_at", now)
+      .order("expires_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (data) {
+      setContactVerified(true);
+
+      await supabase.from("resume_contact_views").insert({
+        employer_user_id: user.id,
+        resume_id: resume.id,
+      });
+    }
+  };
+
+  const handleCardClick = async (resume: any) => {
     if (profile?.user_type === "구인자") {
       setSelectedResume(resume);
+      await checkContactVerification(resume);
     } else {
       setToast(true);
       setTimeout(() => setToast(false), 2000);
@@ -92,14 +135,36 @@ export default function ResumesPage() {
 
             <div style={{ background: "#fff3e0", borderRadius: "12px", padding: "16px", marginBottom: "16px" }}>
               <div style={{ fontSize: "12px", color: "#FF6B00", fontWeight: 700, marginBottom: "10px" }}>📞 연락처</div>
-              {selectedResume.phone && (
-                <a href={`tel:${selectedResume.phone}`} style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "13px", color: "#1a1a1a", fontWeight: 600 }}>{selectedResume.phone}</span>
-                  <span style={{ fontSize: "11px", background: "#FF6B00", color: "#fff", borderRadius: "4px", padding: "2px 6px" }}>전화</span>
-                </a>
-              )}
-              {selectedResume.email && (
-                <div style={{ fontSize: "13px", color: "#666" }}>{selectedResume.email}</div>
+
+              {contactVerified ? (
+                <>
+                  {selectedResume.phone && (
+                    <a href={`tel:${selectedResume.phone}`} style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "13px", color: "#1a1a1a", fontWeight: 600 }}>{selectedResume.phone}</span>
+                      <span style={{ fontSize: "11px", background: "#FF6B00", color: "#fff", borderRadius: "4px", padding: "2px 6px" }}>전화</span>
+                    </a>
+                  )}
+                  {selectedResume.email && (
+                    <div style={{ fontSize: "13px", color: "#666" }}>{selectedResume.email}</div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div style={{ background: "#fff", border: "1px solid #ffd9bf", borderRadius: "10px", padding: "10px 12px", marginBottom: "10px" }}>
+                    <div style={{ fontSize: "12px", color: "#1a1a1a", fontWeight: 700, marginBottom: "4px" }}>
+                      본인인증 후 연락처 열람 가능
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#666", lineHeight: 1.5 }}>
+                      구직자 개인정보 보호를 위해 구인자는 한 달에 한 번 본인인증을 완료해야 연락처를 볼 수 있습니다.
+                    </div>
+                  </div>
+                  <div style={{ fontSize: "13px", color: "#666", marginBottom: "6px" }}>
+                    전화번호: {maskPhone(selectedResume.phone)}
+                  </div>
+                  <div style={{ fontSize: "13px", color: "#666" }}>
+                    이메일: {maskEmail(selectedResume.email)}
+                  </div>
+                </>
               )}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
