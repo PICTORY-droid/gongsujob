@@ -19,6 +19,7 @@ export default function JobDetailPage() {
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [calcDays, setCalcDays] = useState(1);
   const [showCalc, setShowCalc] = useState(false);
+  const [includePensionHealth, setIncludePensionHealth] = useState(false);
   const [staticMapUrl, setStaticMapUrl] = useState<string | null>(null);
   const [mapCoords, setMapCoords] = useState<{ lat: string; lng: string } | null>(null);
 
@@ -70,11 +71,33 @@ export default function JobDetailPage() {
 
   const calcResult = () => {
     if (!job?.pay) return null;
+
     const daily = Number(job.pay);
     const total = daily * calcDays;
+
     const employment = Math.floor(total * 0.009);
-    const incomeTax = daily > 150000 ? Math.floor((daily - 150000) * 0.06 * 0.55) * calcDays : 0;
-    return { total, employment, incomeTax, net: total - employment - incomeTax };
+
+    const dailyIncomeTax = daily > 150000 ? Math.floor((daily - 150000) * 0.06 * 0.45) : 0;
+    const incomeTax = dailyIncomeTax * calcDays;
+    const localIncomeTax = Math.floor(incomeTax * 0.1);
+
+    const nationalPension = includePensionHealth ? Math.floor(total * 0.0475) : 0;
+    const healthInsurance = includePensionHealth ? Math.floor(total * 0.03595) : 0;
+    const longTermCare = includePensionHealth ? Math.floor(healthInsurance * 0.1314) : 0;
+
+    const totalDeduction = employment + incomeTax + localIncomeTax + nationalPension + healthInsurance + longTermCare;
+
+    return {
+      total,
+      employment,
+      incomeTax,
+      localIncomeTax,
+      nationalPension,
+      healthInsurance,
+      longTermCare,
+      totalDeduction,
+      net: total - totalDeduction,
+    };
   };
 
   if (loading) return <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#999"}}>불러오는 중...</div></div>;
@@ -193,12 +216,45 @@ export default function JobDetailPage() {
                   <span style={{fontSize:"13px",color:"#666"}}>일</span>
                 </div>
                 <div style={{background:"#f8f9fa",borderRadius:"12px",padding:"14px"}}>
+                  <label style={{display:"flex",alignItems:"flex-start",gap:"8px",marginBottom:"12px",padding:"10px",background:"#fff",border:"1px solid #eee",borderRadius:"10px",cursor:"pointer"}}>
+                    <input
+                      type="checkbox"
+                      checked={includePensionHealth}
+                      onChange={(e) => setIncludePensionHealth(e.target.checked)}
+                      style={{marginTop:"3px"}}
+                    />
+                    <span>
+                      <span style={{display:"block",fontSize:"13px",fontWeight:700,color:"#1a1a1a"}}>국민연금·건강보험 적용</span>
+                      <span style={{display:"block",fontSize:"11px",color:"#999",lineHeight:1.5,marginTop:"2px"}}>1개월 이상 또는 월 8일 이상 근무 예정일 때 체크</span>
+                    </span>
+                  </label>
+
                   <div style={{display:"flex",justifyContent:"space-between",marginBottom:"8px"}}><span style={{fontSize:"13px",color:"#666"}}>총 일당</span><span>{calc.total.toLocaleString()}원</span></div>
+
+                  {includePensionHealth && (
+                    <>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:"8px"}}><span style={{fontSize:"13px",color:"#666"}}>국민연금 (4.75%)</span><span style={{color:"#e53e3e"}}>- {calc.nationalPension.toLocaleString()}원</span></div>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:"8px"}}><span style={{fontSize:"13px",color:"#666"}}>건강보험 (3.595%)</span><span style={{color:"#e53e3e"}}>- {calc.healthInsurance.toLocaleString()}원</span></div>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:"8px"}}><span style={{fontSize:"13px",color:"#666"}}>장기요양보험</span><span style={{color:"#e53e3e"}}>- {calc.longTermCare.toLocaleString()}원</span></div>
+                    </>
+                  )}
+
                   <div style={{display:"flex",justifyContent:"space-between",marginBottom:"8px"}}><span style={{fontSize:"13px",color:"#666"}}>고용보험 (0.9%)</span><span style={{color:"#e53e3e"}}>- {calc.employment.toLocaleString()}원</span></div>
                   <div style={{display:"flex",justifyContent:"space-between",marginBottom:"8px"}}><span style={{fontSize:"13px",color:"#666"}}>소득세</span><span style={{color:"#e53e3e"}}>- {calc.incomeTax.toLocaleString()}원</span></div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:"8px"}}><span style={{fontSize:"13px",color:"#666"}}>지방소득세</span><span style={{color:"#e53e3e"}}>- {calc.localIncomeTax.toLocaleString()}원</span></div>
+
+                  <div style={{display:"flex",justifyContent:"space-between",marginTop:"10px",paddingTop:"10px",borderTop:"1px solid #e5e7eb"}}>
+                    <span style={{fontSize:"13px",color:"#666",fontWeight:700}}>총 공제액</span>
+                    <span style={{color:"#e53e3e",fontWeight:700}}>- {calc.totalDeduction.toLocaleString()}원</span>
+                  </div>
+
                   <div style={{borderTop:"1px solid #ddd",marginTop:"10px",paddingTop:"12px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                     <span style={{fontSize:"14px",fontWeight:700}}>예상 실수령액</span>
                     <span style={{fontSize:"20px",fontWeight:800,color:"#FF6B00"}}>{calc.net.toLocaleString()}원</span>
+                  </div>
+
+                  <div style={{fontSize:"11px",color:"#999",lineHeight:1.5,marginTop:"10px"}}>
+                    산재보험은 사업주 부담 항목이라 실수령액 공제에 포함하지 않았습니다. 국민연금과 건강보험은 근무 기간과 월 근무일수 조건에 따라 적용 여부가 달라질 수 있습니다. 개인마다 상이할 수 있습니다.
                   </div>
                 </div>
               </div>
