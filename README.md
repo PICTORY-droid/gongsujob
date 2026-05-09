@@ -106,6 +106,7 @@ https://gongsujob-phgb.vercel.app
 
 ## 프로젝트 구조
 
+~~~text
 app
 ├─ api
 │  ├─ geocode
@@ -129,23 +130,32 @@ app
 
 lib
 └─ supabase.ts
+~~~
 
 ## 시작하는 방법
 
+~~~bash
 npm install
+~~~
 
-.env.local 파일을 생성한 뒤 아래 값을 입력합니다.
+`.env.local` 파일을 생성한 뒤 아래 값을 입력합니다.
 
+~~~env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+~~~
 
 개발 서버를 실행합니다.
 
+~~~bash
 npm run dev
+~~~
 
 배포용 빌드를 확인합니다.
 
+~~~bash
 npm run build
+~~~
 
 ## 참고 사항
 
