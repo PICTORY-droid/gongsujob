@@ -271,8 +271,8 @@ export default function MyPage() {
     if (status === "pending") return "제안 대기";
     if (status === "question") return "새 메세지";
     if (status === "answered") return "새 메세지";
-    if (status === "accepted") return "수락됨";
-    if (status === "rejected") return "거절됨";
+    if (status === "accepted") return "수락함";
+    if (status === "rejected") return "거절함";
     if (status === "cancelled") return "취소됨";
     return status;
   };
