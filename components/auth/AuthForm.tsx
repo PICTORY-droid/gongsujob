@@ -1,141 +1,26 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
-
-type AuthMode = "login" | "signup";
+import type { useAuthForm } from "@/features/auth/useAuthForm";
 
 type AuthFormProps = {
-  mode: AuthMode;
+  form: ReturnType<typeof useAuthForm>;
 };
 
-export default function AuthForm({ mode }: AuthFormProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [autoLogin, setAutoLogin] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const isLogin = mode === "login";
-
-  useEffect(() => {
-    setIsMobile(/iPhone|iPad|Android/i.test(navigator.userAgent));
-  }, []);
-
-  const isProfileComplete = (profile: any) => {
-    return Boolean(
-      profile?.user_type &&
-      profile?.name &&
-      profile?.phone &&
-      profile?.address
-    );
-  };
-
-  const moveAfterLogin = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      window.location.href = "/login?mode=login";
-      return;
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("user_type,name,phone,address")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (!isProfileComplete(profile)) {
-      window.location.href = "/onboarding";
-      return;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    const redirectedFrom = params.get("redirectedFrom");
-
-    window.location.href = redirectedFrom || "/";
-  };
-
-  const handleEmailAuth = async () => {
-    if (!email.trim() || !password.trim()) {
-      setError("이메일과 비밀번호를 입력해주세요.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-        if (error) {
-          setError("이메일 또는 비밀번호가 올바르지 않습니다.");
-          return;
-        }
-
-        if (!isMobile) {
-          localStorage.setItem("autoLogin", autoLogin ? "true" : "false");
-        }
-
-        await moveAfterLogin();
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signUp({ email, password });
-
-      if (error) {
-        setError("회원가입 실패: " + error.message);
-        return;
-      }
-
-      const isAlreadyRegistered =
-        data.user &&
-        Array.isArray(data.user.identities) &&
-        data.user.identities.length === 0;
-
-      if (isAlreadyRegistered) {
-        setError("이미 가입된 이메일입니다. 로그인으로 이용해주세요.");
-        return;
-      }
-
-      if (data.session) {
-        window.location.href = "/onboarding";
-        return;
-      }
-
-      alert("회원가입이 완료되었습니다. 이메일 인증 후 로그인하면 첫 설정으로 이동합니다.");
-      window.location.href = "/login?mode=login";
-    } catch {
-      setError("오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogle = async () => {
-    if (!isMobile) {
-      localStorage.setItem("autoLogin", autoLogin ? "true" : "false");
-    }
-
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-  };
-
-  const handleKakao = async () => {
-    if (!isMobile) {
-      localStorage.setItem("autoLogin", autoLogin ? "true" : "false");
-    }
-
-    await supabase.auth.signInWithOAuth({
-      provider: "kakao",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-  };
+/** 로그인·회원가입 화면 (표시 전용). 상태와 동작은 useAuthForm이 담당한다. */
+export default function AuthForm({ form }: AuthFormProps) {
+  const {
+    isLogin,
+    isMobile,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    autoLogin,
+    setAutoLogin,
+    loading,
+    error,
+    submitEmail,
+    signInWith,
+  } = form;
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", fontFamily: "'Apple SD Gothic Neo', sans-serif" }}>
@@ -162,13 +47,14 @@ export default function AuthForm({ mode }: AuthFormProps) {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "12px" }}>
-          <button onClick={handleGoogle}
+          <button type="button" onClick={() => signInWith("google")}
             style={{ width: "100%", padding: "12px", border: "1px solid #ddd", borderRadius: "10px", background: "#fff", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-            <img src="https://www.google.com/favicon.ico" width={18} height={18} alt="google" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://www.google.com/favicon.ico" width={18} height={18} alt="" />
             구글로 계속하기
           </button>
 
-          <button onClick={handleKakao}
+          <button type="button" onClick={() => signInWith("kakao")}
             style={{ width: "100%", padding: "12px", border: "none", borderRadius: "10px", background: "#FEE500", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
             <span style={{ fontSize: "18px" }}>💬</span>
             카카오로 계속하기
@@ -202,7 +88,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="비밀번호"
             autoComplete={isLogin ? "current-password" : "new-password"}
-            onKeyDown={(e) => e.key === "Enter" && handleEmailAuth()}
+            onKeyDown={(e) => e.key === "Enter" && submitEmail()}
             style={{ width: "100%", padding: "12px 14px", border: "1px solid #eee", borderRadius: "10px", fontSize: "14px", outline: "none", boxSizing: "border-box" }}
           />
         </div>
@@ -229,7 +115,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
         )}
 
         <button
-          onClick={handleEmailAuth}
+          type="button" onClick={submitEmail}
           disabled={loading}
           style={{ width: "100%", padding: "13px", background: loading ? "#ddd" : "#FF6B00", color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 700, cursor: loading ? "not-allowed" : "pointer" }}
         >

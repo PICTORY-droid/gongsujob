@@ -1,52 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { calculateNetPay, clampDays } from "@/domain/net-pay";
 
 type NetPayCalculatorProps = {
   dailyPay: number;
 };
 
+/** 일당 기준 실수령액 계산기 (계산 로직은 domain/net-pay.ts) */
 export default function NetPayCalculator({ dailyPay }: NetPayCalculatorProps) {
   const [calcDays, setCalcDays] = useState(1);
   const [showCalc, setShowCalc] = useState(false);
   const [includePensionHealth, setIncludePensionHealth] = useState(false);
 
-  const calcResult = () => {
-    if (!dailyPay) return null;
-
-    const daily = Number(dailyPay);
-    const total = daily * calcDays;
-
-    const employment = Math.floor(total * 0.009);
-
-    const dailyIncomeTax = daily > 150000 ? Math.floor((daily - 150000) * 0.06 * 0.45) : 0;
-    const incomeTax = dailyIncomeTax * calcDays;
-    const localIncomeTax = Math.floor(incomeTax * 0.1);
-
-    const nationalPension = includePensionHealth ? Math.floor(total * 0.0475) : 0;
-    const healthInsurance = includePensionHealth ? Math.floor(total * 0.03595) : 0;
-    const longTermCare = includePensionHealth ? Math.floor(healthInsurance * 0.1314) : 0;
-
-    const totalDeduction = employment + incomeTax + localIncomeTax + nationalPension + healthInsurance + longTermCare;
-
-    return {
-      total,
-      employment,
-      incomeTax,
-      localIncomeTax,
-      nationalPension,
-      healthInsurance,
-      longTermCare,
-      totalDeduction,
-      net: total - totalDeduction,
-    };
-  };
-
-  const calc = calcResult();
+  const calc = calculateNetPay(dailyPay, calcDays, includePensionHealth);
 
   return (
     <div style={{ background: "#fff", borderRadius: "16px", marginBottom: "12px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", overflow: "hidden" }}>
-      <button onClick={() => setShowCalc(v => !v)} style={{ width: "100%", padding: "16px 20px", background: "none", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <button type="button" aria-expanded={showCalc} onClick={() => setShowCalc(v => !v)} style={{ width: "100%", padding: "16px 20px", background: "none", border: "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontSize: "13px", fontWeight: 700, color: "#1a1a1a" }}>실수령액 계산기</span>
         <span style={{ fontSize: "11px", color: "#FF6B00" }}>{showCalc ? "접기" : "열기"}</span>
       </button>
@@ -56,9 +27,9 @@ export default function NetPayCalculator({ dailyPay }: NetPayCalculatorProps) {
           <div style={{ marginTop: "14px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
               <span style={{ fontSize: "13px", color: "#666" }}>일당 {Number(dailyPay).toLocaleString()}원 x</span>
-              <button onClick={() => setCalcDays(d => Math.max(1, d - 1))} style={{ width: "30px", height: "30px", borderRadius: "50%", border: "1px solid #ddd", background: "#fff", fontSize: "18px", cursor: "pointer" }}>-</button>
+              <button type="button" aria-label="근무일 줄이기" onClick={() => setCalcDays((d) => clampDays(d - 1))} style={{ width: "30px", height: "30px", borderRadius: "50%", border: "1px solid #ddd", background: "#fff", fontSize: "18px", cursor: "pointer" }}>-</button>
               <span style={{ fontSize: "18px", fontWeight: 700, minWidth: "32px", textAlign: "center" }}>{calcDays}</span>
-              <button onClick={() => setCalcDays(d => Math.min(31, d + 1))} style={{ width: "30px", height: "30px", borderRadius: "50%", border: "1px solid #ddd", background: "#fff", fontSize: "18px", cursor: "pointer" }}>+</button>
+              <button type="button" aria-label="근무일 늘리기" onClick={() => setCalcDays((d) => clampDays(d + 1))} style={{ width: "30px", height: "30px", borderRadius: "50%", border: "1px solid #ddd", background: "#fff", fontSize: "18px", cursor: "pointer" }}>+</button>
               <span style={{ fontSize: "13px", color: "#666" }}>일</span>
             </div>
 
