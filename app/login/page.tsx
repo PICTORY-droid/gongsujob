@@ -1,19 +1,16 @@
-"use client";
+import type { Metadata } from "next";
+import LoginContainer from "@/features/auth/LoginContainer";
 
-import { useEffect, useState } from "react";
-import AuthForm from "@/components/AuthForm";
+export const metadata: Metadata = {
+  title: "로그인 · 회원가입 | 현장공수잡",
+};
 
-type AuthMode = "login" | "signup";
+type LoginPageProps = {
+  searchParams: Promise<{ mode?: string }>;
+};
 
-export default function LoginPage() {
-  const [mode, setMode] = useState<AuthMode>("login");
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const queryMode = params.get("mode");
-
-    setMode(queryMode === "signup" ? "signup" : "login");
-  }, []);
-
-  return <AuthForm mode={mode} />;
+/** /login?mode=login|signup — 모드는 서버에서 읽어 넘긴다(클라이언트 effect 제거) */
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { mode } = await searchParams;
+  return <LoginContainer mode={mode === "signup" ? "signup" : "login"} />;
 }

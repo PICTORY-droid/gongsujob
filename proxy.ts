@@ -1,44 +1,15 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { createProxySupabase } from "@/lib/supabase/proxy";
+import { isProfileComplete } from "@/domain/profile";
+import { ROUTES } from "@/lib/constants";
 
-const isProfileComplete = (profile: any) => {
-  return Boolean(
-    profile?.user_type &&
-    profile?.name &&
-    profile?.phone &&
-    profile?.address
-  );
-};
-
+/**
+ * 서버 측 접근 제어 (Next.js 16 Proxy).
+ * 1) 비로그인 → /login?redirectedFrom=원래경로
+ * 2) 프로필 미완성 → /onboarding
+ */
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({
-    request,
-  });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value);
-          });
-
-          response = NextResponse.next({
-            request,
-          });
-
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
+  const { supabase, getResponse } = createProxySupabase(request, () => NextResponse.next({ request }));
 
   const {
     data: { user },
@@ -48,9 +19,8 @@ export async function proxy(request: NextRequest) {
 
   if (!user) {
     const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
+    loginUrl.pathname = ROUTES.login;
     loginUrl.searchParams.set("redirectedFrom", pathname);
-
     return NextResponse.redirect(loginUrl);
   }
 
@@ -60,23 +30,16 @@ export async function proxy(request: NextRequest) {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (pathname !== "/onboarding" && !isProfileComplete(profile)) {
+  if (pathname !== ROUTES.onboarding && !isProfileComplete(profile)) {
     const onboardingUrl = request.nextUrl.clone();
-    onboardingUrl.pathname = "/onboarding";
+    onboardingUrl.pathname = ROUTES.onboarding;
     onboardingUrl.searchParams.set("redirectedFrom", pathname);
-
     return NextResponse.redirect(onboardingUrl);
   }
 
-  return response;
+  return getResponse();
 }
 
 export const config = {
-  matcher: [
-    "/jobs/:path*",
-    "/mypage",
-    "/onboarding",
-    "/resume/:path*",
-    "/resumes/:path*",
-  ],
+  matcher: ["/jobs/:path*", "/mypage", "/onboarding", "/resume/:path*", "/resumes/:path*"],
 };
