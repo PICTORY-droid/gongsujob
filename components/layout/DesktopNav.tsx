@@ -12,8 +12,9 @@ import { getActiveHref, getDesktopNavItems } from "@/lib/navigation";
  */
 export function DesktopNav() {
   const pathname = usePathname();
-  const { role } = useViewerRole();
-  const items = getDesktopNavItems(role);
+  const { role, ready } = useViewerRole();
+  // 역할을 확인하기 전에는 비워 둔다 (비로그인 메뉴가 잠깐 보였다 바뀌는 현상 방지)
+  const items = ready ? getDesktopNavItems(role) : [];
   const activeHref = getActiveHref(pathname, items);
 
   return (

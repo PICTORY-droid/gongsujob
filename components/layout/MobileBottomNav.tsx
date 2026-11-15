@@ -23,15 +23,16 @@ type MobileBottomNavProps = {
  */
 export default function MobileBottomNav({ onRequireLogin }: MobileBottomNavProps) {
   const pathname = usePathname();
-  const { role } = useViewerRole();
-  const items = getNavItems(role);
+  const { role, ready } = useViewerRole();
+  // 역할을 확인하기 전에는 탭을 그리지 않고 높이만 유지한다
+  const items = ready ? getNavItems(role) : [];
   const activeHref = getActiveHref(pathname, items);
 
   return (
     <nav
       aria-label="하단 메뉴"
       className="mobile-bottom-nav"
-      style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(255,255,255,0.94)", backdropFilter: "saturate(180%) blur(12px)", WebkitBackdropFilter: "saturate(180%) blur(12px)", borderTop: `1px solid ${colors.line}`, display: "flex", padding: "6px 4px calc(6px + env(safe-area-inset-bottom))", zIndex: 80 }}
+      style={{ minHeight: "61px", boxSizing: "border-box", position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(255,255,255,0.94)", backdropFilter: "saturate(180%) blur(12px)", WebkitBackdropFilter: "saturate(180%) blur(12px)", borderTop: `1px solid ${colors.line}`, display: "flex", padding: "6px 4px calc(6px + env(safe-area-inset-bottom))", zIndex: 80 }}
     >
       {items.map((item) => {
         const active = item.href === activeHref;

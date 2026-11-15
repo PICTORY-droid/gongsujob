@@ -425,3 +425,16 @@ button:not(:disabled):active {
     box-shadow: var(--gs-shadow-md);
   }
 }
+
+/* 불러오는 중 자리 표시 (부드럽게 흐르는 회색 띠) */
+.gs-skeleton > div {
+  animation: gs-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes gs-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}

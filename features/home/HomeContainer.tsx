@@ -25,7 +25,7 @@ const PREVIEW_COUNT = 3;
 
 /** 홈 컨테이너: 세션·목록 데이터와 화면 이동 규칙을 조립한다. */
 export default function HomeContainer() {
-  const { user, profile, isEmployer } = useSession({ subscribe: true });
+  const { user, profile, isEmployer, loading: sessionLoading } = useSession({ subscribe: true });
   const [category, setCategory] = useState<string>(ALL_CATEGORY);
   const [searchQuery, setSearchQuery] = useState("");
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -67,8 +67,13 @@ export default function HomeContainer() {
     <div style={{ minHeight: "100vh", background: colors.page, fontFamily }}>
       {loginModalOpen && <LoginRequiredModal onClose={() => setLoginModalOpen(false)} onLogin={() => goTo(ROUTES.login)} />}
 
-      <HomeHeader user={user} profile={profile} onLogout={handleLogout} />
+      <HomeHeader user={user} profile={profile} onLogout={handleLogout} ready={!sessionLoading} />
       <h1 className="gs-sr-only">현장공수잡 — 현장·기술·물류·이사·식당·공장 일용직 구인구직</h1>
+      {/* 로그인·이용 유형을 확인하기 전에는 역할별 화면 대신 자리만 잡아 둔다 (화면이 바뀌며 깜빡이는 현상 방지) */}
+      {sessionLoading ? (
+        <HomeSkeleton />
+      ) : (
+        <>
       <HomeBanner key={role} slides={getBannerSlides(role)} onNavigate={moveProtected} />
       <QuickSearch
         value={searchQuery}
@@ -106,9 +111,23 @@ export default function HomeContainer() {
       </section>
 
       <FeatureMenu title={feature.title} subtitle={feature.subtitle} items={feature.items} onSelect={moveProtected} />
+        </>
+      )}
 
       <AppFooter />
       <MobileBottomNav onRequireLogin={() => setLoginModalOpen(true)} />
+    </div>
+  );
+}
+
+/** 로그인 확인 중 자리 표시 (배너·검색·분야 메뉴 높이만큼) */
+function HomeSkeleton() {
+  const block = (height: string) => ({ height, borderRadius: "var(--gs-radius-lg)", background: "linear-gradient(90deg, var(--gs-line-soft), #ffffff, var(--gs-line-soft))", backgroundSize: "200% 100%" });
+  return (
+    <div className="gs-container gs-skeleton" aria-busy="true" aria-label="불러오는 중" style={{ paddingBlock: "clamp(16px, 3vw, 28px)", display: "grid", gap: "16px" }}>
+      <div style={block("clamp(240px, 30vw, 340px)")} />
+      <div style={block("58px")} />
+      <div style={block("clamp(260px, 22vw, 300px)")} />
     </div>
   );
 }

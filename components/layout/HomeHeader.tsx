@@ -11,6 +11,8 @@ type HomeHeaderProps = {
   user: User | null;
   profile: Profile | null;
   onLogout: () => void;
+  /** 로그인 확인이 끝났는지. 끝나기 전에는 로그인/프로필 버튼을 그리지 않는다 */
+  ready?: boolean;
 };
 
 /** 홈 상단 헤더: PC 주 메뉴(DesktopNav) + 로그인 상태별 액션. 스타일은 반응형 미디어쿼리 때문에 CSS로 유지 */
@@ -18,6 +20,7 @@ export default function HomeHeader({
   user,
   profile,
   onLogout,
+  ready = true,
 }: HomeHeaderProps) {
   return (
     <>
@@ -214,8 +217,8 @@ export default function HomeHeader({
 
         <DesktopNav />
 
-        <div className="home-header-actions">
-          {user ? (
+        <div className="home-header-actions" aria-busy={!ready}>
+          {!ready ? null : user ? (
             <>
               <Link href={ROUTES.mypage} className="home-profile-link">
                 <Avatar src={profile?.avatar_url} fallback={getAvatarInitial(profile?.name, user.email)} size={32} fontSize={14} />
