@@ -1,5 +1,6 @@
 import { getBrowserSupabase as db } from "@/lib/supabase/client";
-import { ALL_CATEGORY, AVATAR_BUCKET } from "@/lib/constants";
+import { AVATAR_BUCKET } from "@/lib/constants";
+import { jobTypesForCategory } from "@/domain/job-category";
 import type { PublicResume, Resume, ResumeContact, ResumeUpsert, Result } from "@/types/domain";
 
 /**
@@ -17,7 +18,8 @@ export async function listPublicResumes(category: string): Promise<PublicResume[
     .select(PUBLIC_RESUME_COLUMNS)
     .eq("is_public", true)
     .order("created_at", { ascending: false });
-  if (category !== ALL_CATEGORY) query = query.eq("job_type", category);
+  const types = jobTypesForCategory(category);
+  if (types) query = types.length === 1 ? query.eq("job_type", types[0]) : query.in("job_type", [...types]);
 
   const { data, error } = await query;
   if (error || !data) return null;

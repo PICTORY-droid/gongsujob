@@ -332,23 +332,6 @@ button:not(:disabled):active {
   }
 }
 
-/* 직종 메뉴: 폰 4열 → 태블릿 6열 → PC 12열 한 줄 */
-.gs-category-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px 4px;
-}
-@media (min-width: 640px) {
-  .gs-category-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1024px) {
-  .gs-category-grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-}
-
 /* 기능 안내: 폰 1열 → 태블릿 2열 → PC 3열 */
 .gs-feature-grid {
   display: grid;
@@ -369,9 +352,6 @@ button:not(:disabled):active {
 @media (hover: hover) and (pointer: fine) {
   .gs-feature-item:hover {
     background: rgba(255, 255, 255, 0.7) !important;
-  }
-  .gs-category-tile:hover span:first-child {
-    transform: translateY(-2px);
   }
 }
 
@@ -398,5 +378,50 @@ button:not(:disabled):active {
 @media (min-width: 900px) {
   .gs-worker-row {
     grid-template-columns: minmax(0, 1.3fr) auto minmax(150px, auto) auto;
+  }
+}
+
+/* 분야 타일: 폰 3열 → PC 6열 */
+.gs-group-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 2vw, 20px);
+}
+@media (min-width: 1024px) {
+  .gs-group-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+.gs-group-tile {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px 12px;
+  border: none;
+  background: transparent;
+  border-radius: var(--gs-radius-lg);
+  cursor: pointer;
+  text-align: center;
+}
+.gs-group-icon {
+  width: clamp(68px, 18vw, 92px);
+  aspect-ratio: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  border-radius: 26px;
+  background: linear-gradient(160deg, #ffffff 0%, var(--gs-blue-soft) 100%);
+  border: 1px solid var(--gs-blue-border);
+  box-shadow: var(--gs-shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .gs-group-tile:hover .gs-group-icon {
+    transform: translateY(-3px);
+    box-shadow: var(--gs-shadow-md);
   }
 }

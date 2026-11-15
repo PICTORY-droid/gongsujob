@@ -7,13 +7,13 @@ import { LoadingScreen } from "@/components/ui/Feedback";
 import { colors } from "@/components/ui/theme";
 import { useSession } from "@/hooks/useSession";
 import { getConfirmedWorker } from "@/services/workforce.service";
-import { buildContractSections } from "@/domain/workforce";
+import { buildContractSections, contractKind } from "@/domain/workforce";
 import { ROUTES } from "@/lib/constants";
 import type { ConfirmedWorker } from "@/types/domain";
 
 /**
  * 근로계약서 (인쇄·PDF 저장용).
- * 고용노동부 건설일용근로자 표준근로계약서의 기재 항목을 따라, 공고·제안에 있는 값을 미리 채운다.
+ * 고용노동부 표준근로계약서의 기재 항목(건설 직종은 건설일용근로자용)을 따라, 공고·제안에 있는 값을 미리 채운다.
  * 브라우저 인쇄 기능으로 종이 출력 또는 'PDF로 저장'할 수 있다(별도 서버·라이브러리 없음).
  */
 export default function ContractContainer({ offerId }: { offerId: string }) {
@@ -50,6 +50,7 @@ export default function ContractContainer({ offerId }: { offerId: string }) {
 /** 근로계약서 본문 (표시 전용) */
 export function ContractSheet({ worker }: { worker: ConfirmedWorker }) {
   const sections = buildContractSections(worker);
+  const kind = contractKind(worker);
 
   return (
     <main className="gs-print-page" style={{ minHeight: "100vh", background: colors.page, padding: "clamp(12px, 3vw, 32px) 12px 48px" }}>
@@ -64,7 +65,7 @@ export function ContractSheet({ worker }: { worker: ConfirmedWorker }) {
 
       <article className="gs-print-sheet" style={{ maxWidth: "800px", margin: "0 auto", background: "#fff", border: `1px solid ${colors.line}`, borderRadius: "var(--gs-radius-md)", boxShadow: "var(--gs-shadow-sm)", padding: "clamp(20px, 5vw, 48px)", color: "#111", fontSize: "13px", lineHeight: 1.6 }}>
         <h1 style={{ margin: "0 0 4px", textAlign: "center", fontSize: "22px", fontWeight: 800, letterSpacing: "0.2em" }}>근로계약서</h1>
-        <p style={{ margin: "0 0 20px", textAlign: "center", fontSize: "12px", color: "#555" }}>(건설일용근로자)</p>
+        <p style={{ margin: "0 0 20px", textAlign: "center", fontSize: "12px", color: "#555" }}>({kind.subtitle})</p>
 
         <p style={{ margin: "0 0 16px" }}>
           사업주(이하 &quot;갑&quot;)와 근로자(이하 &quot;을&quot;)는 다음과 같이 근로계약을 체결한다.
@@ -108,7 +109,7 @@ export function ContractSheet({ worker }: { worker: ConfirmedWorker }) {
         </div>
 
         <p className="gs-no-print" style={{ margin: "22px 0 0", fontSize: "12px", color: colors.muted }}>
-          이 양식은 고용노동부 건설일용근로자 표준근로계약서의 기재 항목을 바탕으로 한 작성 보조용입니다. 빈칸은 직접 작성하고, 최신 서식은 고용노동부 노동포털(labor.moel.go.kr)에서 확인하세요.
+          이 양식은 고용노동부 {kind.referenceForm}의 기재 항목을 바탕으로 한 작성 보조용입니다. 빈칸은 직접 작성하고, 최신 서식은 고용노동부 노동포털(labor.moel.go.kr)에서 확인하세요.
         </p>
       </article>
     </main>

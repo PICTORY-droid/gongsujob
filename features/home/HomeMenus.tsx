@@ -1,34 +1,25 @@
 import {
   BadgeCheck,
-  BrickWall,
   Briefcase,
   CalendarClock,
   Calculator,
   ClipboardList,
-  Droplets,
-  Ellipsis,
   FileSignature,
   FileSpreadsheet,
   FileText,
-  Flame,
-  Frame,
-  Hammer,
   HardHat,
   Heart,
-  LayoutGrid,
-  Layers,
-  PaintRoller,
   Search,
   ShieldCheck,
   SquarePlus,
   Users,
-  Wrench,
-  Zap,
   type LucideIcon,
 } from "lucide-react";
 import { colors } from "@/components/ui/theme";
 import type { ActionCard, ActionIcon, FeatureIcon, FeatureItem } from "@/features/home/home-menus";
-import { JOB_TYPES } from "@/lib/constants";
+import { JobGroupIcon } from "@/components/job/JobGroupIcon";
+import { JOB_GROUPS } from "@/lib/job-taxonomy";
+import { groupCategoryValue } from "@/domain/job-category";
 
 /** 홈 메뉴 표시 컴포넌트 (상태 없음). 아이콘: Lucide(ISC) */
 
@@ -63,60 +54,39 @@ export function QuickSearch({ value, onChange, onSubmit, placeholder }: { value:
   );
 }
 
-/* ───────── 직종별 메뉴 ───────── */
+/* ───────── 분야별 직종 메뉴 ───────── */
 
-const JOB_TYPE_ICONS: Record<(typeof JOB_TYPES)[number], LucideIcon> = {
-  철근: Hammer,
-  형틀: Frame,
-  방수: Droplets,
-  도장: PaintRoller,
-  미장: Layers,
-  전기: Zap,
-  배관: Wrench,
-  용접: Flame,
-  타일: LayoutGrid,
-  조적: BrickWall,
-  기타: Ellipsis,
-};
-
-export function CategoryMenu({ title, subtitle, onSelect }: { title: string; subtitle: string; onSelect: (jobType: string | null) => void }) {
+/** 분야 6개 타일. 누르면 그 분야 전체로 걸러진 목록으로 이동한다(세부 직종은 목록 화면에서 좁힌다). */
+export function CategoryMenu({ title, subtitle, onSelect }: { title: string; subtitle: string; onSelect: (category: string | null) => void }) {
   return (
     <section className="gs-container" style={{ marginTop: "24px" }} aria-labelledby="category-menu-title">
-      <div style={{ background: colors.surface, borderRadius: "var(--gs-radius-lg)", border: `1px solid ${colors.line}`, padding: "clamp(18px, 3vw, 28px)", boxShadow: "var(--gs-shadow-sm)" }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
-          <div>
-            <h2 id="category-menu-title" style={{ margin: 0, fontSize: "clamp(18px, 1vw + 14px, 22px)", fontWeight: 800, color: colors.ink }}>
-              {title}
-            </h2>
-            <p style={{ margin: "4px 0 0", fontSize: "13px", color: colors.sub }}>{subtitle}</p>
-          </div>
-          <button type="button" onClick={() => onSelect(null)} style={{ border: "none", background: "transparent", color: colors.blue, fontSize: "13px", fontWeight: 700, cursor: "pointer", minHeight: "36px" }}>
-            전체 보기 →
-          </button>
+      <div style={{ background: colors.surface, borderRadius: "var(--gs-radius-lg)", border: `1px solid ${colors.line}`, padding: "clamp(20px, 3vw, 32px)", boxShadow: "var(--gs-shadow-sm)" }}>
+        <div style={{ textAlign: "center", marginBottom: "clamp(18px, 3vw, 28px)" }}>
+          <h2 id="category-menu-title" style={{ display: "inline-block", margin: 0, paddingBottom: "8px", borderBottom: `3px solid ${colors.brandBright}`, fontSize: "clamp(20px, 1.4vw + 15px, 28px)", fontWeight: 800, color: colors.ink }}>
+            {title}
+          </h2>
+          <p style={{ margin: "10px 0 0", fontSize: "14px", color: colors.sub }}>{subtitle}</p>
         </div>
-        <ul className="gs-category-grid" style={{ listStyle: "none", margin: 0, padding: 0 }}>
-          <li>
-            <CategoryTile label="전체" Icon={HardHat} onClick={() => onSelect(null)} highlight />
-          </li>
-          {JOB_TYPES.map((jobType) => (
-            <li key={jobType}>
-              <CategoryTile label={jobType} Icon={JOB_TYPE_ICONS[jobType]} onClick={() => onSelect(jobType)} />
+        <ul className="gs-group-grid" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+          {JOB_GROUPS.map((group) => (
+            <li key={group.key}>
+              <button type="button" onClick={() => onSelect(groupCategoryValue(group.key))} className="gs-group-tile" aria-label={`${group.label} — ${group.description}`}>
+                <span className="gs-group-icon" style={{ color: colors.navy }}>
+                  <JobGroupIcon group={group.key} size={34} strokeWidth={1.7} />
+                </span>
+                <span style={{ fontSize: "15px", fontWeight: 700, color: colors.ink }}>{group.label}</span>
+                <span style={{ fontSize: "12px", color: colors.muted, lineHeight: 1.4 }}>{group.description}</span>
+              </button>
             </li>
           ))}
         </ul>
+        <div style={{ textAlign: "center", marginTop: "14px" }}>
+          <button type="button" onClick={() => onSelect(null)} style={{ border: "none", background: "transparent", color: colors.blue, fontSize: "14px", fontWeight: 700, cursor: "pointer", minHeight: "40px" }}>
+            전체 직종 보기 →
+          </button>
+        </div>
       </div>
     </section>
-  );
-}
-
-function CategoryTile({ label, Icon, onClick, highlight = false }: { label: string; Icon: LucideIcon; onClick: () => void; highlight?: boolean }) {
-  return (
-    <button type="button" onClick={onClick} className="gs-category-tile" style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", padding: "10px 4px", border: "none", background: "transparent", cursor: "pointer", color: colors.text }}>
-      <span className="gs-hover-lift" style={{ width: "56px", height: "56px", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "18px", background: highlight ? colors.navy : colors.blueSoft, color: highlight ? "#fff" : colors.navy, boxShadow: "var(--gs-shadow-sm)" }}>
-        <Icon size={26} strokeWidth={1.9} aria-hidden="true" />
-      </span>
-      <span style={{ fontSize: "13px", fontWeight: 600 }}>{label}</span>
-    </button>
   );
 }
 

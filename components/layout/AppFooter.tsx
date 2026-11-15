@@ -7,7 +7,7 @@ export default function AppFooter() {
         </div>
 
         <div style={{ fontSize: "13px", color: "var(--gs-sub)", lineHeight: 1.6, marginBottom: "18px" }}>
-          건설 현장 일용직 구인구직 흐름을 구현한 포트폴리오 프로젝트입니다.
+          현장·기술·물류·이사·식당·공장 일용직 구인구직 흐름을 구현한 포트폴리오 프로젝트입니다.
         </div>
 
         <div style={{ fontSize: "13px", color: "var(--gs-text)", fontWeight: 700, marginBottom: "6px" }}>

@@ -7,7 +7,8 @@ import { LoadingScreen, Notice } from "@/components/ui/Feedback";
 import { ChipSelect, FieldLabel, FormSection, TextAreaField, TextField } from "@/components/ui/Form";
 import { card, colors, pageShell, primaryButton } from "@/components/ui/theme";
 import { useResumeForm } from "@/features/resume-write/useResumeForm";
-import { JOB_TYPES, REGIONS, ROUTES } from "@/lib/constants";
+import { REGIONS, ROUTES } from "@/lib/constants";
+import { JobTypePicker } from "@/components/ui/JobTypePicker";
 
 const BASIC_FIELDS = [
   { label: "이름 *", name: "name", placeholder: "홍길동" },
@@ -85,7 +86,7 @@ export default function ResumeWriteContainer() {
         <FormSection title="직종 및 경력">
           <div style={{ marginBottom: "14px" }}>
             <FieldLabel gap="8px">직종 *</FieldLabel>
-            <ChipSelect ariaLabel="직종" options={JOB_TYPES} value={form.job_type} onChange={(jobType) => setField("job_type", jobType)} />
+            <JobTypePicker value={form.job_type} onChange={(jobType) => setField("job_type", jobType)} />
           </div>
           <TextField label="경력 (년)" name="career_years" type="number" min="0" value={form.career_years} onChange={handleChange} placeholder="0" />
           <TextField label="보유 기술" name="skills" value={form.skills} onChange={handleChange} placeholder="예) 철근 배근, 거푸집 설치, 용접" />

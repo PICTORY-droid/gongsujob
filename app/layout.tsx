@@ -16,7 +16,7 @@ const gongsuSans = localFont({
 
 export const metadata: Metadata = {
   title: "현장공수잡 GongsuJob",
-  description: "건설 현장 일용직 구인구직 — 공고 확인, 이력서 등록, 포지션 제안까지 한곳에서",
+  description: "현장·기술·물류·이사·식당·공장 일용직 구인구직 — 공고 확인, 이력서 등록, 포지션 제안까지 한곳에서",
 };
 
 export const viewport: Viewport = {

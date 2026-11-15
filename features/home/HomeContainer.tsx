@@ -68,7 +68,7 @@ export default function HomeContainer() {
       {loginModalOpen && <LoginRequiredModal onClose={() => setLoginModalOpen(false)} onLogin={() => goTo(ROUTES.login)} />}
 
       <HomeHeader user={user} profile={profile} onLogout={handleLogout} />
-      <h1 className="gs-sr-only">현장공수잡 — 건설 현장 일용직 구인구직</h1>
+      <h1 className="gs-sr-only">현장공수잡 — 현장·기술·물류·이사·식당·공장 일용직 구인구직</h1>
       <HomeBanner key={role} slides={getBannerSlides(role)} onNavigate={moveProtected} />
       <QuickSearch
         value={searchQuery}
@@ -77,8 +77,8 @@ export default function HomeContainer() {
         placeholder={isEmployer ? "직종·지역으로 인재 검색" : "직종·지역·현장명으로 일자리 검색"}
       />
       <CategoryMenu
-        title={isEmployer ? "직종별 인재 찾기" : "직종별 일자리 찾기"}
-        subtitle={isEmployer ? "필요한 기술 인력을 바로 찾아보세요" : "내 기술에 맞는 현장만 골라 보세요"}
+        title={isEmployer ? "어떤 인력이 필요하세요?" : "어떤 일을 찾으세요?"}
+        subtitle={isEmployer ? "분야를 고르면 해당 인재만 모아 보여드립니다" : "분야를 고르면 해당 일자리만 모아 보여드립니다"}
         onSelect={(jobType) => openList({ category: jobType })}
       />
       <ActionCards cards={getActionCards(role)} onSelect={moveProtected} />
