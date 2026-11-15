@@ -148,9 +148,9 @@ export function FeatureMenu({ title, subtitle, items, onSelect }: { title: strin
                   <span style={{ flexShrink: 0, width: "64px", height: "64px", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "20px", background: colors.surface, boxShadow: "var(--gs-shadow-sm)", color: colors.brand }}>
                     <Icon size={30} strokeWidth={1.8} aria-hidden="true" />
                   </span>
-                  <span style={{ minWidth: 0 }}>
+                  <span style={{ minWidth: 0, flex: 1 }}>
                     <span style={{ display: "block", fontSize: "16px", fontWeight: 700, color: colors.ink, marginBottom: "4px" }}>{item.title}</span>
-                    <span style={{ display: "block", fontSize: "13px", lineHeight: 1.55, color: colors.sub }}>{item.description}</span>
+                    <span style={{ display: "block", fontSize: "13px", lineHeight: 1.55, color: colors.sub, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.description}</span>
                   </span>
                 </button>
               </li>

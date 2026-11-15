@@ -94,20 +94,21 @@ export function getActionCards(role: ViewerRole): ActionCard[] {
   return [CARD.jobs, CARD.resumeWrite, CARD.jobWrite, CARD.resumes];
 }
 
-/* ───────── 실제로 동작하는 기능 안내 (각 항목은 해당 화면으로 연결) ───────── */
+/* ───────── 실제로 동작하는 기능 안내 (각 항목은 해당 화면으로 연결) ─────────
+ * 설명은 한 줄(최대 14자)로 쓴다 — PC 3열·태블릿 2열 칸에서 줄바꿈되지 않는 길이 (테스트로 보장) */
 
 export type FeatureIcon = "verified" | "spreadsheet" | "contract" | "calculator" | "safety" | "privacy" | "saved" | "today";
 export type FeatureItem = { icon: FeatureIcon; title: string; description: string; href: string };
 
 const FEATURE = {
-  workers: { icon: "verified", title: "확정 인력 미리 확인", description: "제안을 수락한 근로자의 연락처·직종을 현장별로 확인", href: ROUTES.manage },
-  ledger: { icon: "spreadsheet", title: "노임대장 엑셀", description: "근무일수만 입력하면 공제액·실지급액까지 계산된 엑셀", href: ROUTES.manage },
-  contract: { icon: "contract", title: "근로계약서 출력", description: "표준 항목에 공고·근로자 정보가 채워진 계약서를 인쇄·PDF로", href: ROUTES.manage },
-  netpay: { icon: "calculator", title: "실수령액 계산", description: "고용보험·소득세·지방세를 뺀 실제 받는 금액", href: ROUTES.jobs },
-  safety: { icon: "safety", title: "안전교육 이수 확인", description: "기초안전보건교육 이수 인재를 배지로 구분", href: ROUTES.resumes },
-  privacy: { icon: "privacy", title: "연락처 보호", description: "제안을 수락하기 전에는 연락처가 공개되지 않음", href: ROUTES.mypage },
-  saved: { icon: "saved", title: "찜한 공고", description: "마음에 드는 현장을 저장해 두고 다시 보기", href: ROUTES.savedJobs },
-  today: { icon: "today", title: "출근일 배지", description: "오늘·내일 출근, D-n으로 일정이 급한 현장부터", href: ROUTES.jobs },
+  workers: { icon: "verified", title: "확정 인력 미리 확인", description: "수락한 근로자 연락처 확인", href: ROUTES.manage },
+  ledger: { icon: "spreadsheet", title: "노임대장 엑셀", description: "공제액·실지급액 자동 계산", href: ROUTES.manage },
+  contract: { icon: "contract", title: "근로계약서 출력", description: "작성 후 인쇄·PDF 저장", href: ROUTES.manage },
+  netpay: { icon: "calculator", title: "실수령액 계산", description: "공제 후 실제 받는 금액", href: ROUTES.jobs },
+  safety: { icon: "safety", title: "안전교육 이수 확인", description: "이수 인재를 배지로 구분", href: ROUTES.resumes },
+  privacy: { icon: "privacy", title: "연락처 보호", description: "수락 전에는 연락처 비공개", href: ROUTES.mypage },
+  saved: { icon: "saved", title: "찜한 공고", description: "마음에 든 현장 저장", href: ROUTES.savedJobs },
+  today: { icon: "today", title: "출근일 배지", description: "오늘·내일 출근 한눈에", href: ROUTES.jobs },
 } as const satisfies Record<string, FeatureItem>;
 
 export function getFeatureSection(role: ViewerRole): { title: string; subtitle: string; items: FeatureItem[] } {
