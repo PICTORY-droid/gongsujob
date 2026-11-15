@@ -133,7 +133,7 @@ const FEATURE_ICONS: Record<FeatureIcon, LucideIcon> = {
 
 export function FeatureMenu({ title, subtitle, items, onSelect }: { title: string; subtitle: string; items: FeatureItem[]; onSelect: (href: string) => void }) {
   return (
-    <section style={{ background: "#fff8f1", borderBlock: `1px solid ${colors.line}`, marginTop: "8px" }} aria-labelledby="feature-menu-title">
+    <section style={{ background: colors.surface, borderBlock: `1px solid ${colors.line}`, marginTop: "8px" }} aria-labelledby="feature-menu-title">
       <div className="gs-container" style={{ paddingBlock: "clamp(28px, 5vw, 56px)" }}>
         <h2 id="feature-menu-title" style={{ margin: 0, textAlign: "center", fontSize: "clamp(20px, 1.4vw + 14px, 28px)", fontWeight: 800, color: colors.ink }}>
           {title}
@@ -145,12 +145,12 @@ export function FeatureMenu({ title, subtitle, items, onSelect }: { title: strin
             return (
               <li key={item.title}>
                 <button type="button" onClick={() => onSelect(item.href)} className="gs-feature-item" style={{ width: "100%", height: "100%", display: "flex", gap: "14px", alignItems: "flex-start", textAlign: "left", border: "none", background: "transparent", padding: "12px", borderRadius: "var(--gs-radius-lg)", cursor: "pointer" }}>
-                  <span style={{ flexShrink: 0, width: "64px", height: "64px", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "20px", background: colors.surface, boxShadow: "var(--gs-shadow-sm)", color: colors.brand }}>
+                  <span style={{ flexShrink: 0, width: "64px", height: "64px", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "20px", background: colors.blueSoft, border: `1px solid ${colors.blueBorder}`, color: colors.navy }}>
                     <Icon size={30} strokeWidth={1.8} aria-hidden="true" />
                   </span>
-                  <span style={{ minWidth: 0 }}>
+                  <span style={{ minWidth: 0, flex: 1 }}>
                     <span style={{ display: "block", fontSize: "16px", fontWeight: 700, color: colors.ink, marginBottom: "4px" }}>{item.title}</span>
-                    <span style={{ display: "block", fontSize: "13px", lineHeight: 1.55, color: colors.sub }}>{item.description}</span>
+                    <span style={{ display: "block", fontSize: "13px", lineHeight: 1.55, color: colors.sub, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.description}</span>
                   </span>
                 </button>
               </li>
