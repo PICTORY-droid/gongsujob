@@ -14,7 +14,7 @@ export function apiError(message: string, status: number, extra?: Record<string,
   return NextResponse.json<ApiError & Record<string, unknown>>({ error: message, ...extra }, { status });
 }
 
-export function parseSearchParams<S extends z.ZodTypeAny>(
+export function parseSearchParams<S extends z.ZodType>(
   searchParams: URLSearchParams,
   schema: S,
 ): { ok: true; data: z.infer<S> } | { ok: false; response: NextResponse } {

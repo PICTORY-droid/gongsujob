@@ -28,7 +28,7 @@ export default function MobileBottomNav({ userLoggedIn = true, onRequireLogin }:
   const pathname = usePathname();
 
   return (
-    <nav aria-label="하단 메뉴" className="mobile-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: `1px solid ${colors.line}`, display: "flex", padding: "8px 0", zIndex: 80 }}>
+    <nav aria-label="하단 메뉴" className="mobile-bottom-nav" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--gs-surface)", borderTop: `1px solid ${colors.line}`, display: "flex", padding: "8px 0", zIndex: 80 }}>
       {BOTTOM_TABS.map((tab) => {
         const active = isTabActive(pathname, tab.href);
         return (

@@ -28,13 +28,13 @@ function ContactContent() {
   }, [searchParams]);
 
   return (
-    <main style={{ minHeight: "100vh", background: "#f5f5f5", fontFamily: "'Apple SD Gothic Neo', sans-serif" }}>
-      <header style={{ background: "#fff", borderBottom: "1px solid #eee", padding: "14px 18px", position: "sticky", top: 0, zIndex: 10 }}>
+    <main style={{ minHeight: "100vh", background: "var(--gs-line-soft)", fontFamily: "var(--gs-font)" }}>
+      <header style={{ background: "var(--gs-surface)", borderBottom: "1px solid var(--gs-line)", padding: "14px 18px", position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: "720px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Link href="/" style={{ color: "#333", textDecoration: "none", fontSize: "14px", fontWeight: 700 }}>
+          <Link href="/" style={{ color: "var(--gs-text)", textDecoration: "none", fontSize: "14px", fontWeight: 700 }}>
             ← 홈으로
           </Link>
-          <div style={{ fontSize: "15px", fontWeight: 800, color: "#1a1a1a" }}>
+          <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--gs-ink)" }}>
             문의하기
           </div>
           <div style={{ width: "48px" }} />
@@ -42,7 +42,7 @@ function ContactContent() {
       </header>
 
       <section style={{ maxWidth: "720px", margin: "0 auto", padding: "18px" }}>
-        <div style={{ background: "#fff", borderRadius: "16px", overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+        <div style={{ background: "var(--gs-surface)", borderRadius: "16px", overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
           <iframe
             src={iframeUrl}
             width="100%"

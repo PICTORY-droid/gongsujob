@@ -13,7 +13,7 @@ type AppHeaderProps = {
 /** 하위 페이지 공통 헤더: 뒤로가기 · 로고 */
 export default function AppHeader({ backHref = ROUTES.home, backLabel = "← 홈", title = "현장공수잡", rightSpace = 40 }: AppHeaderProps) {
   return (
-    <header style={{ background: "#fff", borderBottom: `1px solid ${colors.line}`, padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
+    <header className="gs-header-inset" style={{ background: "var(--gs-surface)", borderBottom: `1px solid ${colors.line}`, padding: "0 20px", height: "56px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
       <Link href={backHref} style={{ fontSize: "13px", color: colors.sub, textDecoration: "none" }}>
         {backLabel}
       </Link>

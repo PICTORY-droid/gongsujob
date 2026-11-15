@@ -8,7 +8,7 @@ export function Toast({ message, zIndex = 500 }: { message: string; zIndex?: num
   return (
     <div
       role="status"
-      style={{ position: "fixed", top: "72px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.78)", color: "#fff", fontSize: "13px", padding: "10px 18px", borderRadius: "999px", zIndex, whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(0,0,0,0.18)" }}
+      style={{ position: "fixed", top: "72px", left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.78)", color: "var(--gs-surface)", fontSize: "13px", padding: "10px 18px", borderRadius: "999px", zIndex, whiteSpace: "nowrap", boxShadow: "0 4px 14px rgba(0,0,0,0.18)" }}
     >
       {message}
     </div>
@@ -75,7 +75,7 @@ export function EmptyState({
 }) {
   return (
     <div
-      style={{ textAlign: "center", padding, ...(boxed ? { background: "#fff", borderRadius: "12px", border: `1px solid ${colors.line}` } : {}) }}
+      style={{ textAlign: "center", padding, ...(boxed ? { background: "var(--gs-surface)", borderRadius: "12px", border: `1px solid ${colors.line}` } : {}) }}
     >
       <div style={{ fontSize: iconSize, marginBottom: "12px" }}>{icon}</div>
       <div style={{ fontSize: textSize, color: colors.muted }}>{text}</div>

@@ -84,10 +84,10 @@ export function OfferComposer({ talent }: { talent: TalentSearch }) {
       {talent.offerMessage && <Notice message={talent.offerMessage.text} tone={talent.offerMessage.tone} style={{ borderRadius: "10px", padding: "10px", fontSize: "12px", marginBottom: "10px" }} />}
 
       <div style={{ display: "flex", gap: "8px" }}>
-        <button type="button" onClick={() => talent.setComposerOpen(false)} style={{ flex: 1, padding: "12px", background: "#fff", border: "1px solid #ddd", borderRadius: "10px", fontSize: "13px", color: colors.sub, cursor: "pointer", fontWeight: 700 }}>
+        <button type="button" onClick={() => talent.setComposerOpen(false)} style={{ flex: 1, padding: "12px", background: "var(--gs-surface)", border: "1px solid var(--gs-disabled)", borderRadius: "10px", fontSize: "13px", color: colors.sub, cursor: "pointer", fontWeight: 700 }}>
           취소
         </button>
-        <button type="button" onClick={talent.sendOffer} disabled={talent.sending} style={{ flex: 2, padding: "12px", background: talent.sending ? "#ddd" : colors.brand, border: "none", borderRadius: "10px", fontSize: "13px", color: "#fff", cursor: talent.sending ? "not-allowed" : "pointer", fontWeight: 800 }}>
+        <button type="button" onClick={talent.sendOffer} disabled={talent.sending} style={{ flex: 2, padding: "12px", background: talent.sending ? "var(--gs-disabled)" : colors.brand, border: "none", borderRadius: "10px", fontSize: "13px", color: "var(--gs-surface)", cursor: talent.sending ? "not-allowed" : "pointer", fontWeight: 800 }}>
           {talent.sending ? "발송 중..." : "제안 보내기"}
         </button>
       </div>

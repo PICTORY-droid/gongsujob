@@ -42,7 +42,7 @@ export function OffersListModal({ page }: { page: MyPageState }) {
   const employer = page.isEmployer;
   return (
     <Modal onClose={page.closeOffers} labelledBy="offers-title" panelStyle={{ background: colors.page, padding: "18px" }}>
-      <ModalHeader id="offers-title" title={employer ? "보낸 포지션 제안" : "받은 포지션 제안"} onClose={page.closeOffers} closeBg="#fff" />
+      <ModalHeader id="offers-title" title={employer ? "보낸 포지션 제안" : "받은 포지션 제안"} onClose={page.closeOffers} closeBg="var(--gs-surface)" />
 
       <div style={{ background: employer ? colors.brandSoft : colors.infoBg, border: "1px solid " + (employer ? colors.brandBorder : colors.infoBorder), borderRadius: "16px", padding: "16px 18px", marginBottom: "12px" }}>
         <div style={{ fontSize: "14px", fontWeight: 800, color: colors.ink, marginBottom: "6px" }}>{employer ? "제안 이력 관리" : "제안 확인 안내"}</div>
@@ -54,11 +54,11 @@ export function OffersListModal({ page }: { page: MyPageState }) {
       </div>
 
       {page.offers.length === 0 ? (
-        <div style={{ background: "#fff", borderRadius: "16px", padding: "36px 20px", textAlign: "center", color: colors.muted, fontSize: "13px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>{employer ? "아직 보낸 제안이 없습니다" : "아직 받은 제안이 없습니다"}</div>
+        <div style={{ background: "var(--gs-surface)", borderRadius: "16px", padding: "36px 20px", textAlign: "center", color: colors.muted, fontSize: "13px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>{employer ? "아직 보낸 제안이 없습니다" : "아직 받은 제안이 없습니다"}</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {page.offers.map((offer) => (
-            <button key={offer.id} type="button" onClick={() => page.selectOffer(offer.id)} style={{ width: "100%", background: "#fff", border: `1px solid ${colors.line}`, borderRadius: "14px", padding: "14px", cursor: "pointer", textAlign: "left", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+            <button key={offer.id} type="button" onClick={() => page.selectOffer(offer.id)} style={{ width: "100%", background: "var(--gs-surface)", border: `1px solid ${colors.line}`, borderRadius: "14px", padding: "14px", cursor: "pointer", textAlign: "left", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
               <OfferHeadline offer={offer} titleSize="14px" />
               {employer && <OfferTarget offer={offer} />}
             </button>
@@ -101,7 +101,7 @@ export function OfferDetailModal({ page, offer }: { page: MyPageState; offer: Po
 
       {messages.length > 0 && (
         <div style={{ border: `1px solid ${colors.line}`, borderRadius: "12px", overflow: "hidden", marginBottom: "12px" }}>
-          <div style={{ background: "#fafafa", padding: "9px 12px", fontSize: "11px", color: colors.muted, fontWeight: 700 }}>질문 및 답변</div>
+          <div style={{ background: "var(--gs-line-soft)", padding: "9px 12px", fontSize: "11px", color: colors.muted, fontWeight: 700 }}>질문 및 답변</div>
           {messages.map((message) => (
             <div key={message.id} style={{ padding: "10px 12px", borderTop: `1px solid ${colors.lineSoft}` }}>
               <div style={{ fontSize: "12px", color: colors.text, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{message.message}</div>
@@ -115,13 +115,13 @@ export function OfferDetailModal({ page, offer }: { page: MyPageState; offer: Po
           <div style={{ fontSize: "12px", color: colors.sub, lineHeight: 1.5, marginBottom: "10px" }}>제안을 수락하면 구인자에게 연락처가 공개됩니다. 수락 전에는 연락처가 공개되지 않습니다.</div>
           <textarea aria-label="질문 입력" value={draft} onChange={(event) => page.setDraft(offer.id, event.target.value)} placeholder={askedBefore ? "추가로 궁금한 점을 입력할 수 있습니다" : "궁금한 점을 구인자에게 질문할 수 있습니다"} rows={3} style={{ ...compactInputStyle, resize: "vertical", marginBottom: "8px" }} />
           <div style={{ display: "flex", gap: "8px" }}>
-            <button type="button" onClick={() => page.respond(offer, "accepted")} style={{ ...primarySmall, background: colors.brand, color: "#fff" }}>
+            <button type="button" onClick={() => page.respond(offer, "accepted")} style={{ ...primarySmall, background: colors.brand, color: "var(--gs-surface)" }}>
               수락
             </button>
-            <button type="button" onClick={() => page.respond(offer, "rejected")} style={{ ...primarySmall, background: "#fff", color: colors.danger, border: `1px solid ${colors.dangerBorder}`, fontWeight: 700 }}>
+            <button type="button" onClick={() => page.respond(offer, "rejected")} style={{ ...primarySmall, background: "var(--gs-surface)", color: colors.danger, border: `1px solid ${colors.dangerBorder}`, fontWeight: 700 }}>
               거절
             </button>
-            <button type="button" onClick={() => page.sendMessage(offer)} style={{ ...primarySmall, background: colors.ink, color: "#fff" }}>
+            <button type="button" onClick={() => page.sendMessage(offer)} style={{ ...primarySmall, background: colors.ink, color: "var(--gs-surface)" }}>
               {askedBefore ? "추가 질문" : "질문"}
             </button>
           </div>
@@ -143,7 +143,7 @@ export function OfferDetailModal({ page, offer }: { page: MyPageState; offer: Po
       {employer && canEmployerReply(offer.status) && (
         <div>
           <textarea aria-label="답변 입력" value={draft} onChange={(event) => page.setDraft(offer.id, event.target.value)} placeholder={answeredBefore ? "추가 답변을 입력할 수 있습니다" : "구직자 질문에 답변하거나 추가 안내를 보낼 수 있습니다"} rows={3} style={{ ...compactInputStyle, resize: "vertical", marginBottom: "8px" }} />
-          <button type="button" onClick={() => page.sendMessage(offer)} style={{ ...primarySmall, width: "100%", background: colors.ink, color: "#fff" }}>
+          <button type="button" onClick={() => page.sendMessage(offer)} style={{ ...primarySmall, width: "100%", background: colors.ink, color: "var(--gs-surface)" }}>
             {answeredBefore ? "추가 답변" : "답변 보내기"}
           </button>
         </div>

@@ -23,6 +23,8 @@ export const EMPLOYER = "구인자" as const;
 export const ROUTES = {
   home: "/",
   login: "/login",
+  loginForm: "/login?mode=login",
+  signupForm: "/login?mode=signup",
   onboarding: "/onboarding",
   jobs: "/jobs",
   jobWrite: "/jobs/write",

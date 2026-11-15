@@ -37,7 +37,7 @@ export function useAuthForm(mode: AuthMode) {
   const moveAfterLogin = async () => {
     const user = await getCurrentUser();
     if (!user) {
-      window.location.href = "/login?mode=login";
+      window.location.href = ROUTES.loginForm;
       return;
     }
 
@@ -86,7 +86,7 @@ export function useAuthForm(mode: AuthMode) {
           return;
         case "email_confirmation_required":
           alert("회원가입이 완료되었습니다. 이메일 인증 후 로그인하면 첫 설정으로 이동합니다.");
-          window.location.href = "/login?mode=login";
+          window.location.href = ROUTES.loginForm;
           return;
       }
     } catch {

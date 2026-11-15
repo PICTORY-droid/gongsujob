@@ -29,7 +29,7 @@ function ContactBlock({ allowed, contact }: { allowed: boolean; contact: ResumeC
           {contact?.phone && (
             <a href={`tel:${contact.phone}`} style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none", marginBottom: "8px" }}>
               <span style={{ fontSize: "13px", color: colors.ink, fontWeight: 600 }}>{contact.phone}</span>
-              <span style={{ fontSize: "11px", background: colors.brand, color: "#fff", borderRadius: "4px", padding: "2px 6px" }}>전화</span>
+              <span style={{ fontSize: "11px", background: colors.brand, color: "var(--gs-surface)", borderRadius: "4px", padding: "2px 6px" }}>전화</span>
             </a>
           )}
           {contact?.email && <div style={{ fontSize: "13px", color: colors.sub }}>{contact.email}</div>}
@@ -94,7 +94,7 @@ export function ResumeDetailModal({ resume, talent }: { resume: PublicResume; ta
           ) : isOfferActive(talent.existingOffer) && talent.existingOffer ? (
             <OfferStatusPanel offer={talent.existingOffer} />
           ) : !talent.composerOpen ? (
-            <button type="button" onClick={() => talent.setComposerOpen(true)} style={{ width: "100%", padding: "14px", background: colors.brand, border: "none", borderRadius: "12px", fontSize: "14px", color: "#fff", cursor: "pointer", fontWeight: 800 }}>
+            <button type="button" onClick={() => talent.setComposerOpen(true)} style={{ width: "100%", padding: "14px", background: colors.brand, border: "none", borderRadius: "12px", fontSize: "14px", color: "var(--gs-surface)", cursor: "pointer", fontWeight: 800 }}>
               포지션 제안하기
             </button>
           ) : (

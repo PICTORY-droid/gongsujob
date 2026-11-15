@@ -31,7 +31,7 @@ export function Modal({ onClose, children, zIndex = 300, backdrop = "rgba(0,0,0,
         aria-modal="true"
         aria-labelledby={labelledBy}
         onClick={(event) => event.stopPropagation()}
-        style={{ width: "100%", maxWidth: "520px", maxHeight: "82vh", overflowY: "auto", background: "#fff", borderRadius: "20px", padding: "20px", boxShadow: "0 12px 40px rgba(0,0,0,0.25)", ...panelStyle }}
+        style={{ width: "100%", maxWidth: "520px", maxHeight: "82vh", overflowY: "auto", background: "var(--gs-surface)", borderRadius: "20px", padding: "20px", boxShadow: "0 12px 40px rgba(0,0,0,0.25)", ...panelStyle }}
       >
         {children}
       </div>
@@ -39,17 +39,17 @@ export function Modal({ onClose, children, zIndex = 300, backdrop = "rgba(0,0,0,
   );
 }
 
-export function ModalHeader({ title, onClose, id, closeBg = "#f5f5f5" }: { title: string; onClose: () => void; id?: string; closeBg?: string }) {
+export function ModalHeader({ title, onClose, id, closeBg = "var(--gs-line-soft)" }: { title: string; onClose: () => void; id?: string; closeBg?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
-      <div id={id} style={{ fontSize: "17px", fontWeight: 800, color: "#1a1a1a" }}>
+      <div id={id} style={{ fontSize: "17px", fontWeight: 800, color: "var(--gs-ink)" }}>
         {title}
       </div>
       <button
         type="button"
         aria-label="닫기"
         onClick={onClose}
-        style={{ width: "32px", height: "32px", borderRadius: "50%", border: "none", background: closeBg, color: "#666", fontSize: "18px", cursor: "pointer" }}
+        style={{ width: "32px", height: "32px", borderRadius: "50%", border: "none", background: closeBg, color: "var(--gs-sub)", fontSize: "18px", cursor: "pointer" }}
       >
         ×
       </button>

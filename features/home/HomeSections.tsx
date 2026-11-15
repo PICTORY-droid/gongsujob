@@ -18,10 +18,10 @@ export function LoginRequiredModal({ onClose, onLogin }: { onClose: () => void; 
         로그인 또는 회원가입 후 다시 이용해주세요.
       </div>
       <div style={{ display: "flex", gap: "8px" }}>
-        <button type="button" onClick={onClose} style={{ flex: 1, padding: "12px", background: "#fff", border: "1px solid #ddd", borderRadius: "10px", fontSize: "13px", color: colors.sub, cursor: "pointer", fontWeight: 700 }}>
+        <button type="button" onClick={onClose} style={{ flex: 1, padding: "12px", background: "var(--gs-surface)", border: "1px solid var(--gs-disabled)", borderRadius: "10px", fontSize: "13px", color: colors.sub, cursor: "pointer", fontWeight: 700 }}>
           닫기
         </button>
-        <button type="button" onClick={onLogin} style={{ flex: 2, padding: "12px", background: colors.brand, border: "none", borderRadius: "10px", fontSize: "13px", color: "#fff", cursor: "pointer", fontWeight: 800 }}>
+        <button type="button" onClick={onLogin} style={{ flex: 2, padding: "12px", background: colors.brand, border: "none", borderRadius: "10px", fontSize: "13px", color: "var(--gs-surface)", cursor: "pointer", fontWeight: 800 }}>
           로그인하기
         </button>
       </div>
@@ -31,25 +31,25 @@ export function LoginRequiredModal({ onClose, onLogin }: { onClose: () => void; 
 
 export function HomeHero({ employer, searchQuery, onSearchChange }: { employer: boolean; searchQuery: string; onSearchChange: (value: string) => void }) {
   return (
-    <section style={{ background: "linear-gradient(135deg, #FF6B00 0%, #ff8c00 100%)", padding: "40px 20px", color: "#fff", textAlign: "center" }}>
-      <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "8px", lineHeight: 1.4 }}>
+    <section className="gs-hero" style={{ background: "radial-gradient(120% 140% at 85% 0%, var(--gs-blue) 0%, var(--gs-navy) 62%)", color: "var(--gs-surface)", textAlign: "center" }}>
+      <h1 className="gs-hero-title" style={{ fontWeight: 800, margin: "0 0 12px" }}>
         {employer ? "건설 현장 인재를" : "건설 현장 일자리를"}
         <br />
         한곳에서 확인하세요
       </h1>
-      <p style={{ fontSize: "14px", opacity: 0.9, marginBottom: "24px" }}>
+      <p className="gs-hero-sub" style={{ opacity: 0.85, margin: "0 0 clamp(20px, 3vw, 32px)" }}>
         {employer ? "공고 등록 · 인재 조회 · 포지션 제안 관리" : "직종별 공고 확인 · 이력서 등록 · 포지션 제안 관리"}
       </p>
-      <div style={{ background: "#fff", borderRadius: "12px", padding: "6px 6px 6px 16px", display: "flex", gap: "8px", maxWidth: "480px", margin: "0 auto" }}>
+      <div style={{ background: "var(--gs-surface)", borderRadius: "var(--gs-radius-lg)", padding: "6px 6px 6px 16px", display: "flex", gap: "8px", maxWidth: "560px", margin: "0 auto", boxShadow: "var(--gs-shadow-md)" }}>
         <input
           type="search"
           aria-label="직종 또는 지역 검색"
           value={searchQuery}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="직종 또는 지역 검색"
-          style={{ flex: 1, border: "none", outline: "none", fontSize: "15px", color: colors.text, background: "transparent" }}
+          style={{ flex: 1, minWidth: 0, width: "100%", border: "none", outline: "none", fontSize: "15px", color: colors.text, background: "transparent" }}
         />
-        <button type="button" style={{ background: colors.brand, color: "#fff", border: "none", borderRadius: "8px", padding: "10px 20px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>
+        <button type="button" style={{ background: colors.brand, color: "var(--gs-surface)", border: "none", borderRadius: "var(--gs-radius-md)", minHeight: "44px", padding: "10px 20px", fontSize: "15px", fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>
           검색
         </button>
       </div>
@@ -59,10 +59,10 @@ export function HomeHero({ employer, searchQuery, onSearchChange }: { employer: 
 
 export function ServiceHighlights() {
   return (
-    <section style={{ background: "#fff", borderBottom: `1px solid ${colors.line}`, padding: "16px 20px", display: "flex", justifyContent: "center", gap: "32px" }}>
+    <section style={{ background: "var(--gs-surface)", borderBottom: `1px solid ${colors.line}`, padding: "16px 20px", display: "flex", justifyContent: "center", gap: "32px" }}>
       {SERVICE_HIGHLIGHTS.map((item) => (
         <div key={item.num} style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "18px", fontWeight: 700, color: colors.brand }}>{item.num}</div>
+          <div style={{ fontSize: "18px", fontWeight: 800, color: colors.navy }}>{item.num}</div>
           <div style={{ fontSize: "11px", color: colors.muted, marginTop: "2px" }}>{item.label}</div>
         </div>
       ))}
@@ -72,9 +72,9 @@ export function ServiceHighlights() {
 
 export function ActionCards({ cards, onSelect }: { cards: ActionCard[]; onSelect: (href: string) => void }) {
   return (
-    <section style={{ padding: "20px", display: "flex", gap: "12px", maxWidth: "600px", margin: "0 auto", flexWrap: "wrap" }}>
+    <section className="gs-container gs-action-grid" style={{ paddingBlock: "20px" }}>
       {cards.map((item) => (
-        <button key={item.href} type="button" onClick={() => onSelect(item.href)} style={{ flex: "1 1 130px", background: "#fff", border: `1px solid ${colors.line}`, borderRadius: "12px", padding: "16px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", cursor: "pointer" }}>
+        <button key={item.href} type="button" onClick={() => onSelect(item.href)} className="gs-hover-lift" style={{ background: "var(--gs-surface)", border: `1px solid ${colors.line}`, borderRadius: "var(--gs-radius-lg)", padding: "18px 16px", textAlign: "center", boxShadow: "var(--gs-shadow-sm)", cursor: "pointer" }}>
           <div style={{ fontSize: "28px", marginBottom: "6px" }}>{item.icon}</div>
           <div style={{ fontSize: "13px", fontWeight: 600, color: colors.ink }}>{item.label}</div>
           <div style={{ fontSize: "11px", color: colors.muted, marginTop: "2px" }}>{item.desc}</div>

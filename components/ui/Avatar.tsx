@@ -13,7 +13,7 @@ export function Avatar({ src, fallback, size = 48, fontSize = 20, alt = "프로�
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={alt} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       ) : (
-        <span style={{ fontSize: `${fontSize}px`, color: "#fff", fontWeight: 700 }}>{fallback}</span>
+        <span style={{ fontSize: `${fontSize}px`, color: "var(--gs-surface)", fontWeight: 700 }}>{fallback}</span>
       )}
     </div>
   );

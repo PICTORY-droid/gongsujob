@@ -29,8 +29,8 @@ export default function HomeHeader({
     <>
       <style>{`
         .home-header {
-          background: #fff;
-          border-bottom: 1px solid #eee;
+          background: var(--gs-surface);
+          border-bottom: 1px solid var(--gs-line);
           padding: 0 20px;
           height: 56px;
           display: flex;
@@ -61,7 +61,7 @@ export default function HomeHeader({
         .home-brand-title {
           font-weight: 800;
           font-size: 18px;
-          color: #1a1a1a;
+          color: var(--gs-ink);
           white-space: nowrap;
           letter-spacing: -0.4px;
         }
@@ -76,7 +76,7 @@ export default function HomeHeader({
 
         .home-desktop-nav a {
           font-size: 14px;
-          color: #333;
+          color: var(--gs-text);
           text-decoration: none;
           font-weight: 600;
           white-space: nowrap;
@@ -92,18 +92,18 @@ export default function HomeHeader({
         .home-header-link {
           height: 34px;
           padding: 0 14px;
-          border: 1px solid #ddd;
+          border: 1px solid var(--gs-disabled);
           border-radius: 9px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           font-size: 13px;
-          color: #333;
+          color: var(--gs-text);
           text-decoration: none;
           white-space: nowrap;
           line-height: 1;
           box-sizing: border-box;
-          background: #fff;
+          background: var(--gs-surface);
         }
 
         .home-header-link-muted {
@@ -115,7 +115,7 @@ export default function HomeHeader({
           align-items: center;
           justify-content: center;
           font-size: 13px;
-          color: #666;
+          color: var(--gs-sub);
           text-decoration: none;
           white-space: nowrap;
           line-height: 1;
@@ -132,13 +132,13 @@ export default function HomeHeader({
           align-items: center;
           justify-content: center;
           font-size: 13px;
-          color: #fff;
+          color: var(--gs-surface);
           text-decoration: none;
           font-weight: 700;
           white-space: nowrap;
           line-height: 1;
           box-sizing: border-box;
-          background: #FF6B00;
+          background: var(--gs-brand);
         }
 
         .home-profile-link {
@@ -152,12 +152,12 @@ export default function HomeHeader({
         .home-profile-avatar {
           width: 32px;
           height: 32px;
-          background: #FF6B00;
+          background: var(--gs-brand);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #fff;
+          color: var(--gs-surface);
           font-size: 14px;
           font-weight: 700;
           overflow: hidden;
@@ -166,7 +166,7 @@ export default function HomeHeader({
 
         .home-profile-name {
           font-size: 13px;
-          color: #333;
+          color: var(--gs-text);
           font-weight: 600;
           white-space: nowrap;
         }
@@ -174,11 +174,11 @@ export default function HomeHeader({
         .home-logout-button {
           height: 34px;
           padding: 0 14px;
-          border: 1px solid #ddd;
+          border: 1px solid var(--gs-disabled);
           border-radius: 9px;
           font-size: 13px;
-          color: #666;
-          background: #fff;
+          color: var(--gs-sub);
+          background: var(--gs-surface);
           cursor: pointer;
           white-space: nowrap;
         }
@@ -253,7 +253,7 @@ export default function HomeHeader({
         }
       `}</style>
 
-      <header className="home-header">
+      <header className="home-header gs-header-inset">
         <div className="home-brand">
           <Image src="/logo.png" alt="로고" width={32} height={32} className="home-brand-logo" />
           <span className="home-brand-title">현장공수잡</span>
@@ -285,10 +285,10 @@ export default function HomeHeader({
               <Link href={ROUTES.contact} className="home-header-link-muted">
                 문의
               </Link>
-              <Link href="/login?mode=login" className="home-header-link">
+              <Link href={ROUTES.loginForm} className="home-header-link">
                 로그인
               </Link>
-              <Link href="/login?mode=signup" className="home-header-link-primary">
+              <Link href={ROUTES.signupForm} className="home-header-link-primary">
                 회원가입
               </Link>
             </>

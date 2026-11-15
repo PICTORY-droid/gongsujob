@@ -1,4 +1,6 @@
+import { SaveToggle } from "@/components/ui/FilterChip";
 import { card, colors } from "@/components/ui/theme";
+import { getStartDayBadge } from "@/domain/job-list";
 import { buildKakaoMapLink } from "@/domain/geo";
 import type { GeoPoint, Job, WeatherSummary } from "@/types/domain";
 
@@ -7,7 +9,8 @@ import type { GeoPoint, Job, WeatherSummary } from "@/types/domain";
 const sectionCard = { ...card, padding: "16px 20px", marginBottom: "12px" } as const;
 const sectionTitle = { fontSize: "13px", fontWeight: 700, color: colors.ink, marginBottom: "12px" } as const;
 
-export function JobInfoCard({ job, address }: { job: Job; address: string }) {
+export function JobInfoCard({ job, address, saved, onToggleSave }: { job: Job; address: string; saved?: boolean; onToggleSave?: () => void }) {
+  const badge = getStartDayBadge(job.start_date);
   const rows = [
     { label: "현장 위치", value: address },
     { label: "시작일", value: job.start_date },
@@ -19,16 +22,22 @@ export function JobInfoCard({ job, address }: { job: Job; address: string }) {
     <div style={{ ...card, padding: "20px", marginBottom: "12px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
         <div style={{ flex: 1, marginRight: "12px" }}>
-          <div style={{ display: "flex", gap: "6px", marginBottom: "6px" }}>
-            {job.is_urgent && <span style={{ background: colors.brand, color: "#fff", fontSize: "11px", borderRadius: "4px", padding: "3px 8px", fontWeight: 700 }}>긴급</span>}
-            <span style={{ background: colors.brandTint, color: colors.brand, fontSize: "11px", borderRadius: "4px", padding: "3px 8px", fontWeight: 600 }}>{job.job_type}</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "8px" }}>
+            {job.is_urgent && <span style={{ background: colors.danger, color: "#fff", fontSize: "11px", borderRadius: "6px", padding: "3px 8px", fontWeight: 700 }}>급구</span>}
+            {badge && <span style={{ background: colors.blueSoft, color: colors.blue, fontSize: "11px", borderRadius: "6px", padding: "3px 8px", fontWeight: 700 }}>{badge.label}</span>}
+            <span style={{ background: colors.brandTint, color: colors.brandText, fontSize: "11px", borderRadius: "6px", padding: "3px 8px", fontWeight: 600 }}>{job.job_type}</span>
           </div>
           <h1 style={{ fontSize: "20px", fontWeight: 700, color: colors.ink, margin: 0, lineHeight: 1.3 }}>{job.title}</h1>
           <div style={{ fontSize: "13px", color: colors.muted, marginTop: "4px" }}>{job.company}</div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontSize: "22px", fontWeight: 800, color: colors.brand }}>{Number(job.pay).toLocaleString()}원</div>
-          <div style={{ fontSize: "12px", color: colors.muted }}>/{job.pay_type}</div>
+          <div style={{ fontSize: "12px", color: colors.muted, fontWeight: 600 }}>{job.pay_type}</div>
+          <div style={{ fontSize: "22px", fontWeight: 800, color: colors.brandText, letterSpacing: "-0.02em" }}>{Number(job.pay).toLocaleString()}원</div>
+          {onToggleSave && (
+            <div style={{ marginTop: "6px", display: "flex", justifyContent: "flex-end" }}>
+              <SaveToggle saved={Boolean(saved)} onToggle={onToggleSave} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -95,9 +104,9 @@ export function JobWeatherCard({ address, weather, loading }: { address: string;
               )}
             </div>
           </div>
-          <div style={{ padding: "10px 14px", borderRadius: "10px", background: weather.workable ? colors.successBg : "#fff5f5", border: "1px solid " + (weather.workable ? colors.successBorder : "#fed7d7"), display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ padding: "10px 14px", borderRadius: "10px", background: weather.workable ? colors.successBg : "var(--gs-danger-bg)", border: "1px solid " + (weather.workable ? colors.successBorder : "var(--gs-danger-bg)"), display: "flex", alignItems: "center", gap: "8px" }}>
             <span>{weather.workable ? "✅" : "⚠️"}</span>
-            <span style={{ fontSize: "13px", fontWeight: 600, color: weather.workable ? colors.success : "#c53030" }}>{weather.workable ? "오늘 작업 가능 날씨" : "비/눈 — 소장님께 확인하세요"}</span>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: weather.workable ? colors.success : "var(--gs-danger)" }}>{weather.workable ? "오늘 작업 가능 날씨" : "비/눈 — 소장님께 확인하세요"}</span>
           </div>
         </div>
       ) : (
@@ -109,13 +118,13 @@ export function JobWeatherCard({ address, weather, loading }: { address: string;
 
 export function ApplyBar({ applied, applying, message, onApply }: { applied: boolean; applying: boolean; message: string; onApply: () => void }) {
   return (
-    <div className="mobile-apply-bar" style={{ position: "fixed", bottom: "64px", left: 0, right: 0, background: "#fff", borderTop: `1px solid ${colors.line}`, padding: "12px 20px", zIndex: 90 }}>
+    <div className="mobile-apply-bar" style={{ position: "fixed", bottom: "64px", left: 0, right: 0, background: "var(--gs-surface)", borderTop: `1px solid ${colors.line}`, padding: "12px 20px", zIndex: 90 }}>
       {message && <div style={{ textAlign: "center", fontSize: "13px", color: colors.success, marginBottom: "8px", fontWeight: 600 }}>{message}</div>}
       <button
         type="button"
         onClick={onApply}
         disabled={applied || applying}
-        style={{ width: "100%", maxWidth: "560px", display: "block", margin: "0 auto", padding: "14px", borderRadius: "12px", border: "none", fontSize: "16px", fontWeight: 700, background: applied ? "#e2e8f0" : colors.brand, color: applied ? colors.muted : "#fff", cursor: applied ? "default" : "pointer" }}
+        style={{ width: "100%", maxWidth: "560px", display: "block", margin: "0 auto", padding: "14px", borderRadius: "12px", border: "none", fontSize: "16px", fontWeight: 700, background: applied ? "var(--gs-line)" : colors.brand, color: applied ? colors.muted : "var(--gs-surface)", cursor: applied ? "default" : "pointer" }}
       >
         {applying ? "지원 중.." : applied ? "이미 지원한 공고" : "지원하기"}
       </button>

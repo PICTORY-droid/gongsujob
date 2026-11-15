@@ -6,7 +6,7 @@ const MAX_ADDRESS_LENGTH = 200;
 
 export const geocodeQuerySchema = z.object({
   address: z
-    .string({ required_error: "no address" })
+    .string({ error: "no address" })
     .trim()
     .min(1, "no address")
     .max(MAX_ADDRESS_LENGTH, "address too long"),
@@ -21,7 +21,7 @@ export const weatherQuerySchema = z
 
 const coordinate = (min: number, max: number) =>
   z
-    .string({ required_error: "no coords" })
+    .string({ error: "no coords" })
     .transform((value) => parseFloat(value))
     .refine((value) => Number.isFinite(value) && value >= min && value <= max, "no coords");
 

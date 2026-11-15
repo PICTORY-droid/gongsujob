@@ -9,7 +9,7 @@ import JobSummaryCard from "@/components/job/JobSummaryCard";
 import { ResumeCardBody } from "@/components/resume/ResumeCard";
 import { CategoryDropdown } from "@/components/ui/CategoryDropdown";
 import { EmptyState, InlineLoading } from "@/components/ui/Feedback";
-import { colors, listCard } from "@/components/ui/theme";
+import { colors, fontFamily, listCard } from "@/components/ui/theme";
 import { ActionCards, HomeHero, LoginRequiredModal, SectionHeading, ServiceHighlights, plainButton } from "@/features/home/HomeSections";
 import { getActionCards, getDesktopTabs } from "@/features/home/home-menus";
 import { useSession } from "@/hooks/useSession";
@@ -53,7 +53,7 @@ export default function HomeContainer() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: colors.page, fontFamily: "'Apple SD Gothic Neo', 'Pretendard', sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: colors.page, fontFamily }}>
       {loginModalOpen && <LoginRequiredModal onClose={() => setLoginModalOpen(false)} onLogin={() => goTo(ROUTES.login)} />}
 
       <HomeHeader user={user} profile={profile} desktopTabs={getDesktopTabs(isEmployer)} onLogout={handleLogout} />
@@ -61,7 +61,7 @@ export default function HomeContainer() {
       <ServiceHighlights />
       <ActionCards cards={getActionCards(Boolean(user), isEmployer)} onSelect={moveProtected} />
 
-      <section style={{ padding: "0 20px 80px", maxWidth: "600px", margin: "0 auto" }}>
+      <section className="gs-container" style={{ paddingBottom: "80px" }}>
         {!user ? (
           <GuestPreview
             jobs={filteredJobs}
@@ -98,8 +98,8 @@ type FeedProps = {
 /** 비로그인: 공고·인재 미리보기 각 3건 */
 function GuestPreview({ jobs, resumes, loading, onOpen }: FeedProps & { onOpen: (href: string) => void }) {
   return (
-    <>
-      <div style={{ marginBottom: "28px" }}>
+    <div className="gs-split">
+      <div>
         <SectionHeading title="공고 미리보기" count={jobs.length} action="전체보기 →" onAction={() => onOpen(ROUTES.jobs)} />
         {loading ? (
           <InlineLoading padding="32px" />
@@ -130,7 +130,7 @@ function GuestPreview({ jobs, resumes, loading, onOpen }: FeedProps & { onOpen: 
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -152,7 +152,7 @@ function MemberFeed({ employer, jobs, resumes, loading }: FeedProps & { employer
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <div className="gs-card-grid">
       {employer
         ? resumes.map((resume) => (
             <Link key={resume.id} href={ROUTES.resumes} style={{ ...listCard, textDecoration: "none" }}>
