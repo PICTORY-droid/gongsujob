@@ -16,13 +16,15 @@ import { EMPTY_JOB_FILTER, applyJobFilter, availableRegions } from "@/domain/job
 import { ALL_CATEGORY, REGIONS } from "@/lib/constants";
 
 /** 공고 목록 컨테이너: 직종(서버 조회) + 검색·지역·급구·찜(화면 내 필터) */
-export default function JobListContainer() {
+type JobListContainerProps = { initialCategory?: string; initialQuery?: string; initialSavedOnly?: boolean };
+
+export default function JobListContainer({ initialCategory = ALL_CATEGORY, initialQuery = "", initialSavedOnly = false }: JobListContainerProps) {
   const { user } = useSession({ requireAuth: true });
-  const [category, setCategory] = useState<string>(ALL_CATEGORY);
-  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<string>(initialCategory);
+  const [query, setQuery] = useState(initialQuery);
   const [region, setRegion] = useState<string | null>(null);
   const [urgentOnly, setUrgentOnly] = useState(false);
-  const [savedOnly, setSavedOnly] = useState(false);
+  const [savedOnly, setSavedOnly] = useState(initialSavedOnly);
   const { jobs, loading } = useJobList(category, { enabled: Boolean(user) });
   const { savedIds, isSaved, toggle } = useSavedJobs();
 

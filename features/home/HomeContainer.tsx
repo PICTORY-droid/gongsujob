@@ -10,12 +10,14 @@ import { ResumeCardBody } from "@/components/resume/ResumeCard";
 import { CategoryDropdown } from "@/components/ui/CategoryDropdown";
 import { EmptyState, InlineLoading } from "@/components/ui/Feedback";
 import { colors, fontFamily, listCard } from "@/components/ui/theme";
-import { ActionCards, HomeHero, LoginRequiredModal, SectionHeading, ServiceHighlights, plainButton } from "@/features/home/HomeSections";
-import { getActionCards, getDesktopTabs } from "@/features/home/home-menus";
+import { LoginRequiredModal, SectionHeading, plainButton } from "@/features/home/HomeSections";
+import { HomeBanner } from "@/features/home/HomeBanner";
+import { ActionCards, CategoryMenu, FeatureMenu, QuickSearch } from "@/features/home/HomeMenus";
+import { getActionCards, getBannerSlides, getFeatureSection } from "@/features/home/home-menus";
+import { toViewerRole } from "@/lib/navigation";
 import { useSession } from "@/hooks/useSession";
 import { useJobList, useResumeList } from "@/hooks/useListings";
 import { signOut } from "@/services/auth.service";
-import { filterJobs, filterResumes } from "@/domain/search";
 import { ALL_CATEGORY, PUBLIC_ROUTES, ROUTES } from "@/lib/constants";
 import type { Job, PublicResume } from "@/types/domain";
 
@@ -31,8 +33,10 @@ export default function HomeContainer() {
   const { jobs, loading } = useJobList(category, { preview: true });
   const { resumes } = useResumeList(category);
 
-  const filteredJobs = filterJobs(jobs, searchQuery);
-  const filteredResumes = filterResumes(resumes, searchQuery);
+  const role = toViewerRole(Boolean(user), isEmployer);
+  const feature = getFeatureSection(role);
+  // 홈 미리보기는 그대로 두고, 검색·직종 선택은 전체 목록 화면으로 보낸다
+  const listRoute = isEmployer ? ROUTES.resumes : ROUTES.jobs;
 
   const goTo = (href: string) => {
     window.location.href = href;
@@ -47,6 +51,13 @@ export default function HomeContainer() {
     goTo(href);
   };
 
+  const openList = (params: Record<string, string | null>) => {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => value && query.set(key, value));
+    const qs = query.toString();
+    moveProtected(qs ? `${listRoute}?${qs}` : listRoute);
+  };
+
   const handleLogout = async () => {
     await signOut();
     goTo(ROUTES.home);
@@ -56,16 +67,27 @@ export default function HomeContainer() {
     <div style={{ minHeight: "100vh", background: colors.page, fontFamily }}>
       {loginModalOpen && <LoginRequiredModal onClose={() => setLoginModalOpen(false)} onLogin={() => goTo(ROUTES.login)} />}
 
-      <HomeHeader user={user} profile={profile} desktopTabs={getDesktopTabs(isEmployer)} onLogout={handleLogout} />
-      <HomeHero employer={isEmployer} searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <ServiceHighlights />
-      <ActionCards cards={getActionCards(Boolean(user), isEmployer)} onSelect={moveProtected} />
+      <HomeHeader user={user} profile={profile} onLogout={handleLogout} />
+      <h1 className="gs-sr-only">현장공수잡 — 건설 현장 일용직 구인구직</h1>
+      <HomeBanner key={role} slides={getBannerSlides(role)} onNavigate={moveProtected} />
+      <QuickSearch
+        value={searchQuery}
+        onChange={setSearchQuery}
+        onSubmit={() => openList({ q: searchQuery.trim() || null })}
+        placeholder={isEmployer ? "직종·지역으로 인재 검색" : "직종·지역·현장명으로 일자리 검색"}
+      />
+      <CategoryMenu
+        title={isEmployer ? "직종별 인재 찾기" : "직종별 일자리 찾기"}
+        subtitle={isEmployer ? "필요한 기술 인력을 바로 찾아보세요" : "내 기술에 맞는 현장만 골라 보세요"}
+        onSelect={(jobType) => openList({ category: jobType })}
+      />
+      <ActionCards cards={getActionCards(role)} onSelect={moveProtected} />
 
-      <section className="gs-container" style={{ paddingBottom: "80px" }}>
+      <section className="gs-container" style={{ paddingBottom: "40px" }}>
         {!user ? (
           <GuestPreview
-            jobs={filteredJobs}
-            resumes={filteredResumes}
+            jobs={jobs}
+            resumes={resumes}
             loading={loading}
             onOpen={moveProtected}
           />
@@ -73,18 +95,20 @@ export default function HomeContainer() {
           <>
             <SectionHeading
               title={isEmployer ? "등록된 인재" : "오늘의 공고"}
-              count={isEmployer ? filteredResumes.length : filteredJobs.length}
+              count={isEmployer ? resumes.length : jobs.length}
               action={isEmployer ? "전체 인재 →" : "전체보기 →"}
               onAction={() => moveProtected(isEmployer ? ROUTES.resumes : ROUTES.jobs)}
               extra={<CategoryDropdown value={category} onChange={setCategory} size="sm" />}
             />
-            <MemberFeed employer={isEmployer} jobs={filteredJobs} resumes={filteredResumes} loading={loading} />
+            <MemberFeed employer={isEmployer} jobs={jobs} resumes={resumes} loading={loading} />
           </>
         )}
       </section>
 
+      <FeatureMenu title={feature.title} subtitle={feature.subtitle} items={feature.items} onSelect={moveProtected} />
+
       <AppFooter />
-      <MobileBottomNav userLoggedIn={Boolean(user)} onRequireLogin={() => setLoginModalOpen(true)} />
+      <MobileBottomNav onRequireLogin={() => setLoginModalOpen(true)} />
     </div>
   );
 }

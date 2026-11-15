@@ -27,10 +27,12 @@ export const ROUTES = {
   signupForm: "/login?mode=signup",
   onboarding: "/onboarding",
   jobs: "/jobs",
+  savedJobs: "/jobs/saved",
   jobWrite: "/jobs/write",
   resumes: "/resumes",
   resumeWrite: "/resume/write",
   mypage: "/mypage",
+  manage: "/manage",
   contact: "/contact",
 } as const;
 

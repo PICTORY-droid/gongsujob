@@ -1,28 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
+import { DesktopNav } from "@/components/layout/DesktopNav";
 import { Avatar } from "@/components/ui/Avatar";
 import { getAvatarInitial } from "@/domain/profile";
 import { ROUTES } from "@/lib/constants";
 import type { Profile } from "@/types/domain";
 
-export type HeaderTab = {
-  label: string;
-  href: string;
-};
-
 type HomeHeaderProps = {
   user: User | null;
   profile: Profile | null;
-  desktopTabs: HeaderTab[];
   onLogout: () => void;
 };
 
-/** 홈 상단 헤더: 데스크톱 탭 + 로그인 상태별 액션. 스타일은 반응형 미디어쿼리 때문에 CSS로 유지 */
+/** 홈 상단 헤더: PC 주 메뉴(DesktopNav) + 로그인 상태별 액션. 스타일은 반응형 미디어쿼리 때문에 CSS로 유지 */
 export default function HomeHeader({
   user,
   profile,
-  desktopTabs,
   onLogout,
 }: HomeHeaderProps) {
   return (
@@ -66,21 +60,7 @@ export default function HomeHeader({
           letter-spacing: -0.4px;
         }
 
-        .home-desktop-nav {
-          display: none;
-          align-items: center;
-          gap: 18px;
-          margin-left: auto;
-          margin-right: 18px;
-        }
 
-        .home-desktop-nav a {
-          font-size: 14px;
-          color: var(--gs-text);
-          text-decoration: none;
-          font-weight: 600;
-          white-space: nowrap;
-        }
 
         .home-header-actions {
           display: flex;
@@ -106,22 +86,6 @@ export default function HomeHeader({
           background: var(--gs-surface);
         }
 
-        .home-header-link-muted {
-          height: 34px;
-          padding: 0 8px;
-          border: none;
-          border-radius: 9px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 13px;
-          color: var(--gs-sub);
-          text-decoration: none;
-          white-space: nowrap;
-          line-height: 1;
-          box-sizing: border-box;
-          background: transparent;
-        }
 
         .home-header-link-primary {
           height: 34px;
@@ -183,12 +147,6 @@ export default function HomeHeader({
           white-space: nowrap;
         }
 
-        @media (min-width: 769px) {
-          .home-desktop-nav {
-            display: flex;
-          }
-        }
-
         @media (max-width: 480px) {
           .home-header {
             height: 56px;
@@ -215,11 +173,6 @@ export default function HomeHeader({
             gap: 4px;
           }
 
-          .home-header-link-muted {
-            height: 32px;
-            padding: 0 6px;
-            font-size: 12px;
-          }
 
           .home-header-link {
             height: 32px;
@@ -254,20 +207,12 @@ export default function HomeHeader({
       `}</style>
 
       <header className="home-header gs-header-inset">
-        <div className="home-brand">
-          <Image src="/logo.png" alt="로고" width={32} height={32} className="home-brand-logo" />
+        <Link href={ROUTES.home} className="home-brand" style={{ textDecoration: "none" }}>
+          <Image src="/logo.png" alt="" width={32} height={32} className="home-brand-logo" />
           <span className="home-brand-title">현장공수잡</span>
-        </div>
+        </Link>
 
-        {user && (
-          <nav className="home-desktop-nav">
-            {desktopTabs.map((tab) => (
-              <Link key={tab.href} href={tab.href}>
-                {tab.label}
-              </Link>
-            ))}
-          </nav>
-        )}
+        <DesktopNav />
 
         <div className="home-header-actions">
           {user ? (
@@ -282,9 +227,6 @@ export default function HomeHeader({
             </>
           ) : (
             <>
-              <Link href={ROUTES.contact} className="home-header-link-muted">
-                문의
-              </Link>
               <Link href={ROUTES.loginForm} className="home-header-link">
                 로그인
               </Link>

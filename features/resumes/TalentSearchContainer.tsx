@@ -13,8 +13,8 @@ import { useTalentSearch } from "@/features/resumes/useTalentSearch";
 import { ROUTES } from "@/lib/constants";
 
 /** 인재 찾기 컨테이너 */
-export default function TalentSearchContainer() {
-  const talent = useTalentSearch();
+export default function TalentSearchContainer({ initialCategory, initialQuery }: { initialCategory?: string; initialQuery?: string } = {}) {
+  const talent = useTalentSearch({ initialCategory, initialQuery });
 
   return (
     <div style={pageShell()} className="gs-page-bottom">
