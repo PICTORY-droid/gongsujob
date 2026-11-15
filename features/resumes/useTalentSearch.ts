@@ -21,7 +21,7 @@ import type { Job, PositionOffer, PublicResume, ResumeContact } from "@/types/do
  * - 연락처는 제안이 "수락"된 경우에만 별도로 조회한다(목록 응답에는 연락처가 없음).
  */
 export function useTalentSearch({ initialCategory = ALL_CATEGORY, initialQuery = "" }: { initialCategory?: string; initialQuery?: string } = {}) {
-  const { user, profile, isEmployer } = useSession({ requireAuth: true });
+  const { user, profile, isEmployer, loading: sessionLoading } = useSession({ requireAuth: true });
   const toast = useToast(2000);
 
   const [category, setCategory] = useState<string>(initialCategory);
@@ -119,7 +119,8 @@ export function useTalentSearch({ initialCategory = ALL_CATEGORY, initialQuery =
     setCategory,
     searchQuery,
     setSearchQuery,
-    loading,
+    // 역할(구인자/구직자)을 알기 전에는 빈 화면의 버튼을 그리지 않도록 함께 기다린다
+    loading: loading || sessionLoading,
     resumes: filterResumes(resumes, searchQuery),
     myJobs,
     selected,

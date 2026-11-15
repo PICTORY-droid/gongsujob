@@ -31,11 +31,14 @@ export function useSession({ requireAuth = false, subscribe = false }: Options =
   useEffect(() => {
     let cancelled = false;
 
+    // 프로필까지 받은 뒤 사용자·프로필·로딩을 한 번에 바꾼다.
+    // (사용자만 먼저 넣으면 잠깐 '로그인한 구직자'로 보여 구인자 화면에 구직자용 버튼이 깜빡였다)
     const load = async (nextUser: User | null) => {
+      const nextProfile = nextUser ? await getProfile(nextUser.id) : null;
       if (cancelled) return;
       setUser(nextUser);
-      setProfile(nextUser ? await getProfile(nextUser.id) : null);
-      if (!cancelled) setLoading(false);
+      setProfile(nextProfile);
+      setLoading(false);
     };
 
     getCurrentUser().then((current) => {
