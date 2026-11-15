@@ -48,7 +48,7 @@ export function HomeBanner({ slides, onNavigate }: { slides: BannerSlide[]; onNa
   }, [emblaApi]);
 
   return (
-    <section aria-roledescription="carousel" aria-label="공수잡 주요 안내" style={{ background: "linear-gradient(180deg, #e8effc 0%, #f4f7fd 100%)", borderBottom: `1px solid ${colors.line}` }}>
+    <section aria-roledescription="carousel" aria-label="공수잡 주요 안내" style={{ background: "linear-gradient(180deg, #eaf0fc 0%, var(--gs-page) 100%)", borderBottom: `1px solid ${colors.line}` }}>
       <div className="gs-container" style={{ position: "relative", paddingBlock: "clamp(16px, 3vw, 28px)" }}>
         <div ref={emblaRef} style={{ overflow: "hidden", borderRadius: "var(--gs-radius-lg)" }}>
           <div style={{ display: "flex", touchAction: "pan-y pinch-zoom" }}>
