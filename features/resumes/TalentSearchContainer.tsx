@@ -13,22 +13,24 @@ import { useTalentSearch } from "@/features/resumes/useTalentSearch";
 import { ROUTES } from "@/lib/constants";
 
 /** 인재 찾기 컨테이너 */
-export default function TalentSearchContainer() {
-  const talent = useTalentSearch();
+export default function TalentSearchContainer({ initialCategory, initialQuery }: { initialCategory?: string; initialQuery?: string } = {}) {
+  const talent = useTalentSearch({ initialCategory, initialQuery });
 
   return (
-    <div style={pageShell()}>
+    <div style={pageShell()} className="gs-page-bottom">
       <Toast message={talent.toastMessage} zIndex={999} />
       {talent.selected && <ResumeDetailModal resume={talent.selected} talent={talent} />}
 
       <AppHeader />
       <SearchBar value={talent.searchQuery} onChange={talent.setSearchQuery} placeholder="이름, 직종, 지역 검색" />
 
-      <div style={{ background: "#fff", padding: "12px 20px", borderBottom: `1px solid ${colors.line}` }}>
-        <CategoryDropdown value={talent.category} onChange={talent.setCategory} />
+      <div style={{ background: "var(--gs-surface)", padding: "12px 0", borderBottom: `1px solid ${colors.line}` }}>
+        <div className="gs-container">
+          <CategoryDropdown value={talent.category} onChange={talent.setCategory} size="sm" />
+        </div>
       </div>
 
-      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "16px 20px" }}>
+      <div className="gs-container" style={{ paddingBlock: "16px" }}>
         {talent.loading ? (
           <InlineLoading />
         ) : talent.resumes.length === 0 ? (
@@ -37,14 +39,14 @@ export default function TalentSearchContainer() {
             text="등록된 인재가 없습니다"
             action={
               !talent.isEmployer && (
-                <Link href={ROUTES.resumeWrite} style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: colors.brand, color: "#fff", borderRadius: "10px", textDecoration: "none", fontSize: "14px", fontWeight: 600 }}>
+                <Link href={ROUTES.resumeWrite} style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: colors.brand, color: "var(--gs-surface)", borderRadius: "10px", textDecoration: "none", fontSize: "14px", fontWeight: 600 }}>
                   이력서 등록하기
                 </Link>
               )
             }
           />
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div className="gs-card-grid">
             {talent.resumes.map((resume) => (
               <ResumeCard key={resume.id} resume={resume} onClick={() => talent.openResume(resume)} />
             ))}

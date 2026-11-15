@@ -1,42 +1,53 @@
 import type { CSSProperties } from "react";
 
-/** 디자인 토큰: 화면마다 흩어져 있던 색상·카드 스타일을 한곳에서 관리 */
+/**
+ * 디자인 토큰: 실제 값은 app/globals.css 의 CSS 변수(--gs-*)에 있고,
+ * 여기서는 변수 이름만 참조한다. 색을 바꿀 때는 globals.css 한 곳만 수정하면 된다.
+ */
 export const colors = {
-  brand: "#FF6B00",
-  brandSoft: "#fff8f5",
-  brandTint: "#fff3e0",
-  brandBorder: "#ffd9bf",
-  ink: "#1a1a1a",
-  text: "#333",
-  sub: "#666",
-  muted: "#999",
-  line: "#eee",
-  lineSoft: "#f5f5f5",
-  page: "#f8f9fa",
-  success: "#276749",
-  successBg: "#f0fff4",
-  successBorder: "#9ae6b4",
-  danger: "#e53e3e",
-  dangerBg: "#fff3f3",
-  dangerBorder: "#ffd0d0",
-  info: "#0ea5e9",
-  infoBg: "#f0f9ff",
-  infoBorder: "#bae6fd",
+  navy: "var(--gs-navy)",
+  blue: "var(--gs-blue)",
+  blueSoft: "var(--gs-blue-soft)",
+  blueBorder: "var(--gs-blue-border)",
+  brand: "var(--gs-brand)",
+  brandBright: "var(--gs-brand-bright)",
+  brandText: "var(--gs-brand-text)",
+  brandSoft: "var(--gs-brand-soft)",
+  brandTint: "var(--gs-brand-tint)",
+  brandBorder: "var(--gs-brand-border)",
+  ink: "var(--gs-ink)",
+  text: "var(--gs-text)",
+  sub: "var(--gs-sub)",
+  muted: "var(--gs-muted)",
+  disabled: "var(--gs-disabled)",
+  line: "var(--gs-line)",
+  lineSoft: "var(--gs-line-soft)",
+  page: "var(--gs-page)",
+  surface: "var(--gs-surface)",
+  success: "var(--gs-success)",
+  successBg: "var(--gs-success-bg)",
+  successBorder: "var(--gs-success-border)",
+  danger: "var(--gs-danger)",
+  dangerBg: "var(--gs-danger-bg)",
+  dangerBorder: "var(--gs-danger-border)",
+  info: "var(--gs-blue)",
+  infoBg: "var(--gs-blue-soft)",
+  infoBorder: "var(--gs-blue-border)",
 } as const;
 
-export const fontFamily = "'Apple SD Gothic Neo', sans-serif";
+export const fontFamily = "var(--gs-font)";
 
 export const card: CSSProperties = {
-  background: "#fff",
-  borderRadius: "16px",
-  boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+  background: colors.surface,
+  borderRadius: "var(--gs-radius-lg)",
+  boxShadow: "var(--gs-shadow-sm)",
 };
 
 export const listCard: CSSProperties = {
-  background: "#fff",
-  borderRadius: "12px",
+  background: colors.surface,
+  borderRadius: "var(--gs-radius-lg)",
   padding: "16px",
-  boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+  boxShadow: "var(--gs-shadow-sm)",
   border: `1px solid ${colors.line}`,
 };
 
@@ -49,10 +60,13 @@ export const pageShell = (paddingBottom = "80px"): CSSProperties => ({
 
 export const inputStyle: CSSProperties = {
   width: "100%",
+  minHeight: "46px",
   padding: "11px 14px",
   border: `1px solid ${colors.line}`,
-  borderRadius: "10px",
-  fontSize: "14px",
+  borderRadius: "var(--gs-radius-md)",
+  background: colors.surface,
+  color: colors.ink,
+  fontSize: "15px",
   outline: "none",
   boxSizing: "border-box",
 };
@@ -68,19 +82,21 @@ export const compactInputStyle: CSSProperties = {
 
 export const tag = (tone: "brand" | "neutral" = "neutral"): CSSProperties => ({
   background: tone === "brand" ? colors.brandTint : colors.lineSoft,
-  color: tone === "brand" ? colors.brand : colors.sub,
-  fontSize: "11px",
+  color: tone === "brand" ? colors.brandText : colors.sub,
+  fontSize: "12px",
+  fontWeight: 600,
   borderRadius: "6px",
-  padding: "3px 8px",
+  padding: "4px 8px",
 });
 
 export const primaryButton = (disabled = false): CSSProperties => ({
   width: "100%",
+  minHeight: "52px",
   padding: "15px",
-  background: disabled ? "#ddd" : colors.brand,
+  background: disabled ? colors.disabled : colors.brand,
   color: "#fff",
   border: "none",
-  borderRadius: "12px",
+  borderRadius: "var(--gs-radius-md)",
   fontSize: "16px",
   fontWeight: 700,
   cursor: disabled ? "not-allowed" : "pointer",

@@ -15,7 +15,7 @@ export default function JobWriteContainer() {
     <div style={pageShell("40px")}>
       <AppHeader backHref={ROUTES.jobs} backLabel="← 공고목록" rightSpace={60} />
 
-      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "20px" }}>
+      <div className="gs-container gs-container--form" style={{ paddingBlock: "20px" }}>
         <label style={{ ...card, padding: "16px 20px", marginBottom: "12px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
           <div>
             <div style={{ fontSize: "14px", fontWeight: 700, color: colors.ink }}>긴급 공고</div>

@@ -23,6 +23,9 @@
 | 구인자 | 공고 등록·삭제, 인재 검색(직종·키워드), 포지션 제안, 구직자 질문에 답변, 수락 후 연락처 확인 |
 | 구직자 | 이력서·증명사진 등록, 공고 검색·지원, 제안 수락/거절/질문, 지원 현황 |
 | 공고 상세 | 카카오 지오코딩 기반 현장 지도, 기상청 단기예보 기반 **작업 가능 여부**, 일용직 **실수령액 계산기** |
+| 공고 탐색 | **찜한 공고**(기기 저장), **급구·지역 필터 칩**, **출근일 배지**(오늘·내일·D-n), 인재 **안전교육 이수** 배지 |
+| 홈 | 역할별 **배너 슬라이드**, **직종별 메뉴**(12종 → 목록 필터 연동), 빠른 검색, 기능 안내 |
+| 현장관리 (구인자) | 수락된 **확정 인력**을 현장별로 확인, 근무일수 입력 → **노임대장 엑셀**(공제·실지급 자동 계산), **근로계약서** 인쇄·PDF |
 
 ---
 
@@ -108,6 +111,41 @@ sequenceDiagram
 
 ---
 
+## 메뉴 구조 (역할별)
+
+모든 메뉴는 `lib/navigation.ts` 한 곳에서 정의하고, 모바일 하단 탭과 PC 상단 메뉴가 같은 목록을 씁니다.
+
+| 역할 | 메뉴 |
+| --- | --- |
+| 비로그인 | 홈 · 일자리 · 인재찾기 · 문의 · 로그인 |
+| 구직자 | 홈 · 일자리 · 찜 · 내 이력서 · 내정보 |
+| 구인자 | 홈 · 인재찾기 · 공고등록 · 현장관리 · 내정보 |
+
+## 사용한 오픈소스
+
+| 용도 | 라이브러리 | 라이선스 |
+| --- | --- | --- |
+| 배너 슬라이드 | Embla Carousel (+ Autoplay) | MIT |
+| 아이콘 | Lucide | ISC |
+| 노임대장 엑셀 | write-excel-file (필요할 때만 불러옴) | MIT |
+| 서체 | Pretendard → GongsuSans(수정본) | SIL OFL 1.1 |
+
+## 디자인 시스템 (2027)
+
+| 역할 | 색 | 근거 |
+| --- | --- | --- |
+| 주조색 (헤더·강조·선택) | Luminous Blue `#203C7F` / `#2B59C3` | WGSN·Coloro 2027 올해의 컬러 — 신뢰·안정 |
+| 행동색 (버튼·일당) | Energy Orange `#D9480F` | S/S 27 키 컬러 — 건설 안전색 계열, 흰 글자 대비 확보 |
+| 바탕 | 따뜻한 오프화이트 `#F7F5F2` | 장시간 보기 편한 저채도 중립색 |
+| 상태 | 초록 `#15803D` / 빨강 `#DC2626` | 안전교육 이수 · 급구 |
+
+- 모든 색은 `app/globals.css`의 CSS 변수(`--gs-*`) 한 곳에서 관리하고, 컴포넌트는 `components/ui/theme.ts`로 변수 이름만 참조합니다.
+- 글자색은 모두 WCAG AA(4.5:1) 이상, 터치 영역 최소 36~52px, 키보드 포커스 링, 동작 줄이기 설정 존중.
+- 서체: Pretendard(SIL OFL)를 완성형 한글 2,350자로 줄인 수정본 `GongsuSans`(약 450KB, `app/fonts/LICENSE.txt`).
+- 반응형: 폰 1열 → 태블릿 2열 → PC 3열 카드 그리드, PC 공고 상세는 2단(지도·날씨 고정), `clamp()` 유동 글자 크기, 컨테이너 쿼리.
+
+---
+
 ## 테스트 하네스
 
 ```bash
@@ -146,10 +184,11 @@ CI(GitHub Actions)는 모든 PR에서 **lint → typecheck → test(coverage) �
 
 | 구분 | 기술 |
 | --- | --- |
-| 프레임워크 | Next.js 16 (App Router, Proxy), React 19, TypeScript (strict) |
+| 프레임워크 | Next.js 16.4 (App Router, Proxy), React 19.3, TypeScript (strict) |
 | 인증·DB·스토리지 | Supabase Auth · PostgreSQL · Storage (`@supabase/ssr`) |
 | 외부 API | 카카오 로컬(지오코딩), 기상청 단기예보, OpenStreetMap 타일 |
-| 검증 | zod |
+| 검증 | zod 4 |
+| 보안 헤더 | CSP(frame-ancestors), HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy |
 | 테스트 | Vitest, Testing Library, jsdom, v8 coverage |
 | CI/CD | GitHub Actions, Vercel |
 

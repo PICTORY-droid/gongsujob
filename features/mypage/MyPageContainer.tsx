@@ -19,7 +19,7 @@ export default function MyPageContainer() {
       <Toast message={page.toastMessage} />
       <AppHeader />
 
-      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "20px" }}>
+      <div className="gs-container gs-container--narrow" style={{ paddingBlock: "20px" }}>
         <ProfileSummary user={page.user} profile={page.profile} employer={page.isEmployer} />
         <PrivacyNotice employer={page.isEmployer} />
         {page.actionMessage && <Notice message={page.actionMessage.text} tone={page.actionMessage.tone} />}

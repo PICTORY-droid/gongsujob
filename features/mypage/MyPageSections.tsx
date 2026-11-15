@@ -68,7 +68,7 @@ function MenuRowContent({ item }: { item: MenuItem }) {
         <div style={{ fontSize: "14px", color: colors.ink, fontWeight: 600 }}>{item.label}</div>
         <div style={{ fontSize: "12px", color: colors.muted, marginTop: "1px" }}>{item.desc}</div>
       </div>
-      <span style={{ color: "#ccc", fontSize: "18px" }}>›</span>
+      <span style={{ color: "var(--gs-muted)", fontSize: "18px" }}>›</span>
     </>
   );
 }
@@ -108,7 +108,7 @@ export function MyJobsSection({ jobs, onDelete }: { jobs: Job[]; onDelete: (jobI
                   {job.region} · {job.job_type} · {job.pay?.toLocaleString()}원/{job.pay_type}
                 </div>
               </Link>
-              <button type="button" onClick={() => onDelete(job.id)} style={{ fontSize: "12px", color: colors.danger, border: `1px solid ${colors.dangerBorder}`, borderRadius: "6px", padding: "4px 8px", background: "#fff", cursor: "pointer", marginLeft: "8px", flexShrink: 0 }}>
+              <button type="button" onClick={() => onDelete(job.id)} style={{ fontSize: "12px", color: colors.danger, border: `1px solid ${colors.dangerBorder}`, borderRadius: "6px", padding: "4px 8px", background: "var(--gs-surface)", cursor: "pointer", marginLeft: "8px", flexShrink: 0 }}>
                 삭제
               </button>
             </div>

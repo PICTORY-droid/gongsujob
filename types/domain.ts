@@ -112,6 +112,14 @@ export type PositionOfferWithRelations = PositionOffer & {
 
 export type NewPositionOffer = Omit<PositionOffer, "id" | "created_at" | "updated_at">;
 
+/** 현장관리: 제안을 수락해 확정된 근로자 (구인자 본인에게만 조회됨) */
+export type ConfirmedWorker = Pick<PositionOffer, "id" | "job_id" | "resume_id" | "title" | "job_type" | "location" | "start_date" | "pay" | "work_conditions"> & {
+  workerName: string;
+  workerJobType: string | null;
+  phone: string | null;
+  job: Pick<Job, "title" | "company" | "region" | "detail_address" | "start_date" | "pay_type"> | null;
+};
+
 export type OfferMessage = {
   id: string;
   offer_id: string;

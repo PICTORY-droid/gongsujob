@@ -20,12 +20,12 @@ import type { Job, PositionOffer, PublicResume, ResumeContact } from "@/types/do
  * - 구인자만 인재 상세를 열 수 있다.
  * - 연락처는 제안이 "수락"된 경우에만 별도로 조회한다(목록 응답에는 연락처가 없음).
  */
-export function useTalentSearch() {
+export function useTalentSearch({ initialCategory = ALL_CATEGORY, initialQuery = "" }: { initialCategory?: string; initialQuery?: string } = {}) {
   const { user, profile, isEmployer } = useSession({ requireAuth: true });
   const toast = useToast(2000);
 
-  const [category, setCategory] = useState<string>(ALL_CATEGORY);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState<string>(initialCategory);
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const { resumes, loading } = useResumeList(category);
   const [myJobs, setMyJobs] = useState<Job[]>([]);
 

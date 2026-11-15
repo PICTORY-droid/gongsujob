@@ -86,7 +86,7 @@ export function ChipSelect<T extends string>({
               padding: CHIP_PADDING[layout],
               border: `1.5px solid ${selected ? colors.brand : colors.line}`,
               borderRadius: "8px",
-              background: selected ? colors.brandSoft : "#fff",
+              background: selected ? colors.brandSoft : "var(--gs-surface)",
               fontSize: layout === "row" || layout === "grid3" ? "14px" : "13px",
               fontWeight: selected ? 700 : 400,
               color: selected ? colors.brand : colors.text,

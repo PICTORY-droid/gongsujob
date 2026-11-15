@@ -28,14 +28,14 @@ export default function ResumeWriteContainer() {
     <div style={pageShell()}>
       <AppHeader backHref={ROUTES.mypage} backLabel="← 내정보" rightSpace={60} />
 
-      <div style={{ maxWidth: "480px", margin: "0 auto", padding: "20px" }}>
+      <div className="gs-container gs-container--form" style={{ paddingBlock: "20px" }}>
         {/* 증명사진 · 공개 여부 */}
         <div style={{ ...card, padding: "20px", marginBottom: "12px", display: "flex", alignItems: "center", gap: "16px" }}>
           <button
             type="button"
             aria-label="증명사진 업로드"
             onClick={() => fileInputRef.current?.click()}
-            style={{ width: "72px", height: "88px", borderRadius: "8px", background: resume.photoUrl ? "transparent" : "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", overflow: "hidden", border: `1px solid ${colors.line}`, flexShrink: 0, padding: 0 }}
+            style={{ width: "72px", height: "88px", borderRadius: "8px", background: resume.photoUrl ? "transparent" : "var(--gs-line)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", overflow: "hidden", border: `1px solid ${colors.line}`, flexShrink: 0, padding: 0 }}
           >
             {resume.photoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element -- 사용자 업로드 이미지(스토리지 URL)

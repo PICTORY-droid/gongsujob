@@ -16,7 +16,7 @@ export default function OnboardingContainer() {
 
   return (
     <div style={{ minHeight: "100vh", background: colors.page, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", fontFamily }}>
-      <div style={{ background: "#fff", borderRadius: "16px", padding: "32px 28px", width: "100%", maxWidth: "420px", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
+      <div style={{ background: "var(--gs-surface)", borderRadius: "16px", padding: "32px 28px", width: "100%", maxWidth: "420px", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
         <div style={{ textAlign: "center", marginBottom: "26px" }}>
           <div style={{ width: "48px", height: "48px", background: colors.brand, borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", margin: "0 auto 10px" }}>⚙</div>
           <h1 style={{ fontSize: "21px", fontWeight: 800, color: colors.ink, margin: 0 }}>첫 설정이 필요합니다</h1>
@@ -35,7 +35,7 @@ export default function OnboardingContainer() {
                   role="radio"
                   aria-checked={selected}
                   onClick={() => setField("userType", option.value)}
-                  style={{ padding: "14px", border: `2px solid ${selected ? colors.brand : colors.line}`, borderRadius: "12px", background: selected ? colors.brandSoft : "#fff", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.2s" }}
+                  style={{ padding: "14px", border: `2px solid ${selected ? colors.brand : colors.line}`, borderRadius: "12px", background: selected ? colors.brandSoft : "var(--gs-surface)", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", transition: "all 0.2s" }}
                 >
                   <span style={{ fontSize: "28px" }}>{option.icon}</span>
                   <div style={{ textAlign: "left" }}>
@@ -74,7 +74,7 @@ export default function OnboardingContainer() {
           type="button"
           onClick={complete}
           disabled={saving}
-          style={{ width: "100%", padding: "14px", background: saving ? "#ddd" : colors.brand, color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}
+          style={{ width: "100%", padding: "14px", background: saving ? "var(--gs-disabled)" : colors.brand, color: "var(--gs-surface)", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 800, cursor: saving ? "not-allowed" : "pointer" }}
         >
           {saving ? "저장 중..." : "설정 완료"}
         </button>
