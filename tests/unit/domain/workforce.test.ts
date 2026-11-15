@@ -66,3 +66,12 @@ describe("파일 이름", () => {
     expect(safeFileName("  ")).toBe("현장");
   });
 });
+
+describe("근로계약서 양식 이름", () => {
+  it("건설 직종은 건설일용근로자, 그 외 직종은 일용근로자", async () => {
+    const { contractKind } = await import("@/domain/workforce");
+    expect(contractKind({ job_type: "철근", workerJobType: null }).subtitle).toBe("건설일용근로자");
+    expect(contractKind({ job_type: "홀서빙", workerJobType: null }).subtitle).toBe("일용근로자");
+    expect(contractKind({ job_type: "", workerJobType: "지게차" }).subtitle).toBe("일용근로자");
+  });
+});

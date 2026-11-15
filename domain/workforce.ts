@@ -1,4 +1,5 @@
 import { calculateNetPay, clampDays } from "@/domain/net-pay";
+import { isConstructionJobType } from "@/domain/job-category";
 import type { ConfirmedWorker } from "@/types/domain";
 
 /**
@@ -99,10 +100,18 @@ export function safeFileName(name: string): string {
 }
 
 export type ContractField = { label: string; value: string };
+
+/** 근로계약서 양식 이름: 건설 직종이면 건설일용근로자, 그 밖의 직종은 일용근로자 */
+export function contractKind(worker: Pick<ConfirmedWorker, "job_type" | "workerJobType">): { subtitle: string; referenceForm: string } {
+  const construction = isConstructionJobType(worker.job_type || worker.workerJobType);
+  return construction
+    ? { subtitle: "건설일용근로자", referenceForm: "건설일용근로자 표준근로계약서" }
+    : { subtitle: "일용근로자", referenceForm: "표준근로계약서(기간의 정함이 있는 경우)" };
+}
 export type ContractSection = { title: string; fields: ContractField[] };
 
 /**
- * 근로계약서 항목. 고용노동부 건설일용근로자 표준근로계약서의 기재 항목 구성을 따르고,
+ * 근로계약서 항목. 고용노동부 표준근로계약서(건설 직종은 건설일용근로자용)의 기재 항목 구성을 따르고,
  * 공고·제안에 있는 값만 채운다. 나머지(주민번호·대표자 등)는 빈칸으로 두어 현장에서 직접 적는다.
  */
 export function buildContractSections(worker: ConfirmedWorker): ContractSection[] {

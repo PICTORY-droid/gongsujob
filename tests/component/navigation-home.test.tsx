@@ -41,14 +41,14 @@ describe("MobileBottomNav", () => {
 });
 
 describe("홈 메뉴", () => {
-  it("직종 메뉴: 전체 + 11개 직종, 누르면 직종을 넘긴다", () => {
+  it("분야 메뉴: 6개 분야, 누르면 분야 필터 값을 넘긴다", () => {
     const onSelect = vi.fn();
-    render(<CategoryMenu title="직종별 일자리 찾기" subtitle="" onSelect={onSelect} />);
+    render(<CategoryMenu title="어떤 일을 찾으세요?" subtitle="" onSelect={onSelect} />);
     const list = screen.getByRole("list");
-    expect(within(list).getAllByRole("button")).toHaveLength(12);
-    fireEvent.click(within(list).getByRole("button", { name: "용접" }));
-    expect(onSelect).toHaveBeenLastCalledWith("용접");
-    fireEvent.click(within(list).getByRole("button", { name: "전체" }));
+    expect(within(list).getAllByRole("button")).toHaveLength(6);
+    fireEvent.click(within(list).getByRole("button", { name: /물류 인력/ }));
+    expect(onSelect).toHaveBeenLastCalledWith("group:logistics");
+    fireEvent.click(screen.getByRole("button", { name: "전체 직종 보기 →" }));
     expect(onSelect).toHaveBeenLastCalledWith(null);
   });
 

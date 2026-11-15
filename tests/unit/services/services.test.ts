@@ -84,6 +84,19 @@ describe("job.service", () => {
     mock = createSupabaseMock({ active_jobs: [{ data: null, error: { message: "x" } }] });
     expect(await listActiveJobs({ category: "전체" })).toBeNull();
   });
+  it("분야를 고르면 소속 직종 전체(in), 세부 직종은 하나(eq)로 조회한다", async () => {
+    mock = createSupabaseMock({ active_jobs: [{ data: [], error: null }, { data: [], error: null }, { data: [], error: null }] });
+    await listActiveJobs({ category: "group:moving" });
+    expect(mock.callsFor("active_jobs")).toContainEqual({ table: "active_jobs", method: "in", args: ["job_type", ["포장이사", "운반"]] });
+
+    mock = createSupabaseMock({ active_jobs: [{ data: [], error: null }] });
+    await listActiveJobs({ category: "지게차" });
+    expect(mock.callsFor("active_jobs")).toContainEqual({ table: "active_jobs", method: "eq", args: ["job_type", "지게차"] });
+
+    mock = createSupabaseMock({ active_jobs: [{ data: [], error: null }] });
+    await listActiveJobs({ category: "전체" });
+    expect(mock.callsFor("active_jobs").some((c) => c.args[0] === "job_type")).toBe(false);
+  });
 });
 
 describe("offer.service", () => {

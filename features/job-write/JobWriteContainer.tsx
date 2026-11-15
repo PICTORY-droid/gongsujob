@@ -5,7 +5,8 @@ import { Notice } from "@/components/ui/Feedback";
 import { ChipSelect, FieldLabel, FormSection, TextAreaField, TextField } from "@/components/ui/Form";
 import { card, colors, pageShell, primaryButton } from "@/components/ui/theme";
 import { useJobForm } from "@/features/job-write/useJobForm";
-import { JOB_TYPES, PAY_TYPES, REGIONS, ROUTES } from "@/lib/constants";
+import { PAY_TYPES, REGIONS, ROUTES } from "@/lib/constants";
+import { JobTypePicker } from "@/components/ui/JobTypePicker";
 
 /** 공고 등록 컨테이너: 섹션별 폼 표시 + useJobForm 연결 */
 export default function JobWriteContainer() {
@@ -34,7 +35,7 @@ export default function JobWriteContainer() {
           <TextField label="상세 주소" name="detail_address" value={form.detail_address} onChange={handleChange} placeholder="예) 화성시 동탄 ○○아파트 신축현장" />
           <div>
             <FieldLabel gap="8px">직종 *</FieldLabel>
-            <ChipSelect ariaLabel="직종" options={JOB_TYPES} value={form.job_type} onChange={(jobType) => setField("job_type", jobType)} />
+            <JobTypePicker value={form.job_type} onChange={(jobType) => setField("job_type", jobType)} />
           </div>
         </FormSection>
 

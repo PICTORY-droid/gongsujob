@@ -1,5 +1,5 @@
 import { getBrowserSupabase as db } from "@/lib/supabase/client";
-import { ALL_CATEGORY } from "@/lib/constants";
+import { jobTypesForCategory } from "@/domain/job-category";
 import type { Job, NewJob, Result } from "@/types/domain";
 
 /** 공고 서비스 (jobs 테이블, active_jobs 뷰) */
@@ -7,7 +7,9 @@ import type { Job, NewJob, Result } from "@/types/domain";
 export async function listActiveJobs(options: { category: string; limit?: number }): Promise<Job[] | null> {
   let query = db().from("active_jobs").select("*").eq("is_active", true).order("created_at", { ascending: false });
   if (options.limit) query = query.limit(options.limit);
-  if (options.category !== ALL_CATEGORY) query = query.eq("job_type", options.category);
+  // 분야(예: 물류 인력)는 소속 직종 전체, 세부 직종은 하나만
+  const types = jobTypesForCategory(options.category);
+  if (types) query = types.length === 1 ? query.eq("job_type", types[0]) : query.in("job_type", [...types]);
 
   const { data, error } = await query;
   if (error || !data) return null;
